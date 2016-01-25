@@ -91,7 +91,7 @@ $\delta_{it_s}$ & The cDNA fragment-per-transcript molecule conversion rate for 
 $R_{t_s}$ is a constant as it depends on the inherent properties of each transcript.
 $\psi_{i}$ is a random variable that represents well-specific biases in library preparation.
 Additional biases in each well are modelled by $\phi_{is}$, which represents well- and population-specific behaviour.
-These parameters are related by $\delta_{it_s} = R_{t_s} \phi_{i} \psi_{is}$.
+These parameters are related by $\delta_{it_s} = R_{t_s} \phi_{is} \psi_i$.
 
 Finally, define $\nu_{ig}$ as the number of transcript molecules for gene $g$ in the cellular RNA for the cell in well $i$.
 This is a random variable that includes the biological variability in gene expression.
@@ -133,10 +133,18 @@ Based on the distribution of the total counts, $\theta_i$ is conditionally distr
     \theta_i |  \{ \eta_{is}, \phi_{is} \forall s \} \sim \mathcal{N}( \log \mu_{i1} - \log \mu_{i2}, \sigma^2_{lib(1)} + \sigma^2_{lib(2)} ) \;. 
 \]
 There is no dependence on $\delta_{ig}$, $\nu_{ig}$ or $\psi_i$, as these terms cancel out during calculation of $\theta_i$ for each well.
+This can be illustrated by examining the conditional expectation for $\theta_i$, i.e.,
+\begin{align*}
+    E(\theta_i |  \{ \eta_{is}, \phi_{is} \forall s \})
+    &= \log \mu_{ix} - \log \mu_{iy} \\
+    &= \log \left( \frac{\rho_i \eta_{i1} \psi_i \phi_{i1} \sum_{t_1} R_{t_1} C_{t_1}}{\rho_i \eta_{i2} \psi_i \phi_{i2} \sum_{t_2} R_{t_2} C_{t_2}} \right) \\
+    &= \log \eta_{i1} - \log \eta_{i2} + \log \phi_{i1} - \log \phi_{i2} + \log (\textstyle \sum_{t_1} R_{t_1} C_{t_1}/  \sum_{t_2} R_{t_2} C_{t_2}) \\
+    &= \log \eta_{i1} - \log \eta_{i2} +  \log \phi_{i1} - \log \phi_{i2} + Z \quad\mbox{for some constant } Z \;.
+\end{align*}
 
-Further assume that both $\log V_{ix}$ and $\log V_{iy}$ are normally distributed with variance $\sigma^2_{vol}$.
-The use of the same variance is justified by the fact that the same spike-in volume is added for both $x$ and $y$, such that the variability should be the same for both volumes.
-The assumption means that the conditional mean $E(\theta_i | \{ V_{is}, \psi_{is} \forall s \})$ is normally distributed, such that $\theta_i$ itself is also normally distributed with variance
+Assume that both $\log \eta_{i1}$ and $\log \eta_{i2}$ are distributed with the same variance $\sigma^2_{vol}$.
+The use of the same variance is justified by the fact that the same spike-in volume is added for both $s=1$ and $2$, such that the variability should be the same for both volumes.
+This means that the variance of $\theta_i$ can be written as
 \[
     \mbox{var}(\theta_i) = 2\sigma_{vol}^2 + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2}) \;. 
 % Easily derived using the law of total variances.
@@ -144,6 +152,8 @@ The assumption means that the conditional mean $E(\theta_i | \{ V_{is}, \psi_{is
 % Both claims tested in simulations (sample variances of normal distribution with normal mean match up with expected truth, no rejections on a Shapiro-Wilk test).
 \]
 This can be estimated as the sample variance of the log-ratios across all wells in the first experiment. 
+For convenience in downstream statistical tests, it is helpful to assume that $\log \eta_{is}$ and $\log \phi_{is}$ are normally distributed for each population $s$.
+This ensures that $\theta_i$ will also follow a normal distribution.
 
 \subsection{Deriving the variance of the log-ratios with premixing}
 In the second experiment, mixing of spike-in populations occurs beforehand such that addition is not variable.
