@@ -62,100 +62,138 @@ $^2$EMBL European Bioinformatics Institute, Wellcome Genome Campus, Hinxton, Cam
 \end{center}
 \end{titlepage}
 
-\section{Introducing the theoretical framework}
-For each well $i$, we consider the following notation:
-\begin{center}
-\begin{tabular}{l l}
-$C_{s}$ & The concentration in transcript molecules per \textmu{}L for spike-in population $s$; a constant. \\
-$V_{is}$ & The volume of spike-in population added to a well; a random variable. 
-\end{tabular}
-\end{center}
-We define $S_{is} = C_{s}V_{is}$, the number of transcript molecules for population $s$ added to $i$ during spike-in addition.
-Further consider the following definitions:
-\begin{center}
-\begin{tabular}{l l}
-$\pi_{ts}$ & The proportion of molecules for transcript $t$ in spike-in population $s$; a constant. \\
-$\delta_{t}$ & The optimal number of cDNA fragments generated from each molecule of transcript $t$; a constant. \\ 
-$\psi_i$ & The efficiency of cDNA generation in well $i$; a random variable.
-\end{tabular}
-\end{center}
-We further define the random variable $\delta_{it} = \psi_i\delta_t$, which represents the cDNA fragment-per-transcript molecule conversion rate for transcript $t$ in well $i$.
-Finally, define $\nu_{it}$ as the number of molecules for transcript $t$ in the cellular RNA for the cell in well $i$ -- this is another random variable across wells.
+\section{Decomposing the variance for log-ratios of spike-ins}
 
-All random variables are assumed to be independent unless they have been explicitly related by equalities, e.g., $S_{is}$ and $V_{is}$.
+\subsection{Overview of basic definitions}
+The first step of the protocol involves adding spike-in populations together.
+Consider the following definitions:
+\begin{center}
+    \begin{tabular}{l p{0.9\textwidth}}
+$C_{t_s}$  & The concentration in molecules per unit of volume for transcript $t_s$ in spike-in population $s$. \\
+$\eta_{is}$   & The volume of spike-in population $s$ added to well $i$. \\
+$\zeta_{it_s}$ & The number of molecules for transcript $t_s$ of population $s$ added to $i$ during spike-in addition.
+\end{tabular}
+\end{center}
+$\eta_{is}$ is a random variable that depends on the experimental precision of volume addition.
+In contrast, $C_{t_s}$ is a constant that depends on the composition of the spike-in population $s$.
+We also define $\zeta_{it_s} = C_{t_s}\eta_{is}$.
+
+After the spike-in volumes are added together, library preparation is performed to convert RNA to cDNA prior to high-throughput sequencing.
+Consider the following definitions:
+\begin{center}
+\begin{tabular}{l p{0.9\textwidth}}
+$R_{t_s}$ & The optimal number of cDNA fragments generated from each molecule of $t_s$. \\
+$\psi_{i}$ & The efficiency of cDNA generation in well $i$ for all transcripts. \\
+$\phi_{is}$ & The relative efficiency of cDNA generation in well $i$ for all transcripts of population $s$. \\
+$\delta_{it_s}$ & The cDNA fragment-per-transcript molecule conversion rate for transcript $t_s$ in well $i$.
+\end{tabular}
+\end{center}
+$R_{t_s}$ is a constant as it depends on the innate properties of each transcript.
+$\psi_{i}$ is a random variable bounded in [0, 1] that varies across wells and represents well-specific biases in library preparation.
+Additional population-specific biases are represented by $\phi_{is}$ in each well.
+These parameters are related by $\delta_{it_s} = R_{t_s} \phi_{i} \psi_{is}$.
+
+Finally, define $\nu_{ig}$ as the number of transcript molecules for gene $g$ in the cellular RNA for the cell in well $i$.
+This is a random variable that includes the biological variability in gene expression.
+Let $\delta_{ig}$ represent the cDNA fragment-per-transcript conversion rate for $g$ in $i$, which is also a random variable across wells.
+
+All random variables are assumed to be independent unless they have been explicitly related by equalities, e.g., $\zeta_{it_s}$ and $\eta_{is}$.
 This is justified by the fact that they describe separate processes in the protocol.
 
-For convenience, we will consider the union of all transcripts when referring to the sum across all $t$.
-This includes both spike-in and cellular transcipts, with a total of $n$ distinct species.
-Obviously, this means that $\pi_{ts}=0$ for transcripts that only exist in the cell, while $\nu_{it}=0$ for spike-in-only transcripts. \\[0.1in]
+\subsection{Constructing the distribution of the total counts}
+For spike-in populations $s=1, 2, \ldots$, the cDNA fragment-to-read conversion factor for each well is
+\[
+    \rho_i = \frac{N_i}{\sum_g \delta_{ig}\nu_{ig} + \sum_{t_1} \delta_{it_1} S_{it_1}  + \sum_{t_2} \delta_{it_2} S_{it_2} + \ldots} 
+\]
+where $N_i$ is the size of the library for well $i$.
+This accounts for composition biases, e.g., when overexpression of one gene can take up more sequencing resources and suppress the coverage of other genes.
+In contrast, for UMI data, the fragment-to-UMI conversion factor is simply $\rho_i = 1$ when sequencing is saturated.
 
-For the first experiment, assume that two spike-in populations are present, i.e., $s=x,y$.
-The expected total read count across all genes in $s$ is affected by library size and undersampling, and is defined as
+The conditional expectation of the total read count across all transcripts in population $s$ for well $i$ is
 \[
-\mu_{is} = \left[\frac{N_i}{S_{ix}\sum_t \delta_{it}\pi_{tx} + S_{iy}\sum_t \delta_{it}\pi_{ty} + \sum_t \delta_{it} \nu_{it}}\right] S_{is}\sum_t \delta_{it}\pi_{ts}
-= \rho_i  S_{is}\sum_t \delta_{it}\pi_{ts}
+    \mu_{is} = \rho_i  \textstyle\sum_{t_s} \delta_{it_s} \zeta_{it_s} = \rho_i  \eta_{is} \psi_i \phi_{is} \sum_{t_s} R_{t_s} C_{t_s} \;.
 \]
-where $N_i$ is the expected total number of (mapped) reads in the library generated from well $i$.
-Note that $\rho_i=1$ when sequencing is performed to saturation, e.g., for UMIs -- this will not affect the generality of our conclusions below, as $\rho_i$ will cancel out in calculation of the relevant (log-)ratios.
-The observed total read count $y_{is}$ is assumed to be log-normally distributed, conditional on the other random variables, i.e., 
+The observed total $y_{is}$ is assumed to be log-normally distributed, conditional on the other parameters, i.e., 
 \[
-\log y_{is} | V_{ix}, V_{iy}, \psi_i, \nu_{i1}, \ldots, \nu_{in} \sim \mathcal{N}(\mu_{is}, \sigma^2_{lib})
+    \log y_{is} | \{ \eta_{is}, \phi_{is} \forall s \}, \psi_i, \{ \delta_{ig}, \nu_{ig} \forall g \} \sim \mathcal{N}(\log \mu_{is}, \sigma^2_{lib(s)})
 \]
-where $\sigma^2_{lib}$ represents the variability due to sequencing.
-Counts from each population are independent.
-The log-ratio of the total counts between populations is $R_i = \log(y_{ix}/y_{iy})$, and is conditionally distributed as
+where $\sigma^2_{lib(s)}$ represents the variability due to sequencing of population $s$.
+We consider that $\sigma^2_{lib(s)} = f(A_s)$ for some monotonic decreasing function $f$ of the abundance $A_s$ for $s$.
+This represents the decrease in variability with increasing abundance, as typically observed in sequencing data.
+For simplicity, we define $A_s = E(\log \mu_{is})$ rather than $A_s = \log \mu_{is}$, i.e., we use the full expectation without conditioning on any other parameters.
+This approximation ensures that we do not have to consider the effect of variability in $V_{is}$, $\psi_i$, etc. on the value of $\sigma^2_{lib(s)}$.
+We also assume that totals are conditionally independent between spike-in populations.
+This is because we have already conditioned on the well-specific biases common to the populations within each well.
+Thus, any remaining variation due to technical noise should be independent for each population $s$.
+
+\subsection{Deriving the variance of the log-ratios upon separate addition}
+Denote the log-ratio of the total counts between two spike-in populations $s=1, 2$ as $\theta_i = \log(y_{i1}/y_{i2})$ for well $i$.
+Based on the distribution of the total counts, $\theta_i$ is conditionally distributed as
 \[
-R_i | V_{ix}, V_{iy},  \psi_i, \nu_{i1}, \ldots, \nu_{in} \sim \mathcal{N}( \log \mu_{ix} - \log \mu_{iy}, 2\sigma^2_{lib} ) \;. 
+    \theta_i |  \{ \eta_{is}, \phi_{is} \forall s \} \sim \mathcal{N}( \log \mu_{i1} - \log \mu_{i2}, \sigma^2_{lib(1)} + \sigma^2_{lib(2)} ) \;. 
 \]
-There is actually no dependence on $\psi_i$ or $\nu_{it}$, as these terms cancel out during calculation of $R_i$.
-To illustrate, 
-\begin{align*}
-E(R_i | V_{ix}, V_{iy},  \psi_i, \nu_{i1}, \ldots, \nu_{in} ) &= \log \mu_{ix} - \log \mu_{iy} \\
-&= \log \frac{ S_{ix } \sum_t \delta_{it} \pi_{tx} } { S_{iy}\sum_t \delta_{it} \pi_{ty} } \\
-&= \log V_{ix} - \log V_{iy} + \log (C_x/C_y) + \log (\textstyle\sum_t \delta_{t} \pi_{tx}/\textstyle\sum_t \delta_{t} \pi_{ty}) \\
-&= \log V_{ix} - \log V_{iy } + Z \quad\mbox{for some constant } Z
-\end{align*}
-This allows us to simplify the conditional distribution from $R_i | V_{ix}, V_{iy},  \psi_i, \nu_{i1}, \ldots, \nu_{in}$ to $R_i | V_{ix}, V_{iy}$.
-In particular, cancellation of $\psi_i$ allows us to ignore well-specific effects like RT efficiency or barcode biases.
+There is no dependence on $\delta_{ig}$, $\nu_{ig}$ or $\psi_i$, as these terms cancel out during calculation of $\theta_i$ for each well.
 
 Further assume that both $\log V_{ix}$ and $\log V_{iy}$ are normally distributed with variance $\sigma^2_{vol}$.
 The use of the same variance is justified by the fact that the same spike-in volume is added for both $x$ and $y$, such that the variability should be the same for both volumes.
-The assumption means that the conditional mean $E(R_i |V_{ix}, V_{iy})$ is normally distributed, such that $R_i$ itself is also normally distributed with variance
+The assumption means that the conditional mean $E(\theta_i | \{ V_{is}, \psi_{is} \forall s \})$ is normally distributed, such that $\theta_i$ itself is also normally distributed with variance
 \[
-\mbox{var}(R_i) = 2\sigma^2_{lib} + 2\sigma_{vol}^2 \;. 
+    \mbox{var}(\theta_i) = 2\sigma_{vol}^2 + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2}) \;. 
 % Easily derived using the law of total variances.
 % Normal distribution for R_i is obvious, based on product of PDFs (int[ P(X=x|u)*P(u) du ] gives a exp(x^2), eventually, and you can work this out to validate the variance).
 % Both claims tested in simulations (sample variances of normal distribution with normal mean match up with expected truth, no rejections on a Shapiro-Wilk test).
 \]
-This can be estimated as the sample variance of the log-ratios across all wells in the first experiment. \\[0.1in]
+This can be estimated as the sample variance of the log-ratios across all wells in the first experiment. 
 
-In the second experiment, mixing of spike-in populations occurs beforehand and is not variable.
-More specifically, $V_{ix}=V_{iy}$ such that they cancel out in calculating $R_i$ and do not contribute to the variance.
-This means that the variance of the log-ratio (denoted here as $R_i'$) across multiple runs can be described as
+\subsection{Deriving the variance of the log-ratios with premixing}
+In the second experiment, mixing of spike-in populations occurs beforehand such that addition is not variable.
+More specifically, $\eta_{i1}=\eta_{i2}$ in each well such that they cancel out in calculating $\theta_i$ and do not contribute to the variance.
+This means that the variance of the log-ratio (denoted here as $\theta_i'$) can be written as
 \[
-\mbox{var}(R_i') = 2\sigma^2_{lib}
+    \mbox{var}(\theta_i') = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2})
 \]
 and can be estimated as the sample variance of the log-ratios in this experiment.
-One can see that the variance estimates for $\log R_i$ and $\log R_i'$ in the first and second experiments can be used to obtain an estimate of $\sigma^2_{vol}$ - most obviously via subtraction, though a more refined approach will be described below. 
-
-At this point, it is worth taking a closer look at the assumption used to derive $\sigma^2_{lib}$.
-We have assumed that this value is constant with respect to the random variables $V_{is}$, $\psi_i$ and $\nu_{it}$.
-However, this may not be true as the variance of count data will vary according to the mean.
-One would then expect that the variance of the log-ratio of counts would depend on the magnitude of $V_{ix}$, $V_{iy}$ and others.
-Accounting for this effect would be problematic, as it would complicate the expressions for the variances.
-In practice, we should be able to ignore this dependency as long as the counts are large enough for both spike-in populations.
-This can be done by carefully choosing the concentrations of the spike-in RNA so that enough RNA is sequenced from each population.
-The sampling variability of $\log y_{is}$ should approach zero at large means if counts are Poisson-distributed, or approach a constant under the NB distribution with a fixed dispersion.
-The former can be validated by checking whether $\mbox{var}(R_i')$ is much smaller than $\mbox{var}(R_i)$.
-While this may not be the case if both are near zero, any inaccuracy becomes irrelevant as we can simply state that spike-in addition is precise.
-The latter is justified by the plateau in the NB dispersions at large means in most real data sets.
-In both cases, any change with respect to the random variables can be considered to be negligible. \\[0.1in]
+Subtraction of the estimated variance of $\theta_i'$ from that of $\theta_i$ from the first experiment can be used to obtain an estimate of $\sigma^2_{vol}$.
+Note that this assumes that $E(\log \mu_{is})$ is the same for each spike-in population between the first and second experiments, i.e., the average count size for each population is the same between experiments.
+This ensures that there are no abundance-related changes in the technical variability of each population.
+In general, this assumption is reasonable if premixing of the two populations is done in a 1:1 ratio (volume-by-volume) and the total added volume of premixed spike-in is equal to the total volume for separate additions in the first experiment.
 
 % It's possible to do something more complicated with a Poisson sampling distribution that's conditional on the mean.
 % You could use the general variance decomposition formula to get the variance of the total count (see Bowsher and Swain, 2012).
 % This would account for the mean-variance relationship at low counts.
 % However, it becomes intractable to solve for the variance of the log-ratio of counts.
 % There is no apparent benefit to this complexity, given that the log-normal approximation is more than sufficient at large counts.
+
+\subsection{Estimating the variance of the population-specific capture efficiency}
+Some work is required to decompose the components of $\mbox{var}(\theta_i')$, in order to separate technical variability from the variability of the $\phi_{is}$ terms.
+This can be done by splitting one of the spike-in populations into two halves.
+Divide transcripts in $s=1$ into two halves, i.e., $s=1_a$ and $1_b$.
+As $\phi_{i1} = \phi_{i1_a} = \phi_{i1_b}$ for transcripts from the same spike-in population, they cancel out when computing the log-ratio between the total counts of the two halves.
+Thus, the variance of the log-ratio (denoted here as $\theta_{i(ab)}'$) will simplify to 
+\[
+    \mbox{var}(\theta_{i(ab)}') = \sigma^2_{lib(1_a)} + \sigma^2_{lib(1_b)} \;.
+\]
+This is true for both experiments, as $\eta_{i1} = \eta_{i1_a} = \eta_{i1_b}$ within a single population.
+Now, consider the variance of the log-ratio of the total count for each half to the second population $s=2$.
+This is written as
+\begin{align*}
+    \mbox{var}(\theta_{i(a)}') &= \sigma^2_{lib(1_a)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) + \mbox{var}(\log \phi_{i2}) \\
+    \mbox{var}(\theta_{i(b)}') &= \sigma^2_{lib(1_b)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) + \mbox{var}(\log \phi_{i2})
+\end{align*}
+using only the samples in the second experiment (where variability in volume addition need not be considered).
+We now perform some basic arithmetic on the variances of the log-ratios:
+\begin{align*}
+    &\mbox{var}(\theta_{i(a)}') +  \mbox{var}(\theta_{i(b)}') - \mbox{var}(\theta_{i(ab)}') = 2 [\sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) + \mbox{var}(\log \phi_{i2}) ] \\
+    &\mbox{var}(\theta_i') - \textstyle\frac{1}{2}[\mbox{var}(\theta_{i(a)}') + \mbox{var}(\theta_{i(b)}') - \mbox{var}(\theta_{i(ab)}') ] = \sigma^2_{lib(1)}
+\end{align*}
+We repeat this after splitting $s=2$ into halves to obtain an estimate of $\sigma^2_{lib(2)}$.
+These values can be subtracted from $\mbox{var}(\theta_i')$ to estimate the variance in spike-in-specific behaviour, i.e., $\mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2})$.
+
+Note that our model does not consider transcript-specific variability in behaviour in each well.
+If such variability exists, it will not cancel out when calculating $\theta_{i(ab)}')$ and will instead be treated as part of the technical variability.
+This results in overestimation of $\sigma^2_{lib(s)}$ and underestimation of the variance in spike-in-specific behaviour.
+To mitigate this effect, we split the transcripts so that the distribution of transcript abundances is similar between halves.
+This increases the chance that each half will behave similarly, such that spike-in-specific behaviour will cancel out between halves in each well when calculating the log-ratio.
 
 \newpage
 \section{Dealing with variable spike-in behaviour}
