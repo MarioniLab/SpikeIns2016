@@ -1,0 +1,5 @@
+# Importing packages.
+import(edgeR, limma, AnnotationDbi)
+
+# Exporting everything that's not hidden.
+exportPattern("^[^\\.]")
