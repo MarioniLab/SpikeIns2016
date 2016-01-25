@@ -83,14 +83,14 @@ Consider the following definitions:
 \begin{center}
 \begin{tabular}{l p{0.9\textwidth}}
 $R_{t_s}$ & The optimal number of cDNA fragments generated from each molecule of $t_s$. \\
-$\psi_{i}$ & The efficiency of cDNA generation in well $i$ for all transcripts. \\
+$\psi_{i}$ & The overall efficiency of cDNA generation in well $i$ for all transcripts. \\
 $\phi_{is}$ & The relative efficiency of cDNA generation in well $i$ for all transcripts of population $s$. \\
 $\delta_{it_s}$ & The cDNA fragment-per-transcript molecule conversion rate for transcript $t_s$ in well $i$.
 \end{tabular}
 \end{center}
-$R_{t_s}$ is a constant as it depends on the innate properties of each transcript.
-$\psi_{i}$ is a random variable bounded in [0, 1] that varies across wells and represents well-specific biases in library preparation.
-Additional population-specific biases are represented by $\phi_{is}$ in each well.
+$R_{t_s}$ is a constant as it depends on the inherent properties of each transcript.
+$\psi_{i}$ is a random variable that represents well-specific biases in library preparation.
+Additional biases in each well are modelled by $\phi_{is}$, which represents well- and population-specific behaviour.
 These parameters are related by $\delta_{it_s} = R_{t_s} \phi_{i} \psi_{is}$.
 
 Finally, define $\nu_{ig}$ as the number of transcript molecules for gene $g$ in the cellular RNA for the cell in well $i$.
