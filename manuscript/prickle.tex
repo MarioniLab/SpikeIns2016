@@ -1,0 +1,178 @@
+\documentclass{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[font={small,it}]{caption}
+\usepackage{amsmath}
+
+\title{When normalization gets prickly: are spike-ins good enough for single-cell RNA sequencing data?}
+\author{Aaron Lun}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Single-cell RNA sequencing is a rapidly growing area of research that allows detailed study of the transcriptional activity of individual cells.
+Briefly, RNA is isolated from single cells, converted into cDNA and sequenced using massively parallel sequencing technologies \cite{shapiro2013singlecell}.
+Gene expression can be quantified by mapping the read sequences back to the genome, and counting the number of reads mapped to each gene.
+To avoid amplification biases, individual transcript molecules can be tagged with unique molecular identifiers (UMIs) \cite{islam2014quantitative}, such that sequencing to saturation and counting UMIs will yield the number of transcripts of each gene in a cell.
+However, sequencing to saturation may not be economically feasible for hundreds or thousands of cells.
+In addition, not all molecules will be captured due to cell-specific inefficiencies in reverse transcription \cite{stegle2015computational}.
+As a result, the count for each gene will usually reflect the proportion of transcripts rather than the absolute quantity within each cell (Figure~\ref{fig:cellexample}).
+The latter is more relevant as it can be meaningfully compared between cells for any given gene, whereas the former depends on the expression of all other genes in the cell.
+Thus, some normalization is necessary to adjust the read count into a useful measure of gene expression.
+
+\begin{figure}[H]
+\begin{center}
+%\includegraphics[width=0.6\textwidth]{motivation.pdf}
+\end{center}
+\caption{Need for normalization in single-cell transcriptome sequencing.
+RNA is extracted from each cell, converted to cDNA and sequenced.
+Each transcript molecule is coloured according to the identity of the gene.
+Read (or UMI) counts for each gene are also shown, with a total sequencing depth of 100 reads for each cell.
+These counts represent proportions rather than the absolute number of molecules in each cell.
+For example, counts are identical for all genes in the first and second cells, despite the differences in the total number of transcript molecules. 
+Similarly, even though the number of transcripts is the same, the count for the red gene is lower in the third cell compared to the first cell.
+}
+\label{fig:cellexample}
+\end{figure}
+
+One popular normalization approach is to use a set of genes that have constant expression across cells.
+The set can consist of pre-defined ``house-keeping'' genes, or it can be empirically defined under the assumption that most genes are not differentially expressed (DE) between cells.
+Counts are scaled to eliminate (presumably artifactual) differences in the coverage of this set across libraries.
+This removes proportion-based differences, e.g., where greater sequencing of upregulated transcripts proportionally reduces the sequencing of all other genes \cite{robinson2010tmm}.
+The scaled counts can then be compared between libraries.
+This gene-based approach works well for bulk sequencing experiments where the population-wide gene expression profile is stable.
+However, it may not be suitable for single-cell experiments where stochasticity dominates (Figure~\ref{fig:maexample}).
+For example, house-keeping genes may be turned on or off by transcriptional bursting \cite{marinov2014singlecell}, while cell cycling may trigger large-scale changes in the transcriptional programme that preclude the assumption of a non-DE majority.
+
+\begin{figure}[H]
+\begin{center}
+%\includegraphics[width=0.4\textwidth,trim=0mm 0mm 0mm 20mm,clip]{ma_cellular.png}
+%\includegraphics[width=0.4\textwidth,trim=0mm 0mm 0mm 20mm,clip]{ma_spiked.png}
+\end{center}
+\caption{MA plots for cellular (left) and spike-in (right) transcripts, using data from the Brennecke \emph{et al.} study \cite{brennecke2013accounting}.
+For the cellular transcripts, the plot compares genewise log-counts between single QC and GL2 cells.
+For the spike-ins, the plot compares genewise log-counts between the same libraries for pooled HeLa RNA spike-in.
+All log-values are computed with a prior count of 2, where genes with zero counts are marked in orange.
+Multiple masses are present for the cellular genes, whereas only one mass is present for the spike-in genes.
+The spike-in mass is also well-defined whereas the cellular masses are much noisier.
+In short, no obvious non-DE majority is present among the cellular genes.
+This is attributable to biological variability given that both plots should be affected by technical noise.
+}
+\label{fig:maexample}
+\end{figure}
+
+Another normalization strategy involves the use of spike-in RNA for which the identity and quantity of all transcripts is known \cite{stegle2015computational}.
+The same volume of spike-in RNA solution is added to each cell, usually during cell lysis. 
+Massively parallel sequencing generates reads - and, upon mapping, counts - for both cellular and spike-in genes.
+Normalization is performed by scaling the counts in each library such that the counts for the spike-in genes are, on average, the same between libraries.
+The central assumption of this approach is that the same amount of spike-in RNA is added to each cell \cite{marinov2014singlecell,stegle2015computational}.
+Thus, any differences in the coverage of the spike-in genes between libraries are artifactual in origin and must be removed by scaling.
+Again, this includes proportion-based differences, such that the scaled counts can be easily compared between cells. 
+
+The use of spike-ins for normalization seems preferable as it avoids making strong assumptions about the biology of single cells.
+However, one major criticism of this approach is that the volume of spike-in RNA cannot be consistently added to each sample \cite{robinson2010tmm}.
+Variable addition of spike-in RNA would mean that the assumption of equal spike-ins betwen cells is violated, compromising the effectiveness of normalization \cite{risso2014normalization}.
+We propose to conduct a series of experiments to estimate the variability of spike-in quantities in single-cell transcriptome studies.
+In doing so, the effectiveness of spike-in normalization can be properly evaluated.
+Generation of data will be accompanied by the development of appropriate statistical routines to analyze the data, and to incorporate the findings into downstream analyses such as detection of DE genes.
+
+% Grun and van Oudenaarden also advise against using spike-ins, mostly on the basis of them not behaving the same as the cellular transcripts.
+
+\section{Assessing the variability of spike-in addition}
+The first experiment uses two distinct spike-in RNA populations.
+For example, ERCC spike-ins can be used as one population, while pooled cellular RNA from a bulk population can be used as the other population.
+Equal volumes of each spike-in population are added into a well and converted into a library with an appropriate protocol (Figure~\ref{fig:expdesign}).
+This process is repeated for multiple wells, and sequencing is performed on all of the generated libraries.
+For each library, reads are mapped back to the genome and counted into genes.
+The total count across all genes is computed for each population, and the log-ratio of the total counts between the two spike-ins is calculated.
+The variability of this log-ratio across wells represents the technical variability of the entire protocol, including the addition of the spike-in volume as well as library preparation.
+
+% It should be stressed that the specific choice of population does not matter.
+% Once the variance is estimated, it can be applied to other studies involving different RNA populations.
+
+\begin{figure}[H]
+\begin{center}
+%\includegraphics[width=0.8\textwidth]{expdesign.pdf}
+\end{center}
+\caption{Proposed experimental design to assess the variability of spike-ins.
+The first experiment (A) involves adding an equal volume of each spike-in population (red or blue) into each well, and sequencing each well.
+The variance in the log-ratios of the populations across wells represents the technical variability of the spike-in procedure.
+The second experiment (B) involves adding an equal volume of a pooled mixture of the two spike-ins into each well, and sequencing each well.
+Here, the variance represents the specific variability introduced by library generation and sequencing.
+The third experiment (C) involves adding an equal volume of one spike-in population (red) into each well with RNA from a single cell, and sequencing each well.
+This measures the overall variability, including the biological variability in the total RNA of each cell.
+Components of the variability can be separated by comparing the variances of the log-ratios.
+}
+\label{fig:expdesign}
+\end{figure}
+
+The second experiment uses the same two spike-in populations, but pools them beforehand.
+The mixed population is aliquoted into separate wells and used to generate libraries.
+Sequencing of this population is performed, and the variability of the log-ratio of the total counts of the two spike-ins is computed.
+This reflects the variability of the library generation and sequencing steps, as the relative volume of each spike-in population is constant for all aliquots.
+Subtracting this variability from the overall technical variability of the first experiment yields the net variability of the volume addition step.
+If spike-in quantities are consistent between cells, the magnitude of the net variability should be low.
+Similarly, if the technical variability is dominated by library preparation, minor variability in the spike-in volume may not be a concern.
+%This variability may not be negligible in a single-cell protocol, due to the difficulty of reliably capturing small numbers of transcript molecules.
+
+The final experiment is that of a realistic single-cell transcriptome study, where one spike-in is added to RNA from individual cells.
+This is repeated for multiple wells - obviously, with a different cell in each well.
+The log-ratio between spike-in and cellular counts is computed for each well.
+The variability of this log-ratio across wells includes the biological variability in total RNA across cells.
+This is compared to the technical variability, i.e., of spike-in volume addition and library generation/sequencing.
+We can then determine whether the overall variability of the log-ratios is dominated by the biological or technical component.
+If the former is much larger than the latter, any variability in the spike-in volume may be considered negligible.
+This suggests that the assumption of equal spike-in quantities might be reasonable for normalization.
+
+In summary, the results from these experiments will allow us to measure the magnitude of the variability in the addition of spike-in volumes for single-cell experiments.
+If substantial spike-in variability is present, this experimental framework will also allow us to explore approaches to improve consistency.
+For example, can variability be reduced by increasing the volume of spike-in solution added to each well?
+
+\section{Evaluating the effect of spike-in variability on existing software}
+The effect of variable spike-in quantities can be more rigorously evaluated in the context of downstream analyses.
+Popular analyses include detection of DE genes between two or more biological conditions, and clustering of cells based on their expression profiles to identify distinct subpopulations.
+We propose to assess the effect of spike-in variability on the behaviour of these analyses.
+More specifically, we aim to determine whether each analysis is sensitive to realistic violations of the assumption of equal spike-in quantities.
+
+DE detection can be performed using established methods for bulk data like edgeR \cite{robinson2010edgeR} or DESeq \cite{anders2010differential}, or with dedicated single-cell methods like Monocle \cite{trapnell2014dynamics} and SAMstrt \cite{katayama2013samstrt}.
+The performance of each method can be described in terms of detection power (i.e., detection of truly DE genes) and control of the error rate (i.e., false detection of non-DE genes).
+We plan to simulate single-cell gene counts where the spike-in quantity in each sample varies randomly, based on the estimated variability from previous experiments.
+This simulation will involve multiple cells across different biological conditions, with some DE genes introduced as true positives.
+We will apply each method to detect these DE genes, where normalization uses the assumption of equal spike-in quantities.
+The effect of spike-in variability on performance can then be evaluated.
+
+Clustering of cells is often done informally through dimensionality-reduction techniques such as Principal Component Analysis (PCA) or t-Distributed Stochastic Neighbor Embedding (t-SNE) \cite{van2008visualizing,julia2015sincell}.
+This collapses the relative positioning of cells in high-dimensional expression space to a 2- or 3-dimensional representation from which distinct clusters can be more easily identified. 
+Each cluster is interpretated as a subpopulation that may be of biological interest, e.g., a different cell type, cycling or apoptotic cells.
+We propose to simulate expression data for several subpopulations of cells with variable spike-in quantities.
+We normalize expression values under the assumption of equal spike-in quantities, and then we identify clusters from the normalized data with PCA and t-SNE.
+Of particular concern is whether spike-in variability reduces the separation between the clusters for different subpopulations, or even results in the formation of spurious clusters.
+
+\section{Integrating spike-in variability in DE analyses}
+Most statistical pipelines for DE analyses assume that the scaling factors used in normalization are known.
+They fail to account for uncertainty in the estimation of these factors, which may result in suboptimal performance when the spike-in quantities are variable.
+However, this kind of uncertainty can be easily incorporated in a Bayesian framework.
+In particular, the BASIC software package performs a Bayesian DE analysis for single-cell data \cite{cata?}.
+We propose to augment the statistical routines in this package to account for the estimated variability in the spike-ins, and to assess the effect of doing so on performance.
+We also plan to check whether the estimated variability of the spike-ins changes significantly between runs.
+If not, the first and second experiments in Figure~\ref{fig:expdesign} can be done once for any given system.
+The variability estimate can then be re-used for all analyses that use the same spike-in and sequencing protocol.
+Otherwise, the experiments must be repeated for each study, to obtain an appropriate variability estimate that point in time.
+
+
+%The final experiment uses RNA from single cells to gauge the effect of variable spike-ins on the detection of DE genes.
+%Two homogeneous cell lines are chosen for sequencing, with multiple cells for each line and spike-ins added to each cell.
+%The data is used for a DE analysis, using statistical methods that don't use spike-ins; do use spike-ins, but don't account for variability in the added volume; or do use spike-ins, and account for variable volume.
+%Performance evaluation is based on the number of DE genes detected between cell lines (true positives) against that detected within cell lines (false positives).
+%We hope to show that considering the variability in the spike-in quantity will improve DE detection.
+
+{\small
+\bibliography{refnorm}
+\bibliographystyle{unsrt}
+}
+
+\end{document}
