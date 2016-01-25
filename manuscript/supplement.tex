@@ -119,12 +119,14 @@ The observed total $y_{is}$ is assumed to be log-normally distributed, condition
 \]
 where $\sigma^2_{lib(s)}$ represents the variability due to sequencing of population $s$.
 We consider that $\sigma^2_{lib(s)} = f(A_s)$ for some monotonic decreasing function $f$ of the abundance $A_s$ for $s$.
-This represents the decrease in variability with increasing abundance, as typically observed in sequencing data.
-For simplicity, we define $A_s = E(\log \mu_{is})$ rather than $A_s = \log \mu_{is}$, i.e., we use the full expectation without conditioning on any other parameters.
-This approximation ensures that we do not have to consider the effect of variability in $V_{is}$, $\psi_i$, etc. on the value of $\sigma^2_{lib(s)}$.
+This models the decrease in variability with increasing abundance, a trend that is typically observed in analyses of sequencing count data.
+
+For simplicity, we define $A_s = E(\log \mu_{is})$ rather than $A_s = \log \mu_{is}$.
+This is an approximation as the variability should depend on the size of the total count within each well, rather than on its expectation across all wells.
+Nonetheless, this approximation is useful as it simplifies the following derivations, by ensuring that we do not have to consider the effect of variability in $\eta_{is}$, $\psi_i$, etc. on the value of $\sigma^2_{lib(s)}$.
 We also assume that totals are conditionally independent between spike-in populations.
-This is because we have already conditioned on the well-specific biases common to the populations within each well.
-Thus, any remaining variation due to technical noise should be independent for each population $s$.
+This is because we have already conditioned on the well-specific biases that are common to the populations within each well.
+Thus, any remaining variation due to random technical noise should be independent for each population.
 
 \subsection{Deriving the variance of the log-ratios upon separate addition}
 Denote the log-ratio of the total counts between two spike-in populations $s=1, 2$ as $\theta_i = \log(y_{i1}/y_{i2})$ for well $i$.
@@ -138,7 +140,6 @@ This can be illustrated by examining the conditional expectation for $\theta_i$,
     E(\theta_i |  \{ \eta_{is}, \phi_{is} \forall s \})
     &= \log \mu_{ix} - \log \mu_{iy} \\
     &= \log \left( \frac{\rho_i \eta_{i1} \psi_i \phi_{i1} \sum_{t_1} R_{t_1} C_{t_1}}{\rho_i \eta_{i2} \psi_i \phi_{i2} \sum_{t_2} R_{t_2} C_{t_2}} \right) \\
-    &= \log \eta_{i1} - \log \eta_{i2} + \log \phi_{i1} - \log \phi_{i2} + \log (\textstyle \sum_{t_1} R_{t_1} C_{t_1}/  \sum_{t_2} R_{t_2} C_{t_2}) \\
     &= \log \eta_{i1} - \log \eta_{i2} +  \log \phi_{i1} - \log \phi_{i2} + Z \quad\mbox{for some constant } Z \;.
 \end{align*}
 
