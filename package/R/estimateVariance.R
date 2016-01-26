@@ -1,4 +1,4 @@
-setupSpikes <- function(counts, spike1, spike2, separate, premixed) 
+setupSpikes <- function(counts, spike1, spike2, separate, premixed, ...) 
 # Returns a DGEList with the information formatted in a reasonably pretty manner.
 # Avoids having to recompute things many times.
 #
@@ -11,10 +11,12 @@ setupSpikes <- function(counts, spike1, spike2, separate, premixed)
     y$samples$ratio <- log2(y$samples$sum1/y$samples$sum2)
 
     # Remembering which samples/genes do what.
-    y$samples$separate <- .indexToLogical(separate)
-    y$samples$premixed <- .indexToLogical(premixed)
-    spike.data <- data.frame(spike1=.indexToLogical(spike1, byrow=TRUE), 
-                             spike2=.indexToLogical(spike2, byrow=TRUE))
+    y$samples$separate <- .indexToLogical(counts, separate)
+    y$samples$premixed <- .indexToLogical(counts, premixed)
+    y$samples <- cbind(y$samples, ...)
+
+    spike.data <- data.frame(spike1=.indexToLogical(counts, spike1, byrow=TRUE), 
+                             spike2=.indexToLogical(counts, spike2, byrow=TRUE))
     if (!is.null(y$genes)) { 
         y$genes <- cbind(y$genes, spike.data)
     } else {
@@ -42,18 +44,26 @@ setupSpikes <- function(counts, spike1, spike2, separate, premixed)
     return(index)
 }
 
-estimateVariance <- function(ratios, design, ...) 
+estimateVariance <- function(y, design, ..., ratios, getfit=FALSE) 
 # Estimates the variance of the ratios, given the design matrix.
 #
 # written by Aaron Lun
 # created 26 January 2016
 {
+    if (missing(ratios)) { ratios <- y$samples$ratio }
     if (missing(design)) { design <- .make_intercept(length(ratios)) }
+    else { design <- .restore_rank(design) }
     fit <- lm.fit(y=ratios, x=design, ...)
-    sum(out$effects[-seq_len(out$rank)]^2)/out$df.residual
+    if (getfit) { return(fit) }
+    sum(fit$effects[-seq_len(fit$rank)]^2)/fit$df.residual
 }
 
 .make_intercept <- function(n) { as.matrix(rep(1, n)) }
+
+.restore_rank <- function(X) {
+    QR <- qr(X)
+    X[,QR$pivot[seq_len(QR$rank)],drop=FALSE]
+}
 
 testVariance <- function(var1, var2, df1, df2, ratios1, ratios2, design1, design2, type=c("one-sided", "two-sided"), ...) 
 # Tests if the first variance is significantly larger than the second.
@@ -62,13 +72,23 @@ testVariance <- function(var1, var2, df1, df2, ratios1, ratios2, design1, design
 # written by Aaron Lun
 # created 26 January 2016
 {
-    if (missing(design1)) { design1 <- .make_intercept(length(ratios1)) }
-    if (missing(var1)) { var1 <- estimateVariance(ratios1, design1, ...) } 
-    if (missing(design2)) { design2 <- .make_intercept(length(ratios2)) }
-    if (missing(var2)) { var2 <- estimateVariance(ratios2, design2, ...) }
+    if (missing(var1)) { 
+        if (missing(design1)) { design1 <- .make_intercept(length(ratios1)) }
+        var1 <- estimateVariance(ratios=ratios1, design=design1, ...) 
+    } 
+    if (missing(var2)) { 
+        if (missing(design2)) { design2 <- .make_intercept(length(ratios2)) }
+        var2 <- estimateVariance(ratios=ratios2, design=design2, ...) 
+    }
 
-    if (missing(df1)) { df1 <- nrow(design1) - ncol(design1) }
-    if (missing(df2)) { df2 <- nrow(design2) - ncol(design2) }
+    if (missing(df1)) { 
+        if (missing(design1)) { design1 <- .make_intercept(length(ratios1)) }
+        df1 <- nrow(design1) - ncol(design1) 
+    }
+    if (missing(df2)) { 
+        if (missing(design2)) { design2 <- .make_intercept(length(ratios2)) }
+        df2 <- nrow(design2) - ncol(design2) 
+    }
     type <- match.arg(type)
     var.ratio <- var1/var2
 
@@ -87,7 +107,11 @@ splitSpikes <- function(spike.counts)
 # written by Aaron Lun
 # created 26 January 2016
 {
-
+    o <- order(rowSums(spike.counts))
+    chosen <- rep(c(TRUE, FALSE), length.out=length(o))
+    subsum1 <- colSums(spike.counts[o[chosen],,drop=FALSE])
+    subsum2 <- colSums(spike.counts[o[!chosen],,drop=FALSE])  
+    return(list(first=subsum1, second=subsum2))
 }
 
 diagnoseVariance <- function(y, groups, design) 
@@ -98,7 +122,7 @@ diagnoseVariance <- function(y, groups, design)
 # created 26 January 2016
 {
     if (missing(design)) { design <- .make_intercept(length(groups)) }
-    ratios <- y$samples$ratios
+    ratios <- y$samples$ratio
     all.index <- split(seq_len(length(ratios)), groups)
     all.var <- list()
     all.df <- list()
@@ -106,10 +130,8 @@ diagnoseVariance <- function(y, groups, design)
     for (g in names(all.index)) {
         current <- all.index[[g]]
         cur.ratios <- ratios[current]
-        cur.design <- design[current,,drop=FALSE]
-        QR <- qr(cur.design)
-        cur.design <- cur.design[,QR$pivot[seq_len(QR$rank)]]
-        all.var[[g]] <- estimateVariance(cur.ratios, cur.design)
+        cur.design <- .restore_rank(design[current,,drop=FALSE])
+        all.var[[g]] <- estimateVariance(ratios=cur.ratios, design=cur.design)
         all.df[[g]] <- nrow(cur.design) - ncol(cur.design)
     }
     
@@ -117,30 +139,35 @@ diagnoseVariance <- function(y, groups, design)
     for (g1 in seq_along(all.var)) { 
         for (g2 in seq_len(g1-1L)) {
             out <- testVariance(var1=all.var[[g1]], var2=all.var[[g2]],
-                                df1=all.df[[g1]], df2=all.df[[g2]])
+                                df1=all.df[[g1]], df2=all.df[[g2]], type="two-sided")
             pairwise[g1,g2] <- out
             pairwise[g2,g1] <- out
         }
     }
-    colnames(pairwise) <- paste0("vs.", names(all.var))
-    return(data.frame(group=groups, var=unlist(all.var), pairwise))
+    rownames(pairwise) <- colnames(pairwise) <- names(all.var)
+    return(list(var=unlist(all.var), pval=pairwise))
 }
 
-decomposeVariance <- function(y, separate.design, premixed.design) 
+decomposeVariance <- function(y, design) 
 # This decomposes the variances to their relevant components, given the count matrix in 'counts'.
 # We need an indication of which genes are in each spike-in set (spike1, spike2).
 # We also need to know which samples correspond to premixed and separate additions.
 {
     ratios <- y$samples$ratio
-    total.var <- estimateVariance(ratios[separate], separate.design)
-    premix.var <- estimateVariance(ratios[premixed], premixed.design)
+    separate <- y$samples$separate
+    premixed <- y$samples$premixed
+
+    separate.design <- .restore_rank(design[separate,,drop=FALSE])
+    premixed.design <- .restore_rank(design[premixed,,drop=FALSE])
+    total.var <- estimateVariance(ratios=ratios[separate], design=separate.design)
+    premix.var <- estimateVariance(ratios=ratios[premixed], design=premixed.design)
     volume.var <- 0.5*(total.var - premix.var)
 
-    # Following the REML definition when the subtraction is negative.
+    # Following the REML definition when the subtraction is negative (reconstructing the matrix, just in case it didn't have premixed in it).
     combined.design <- rbind(do.call(cbind, c(list(separate.design), rep(list(0), ncol(premixed.design)))),
-                             do.call(cbind, c(list(premixed.design), rep(list(0), ncol(separate.design)))))
+                             do.call(cbind, c(rep(list(0), ncol(separate.design)), list(premixed.design))))
     if (volume.var < 0) {
-        premix.var <- total.var <- estimateVariance(c(ratios[separate], ratios[premixed]), combined.design)
+        premix.var <- total.var <- estimateVariance(ratios=c(ratios[separate], ratios[premixed]), design=combined.design)
         volume.var <- 0
         volume.sig <- 1
     } else {
@@ -166,11 +193,11 @@ decomposeVariance <- function(y, separate.design, premixed.design)
         self.ratios <- log2(subsumA/subsumB) 
 
         # Should not have behavioural variability between spike-ins from the same population.
-        self.tech.var <- estimateVariance(c(self.ratios[separate], self.ratios[premixed]), combined.design)
+        self.tech.var <- estimateVariance(ratios=c(self.ratios[separate], self.ratios[premixed]), design=combined.design)
         against.ratiosA <- log2(subsumA/alt.sum)
-        premix.varA <- estimateVariance(against.ratiosA[premixed], premixed.desgn)
+        premix.varA <- estimateVariance(ratios=against.ratiosA[premixed], design=premixed.design)
         against.ratiosB <- log2(subsumB/alt.sum)
-        premix.varB <- estimateVariance(against.ratiosB[premixed], premixed.desgn)
+        premix.varB <- estimateVariance(ratios=against.ratiosB[premixed], design=premixed.design)
 
         tech.var <- premix.var - 0.5*(premix.varA + premix.varB - self.tech.var)
         tech.var <- pmax(tech.var, 0) # slightly biased, but avoid silly results.
@@ -179,6 +206,6 @@ decomposeVariance <- function(y, separate.design, premixed.design)
     behave.var <- premix.var - tech.var1 - tech.var2
     
     # Reporting the final breakdown of the variance components.
-    return(list(direct=data.frame(Total=total.var, Premixed=premix.var, Volume=volume.var, Significance=volume.sig),
-                split=data.frame(Tech1=tech.var1, Tech2=tech.var2, Behaviour=behave.var)))
+    return(list(direct=data.frame(total=total.var, premixed=premix.var, volume=volume.var, pval=volume.sig),
+                split=data.frame(tech1=tech.var1, tech2=tech.var2, behaviour=behave.var)))
 }

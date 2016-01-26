@@ -4,8 +4,8 @@ Date: 2015/10/30
 Title: Simulator for spike-ins in single-cell RNA-seq data
 Author: Aaron Lun <alun@wehi.edu.au>
 Maintainer: Aaron Lun <alun@wehi.edu.au>
-Depends: R (>= 3.2.0)
-Imports: edgeR, limma, AnnotationDbi 
+Depends: R (>= 3.2.0), edgeR, limma
+Imports: AnnotationDbi 
 Suggests: TxDb.Mmusculus.UCSC.mm10.knownGene
 biocViews: RNASeq 
 Description: Simulates spike-in variability in single-cell RNA-seq data.
