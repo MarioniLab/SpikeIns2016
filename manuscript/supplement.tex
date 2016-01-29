@@ -210,6 +210,12 @@ This increases the chance that each half will behave similarly, such that spike-
 \section{Implementation details for the downstream analyses}
 
 \subsection{Methods for differential expression}
+For the mouse study, count data was obtained from the NCBI Gene Expression Omnibus under the accession GSE29087 \cite{islam2011characterization}.
+A cell was considered to be of low quality and discarded if the sum of counts was below 10$^5$ or the proportion of mitochondrial reads was above 10\%.
+For the \textit{A. thaliana} study, count data was obtained as Supplementary Table~8 \cite{brennecke2013accounting}.
+Quality control on the cells was not required as it had already been performed.
+In both data sets, low-abundance genes (defined as those with an average count below 1) were removed.
+
 For edgeR v3.12.0, the quasi-likelihood (QL) framework was used to detect DE genes \cite{lund2012detecting}.
 Briefly, an abundance-dependent trend was fitted to the NB dispersions of all genes.
 A NB GLM was fitted to the counts for each gene using the trended NB dispersion.

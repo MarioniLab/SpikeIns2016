@@ -225,7 +225,8 @@ Thus, $s^2$ was set to $X$ to provide a realistic simulation.
 \subsection{Implementation of downstream analyses}
 
 \subsubsection{Detecting differential expressed genes}
-DE genes were detected in the original and simulated data using edgeR \cite{lund2012detecting} and monocle \cite{trapnell2014dynamics}.
+Two scRNA-seq data sets were obtained -- one from a study with mouse embryonic stem cells and fibroblasts \cite{islam2011characterization} and another from a study with GL2 and QC \textit{Arabidopsis Thaliana} cells \cite{brennecke2013accounting}.
+In each study, DE genes were detected between cell types using edgeR \cite{lund2012detecting} and monocle \cite{trapnell2014dynamics}.
 The former represents methods designed for analyses of bulk RNA-seq data, while the latter represents specialized single-cell methods.
 For each method, spike-in normalization was performed by scaling the counts such that the spike-in totals were the same between cells.
 The set of DE genes in the original data was then identified at a FDR of 5\% (see Section~Y in the Supplementary Materials for implementation details of each method).
