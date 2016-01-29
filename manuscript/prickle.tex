@@ -207,9 +207,14 @@ This was used as the mean of a simulated NB distribution, using the same value f
 The quantile of each original count in its true distribution was mapped to a quantile in the simulated distribution, using the q2qnbinom function \cite{robinson2008small}.
 This new quantile was used as the simulated count for the corresponding gene and cell.
 
-% Assumes that spike-ins are, actually, not variable? Not really, just to get a gauge.
+% For simplicity, we assume that sequencing is performed to saturation in each data set, e.g., like UMIs.
+% Thus, variability in the added volume will directly translate to variability in the total spike-in count.
+% It also means that we do not have to rescale the cellular counts to reflect variable undersampling.
+% Doing so would be problematic, as direct scaling of the counts would distort the empirical mean-variance relationship of the count data.
 
-
+% The estimation of the true parameters conditions on the observed spike-in totals, and doesn't make the assumption that spike-in totals are constant.
+% For example, if it turned out that you added half the amount of spike-in to one well, it wouldn't distort the estimation of the (conditional) mean.
+% Okay, maybe the trended dispersion would be a bit weird, because technical variability should depend on the amount of RNA, but some inaccuracy there is forgivable.
 
 {\small
 \bibliography{refnorm}
