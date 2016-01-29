@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[margin=2.5cm]{geometry}
+\usepackage[margin=3cm]{geometry}
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{float}
@@ -173,7 +173,7 @@ Otherwise, the experiments must be repeated for each study, to obtain an appropr
 
 \newpage
 
-\section{Simulations}
+\section{Simulating the effect of spike-in variability}
 
 \subsection{Overview}
 The aim is to determine whether results are sensitive to spike-in variability, for downstream analyses that depend on the assumption of constant spike-ins.
@@ -184,12 +184,12 @@ Any changes indicate that the analysis is sensitive to spike-in variability.
 The advantage of this approach is that it only modifies the scale of the spike-in counts -- the counts for the cellular genes are used directly and do not need to be simulated.
 
 \subsection{Simulation design}
-For each data set, the sum of the spike-in counts (referred to here as the spike-in total) was computed for each cell.
-The variance of the log$_2$-transformed spike-in totals across cells will include technical components as well as variance due to spike-in addition and capture efficiency.
-The latter -- denoted here as $s^2$ -- must be removed prior to simulation.
-Otherwise, resampling will introduce variance for addition/efficiency on top of what is already present, leading to overrepresentation of $s^2$ in the simulation variance.
-Removal was achieved by scaling the log$_2$-totals such that the variance was reduced by $s^2$ without changing the mean.
-The scaled log-values were converted back to ``processed'' totals that contain no variability due to addition or efficiency.
+For each data set, the sum of the spike-in counts (i.e., the spike-in total) was computed for each cell.
+The variance of the log$_2$-transformed spike-in totals across cells includes technical noise; variability in sequencing depth and capture efficiency between wells; and the variance of spike-in addition and population-specific behaviour.
+The final component (denoted here as $s^2$) represents spike-in variability and must be removed prior to simulation.
+Otherwise, resampling will introduce variance for addition/behaviour on top of what is already present, leading to overrepresentation of $s^2$ in the variance of the simulated totals.
+Removal was achieved by scaling the log$_2$-totals such that the variance across wells was reduced by $s^2$ without changing the mean.
+The scaled log-values were then transformed back to ``processed'' totals that contain no variability due to addition or behaviour.
 
 The simulation was performed by sampling a new value for the combined addition/efficiency effect in each cell.
 Specifically, the effect for each cell was sampled independently from a $2^X$ distribution where $X \sim \mathcal{N}(0, s^2)$.
