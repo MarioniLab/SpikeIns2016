@@ -6,7 +6,6 @@
 \usepackage{xcite}
 \usepackage{amsmath}
 \usepackage{textcomp}
-\usepackage{natbib}
 
 \renewcommand{\textfraction}{1.0}
 \renewcommand{\floatpagefraction}{.9}
@@ -18,6 +17,8 @@
 \makeatletter 
 \renewcommand{\thefigure}{S\@arabic\c@figure} 
 \renewcommand{\thetable}{S\@arabic\c@table} 
+
+\externalcitedocument{prickle}
 
 \usepackage{url}
 \urlstyle{same}
@@ -205,6 +206,23 @@ If such variability exists, it will not cancel out when calculating $\theta_{i(a
 This results in overestimation of $\sigma^2_{lib(s)}$ and underestimation of the variance in spike-in-specific behaviour.
 To mitigate this effect, we split the transcripts so that the distribution of transcript abundances is similar between halves.
 This increases the chance that each half will behave similarly, such that spike-in-specific behaviour will cancel out between halves in each well when calculating the log-ratio.
+
+\section{Implementation details for the downstream analyses}
+
+\subsection{Methods for differential expression}
+For edgeR v3.12.0, the quasi-likelihood (QL) framework was used to detect DE genes \cite{lund2012detecting}.
+Briefly, an abundance-dependent trend was fitted to the NB dispersions of all genes.
+A NB GLM was fitted to the counts for each gene using the trended NB dispersion.
+The QL dispersion was estimated from the GLM deviance and a second abundance-dependent trend was fitted to the QL dispersions across all genes.
+Robust empirical Bayes shrinkage was performed towards this trend to obtain a shrunken dispersion for each gene.
+Each gene was tested for significant differences in expression between groups using the QL F-test.
+The Benjamini-Hochberg correction was then applied to control the FDR.
+This process was performed using the log-transformed spike-in total (original or simulated) as the offset for each cell during GLM fitting.
+
+For Monocle v1.4.0, each count was divided by the spike-in total for the corresponding cell to obtain normalized expression values.
+These expression values were used for DE testing between groups with the likelihood ratio test in the differentialGeneTest function.
+The Benjamini-Hochberg correction was then applied to control the FDR.
+This was performed with both the original and simulated spike-in totals.
 
 \newpage
 \section{Dealing with variable spike-in behaviour}

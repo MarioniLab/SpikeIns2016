@@ -216,6 +216,28 @@ This new quantile was used as the simulated count for the corresponding gene and
 % For example, if it turned out that you added half the amount of spike-in to one well, it wouldn't distort the estimation of the (conditional) mean.
 % Okay, maybe the trended dispersion would be a bit weird, because technical variability should depend on the amount of RNA, but some inaccuracy there is forgivable.
 
+The value of $s^2$ was set based on the estimated values for $\sigma^2_{vol} = X$ and $\mbox{var}(\psi_{is})$ in the previous section.
+Technically, only the sum of $\mbox{var}(\psi_{is})$ across both spike-in populations was estimated 
+    -- this is assumed to be evenly split between populations to obtain $\mbox{var}(\psi_{is}) = X$ for each $s$.
+The sum of the variance components for addition and efficiency is then equal to $X$.
+Thus, $s^2$ was set to $X$ to provide a realistic simulation.
+
+\subsection{Implementation of downstream analyses}
+
+\subsubsection{Detecting differential expressed genes}
+DE genes were detected in the original and simulated data using edgeR \cite{lund2012detecting} and monocle \cite{trapnell2014dynamics}.
+The former represents methods designed for analyses of bulk RNA-seq data, while the latter represents specialized single-cell methods.
+For each method, spike-in normalization was performed by scaling the counts such that the spike-in totals were the same between cells.
+The set of DE genes in the original data was then identified at a FDR of 5\% (see Section~Y in the Supplementary Materials for implementation details of each method).
+This was repeated for the simulated data, and the proportion of genes common to both the original and simulated sets was computed.
+The proportion of common genes in the top set of 20-2000 genes with the smallest $p$-values was also computed between the original and simulated analyses.
+This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
+
+\subsubsection{Ranking highly variable genes}
+
+\subsubsection{Dimensionality reduction}
+
+
 {\small
 \bibliography{refnorm}
 \bibliographystyle{unsrt}
