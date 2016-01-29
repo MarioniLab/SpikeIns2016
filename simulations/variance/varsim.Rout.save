@@ -1,0 +1,236 @@
+
+R version 3.2.2 (2015-08-14) -- "Fire Safety"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ###########################################################################
+> # Identifying highly variable genes using the QL strategy.
+> 
+> suppressPackageStartupMessages(require(simpaler))
+> suppressPackageStartupMessages(require(edgeR))
+> suppressPackageStartupMessages(require(scran))
+> suppressPackageStartupMessages(require(matrixStats))
+> suppressPackageStartupMessages(require(statmod))
+> 
+> temp <- "temp.txt"
+> if (file.exists(temp))  { unlink(temp) }
+> filled <- FALSE
+> 
+> top.hits <- c(20, 200, 2000)
+> 
+> ###########################################################################
+> # Running across all data types (saving diagnostics along the way)
+> 
+> for (datatype in c("wilson", "islam", "brennecke")) { 
++ 
++ 	if (datatype=="wilson") { 
++ 		incoming <- read.table('GSE61533_HTSEQ_count_results.tsv.gz', header=TRUE, row.names=1, colClasses=c('character', rep('integer', 96)))
++ 		spike.in <- grepl('^ERCC', rownames(incoming))
++ 
++ 		# Quality control on cells.
++ 		totals <- colSums(incoming[!spike.in,])
++ 		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
++ 		okay.libs <- totals > 1e5 & colSums(incoming[is.mito,])/totals < 0.1 
++ 		incoming <- incoming[,okay.libs]
++ 
++ 	} else if (datatype=="islam") { 
++ 		incoming <- read.table('GSE46980_CombinedMoleculeCounts.tab.gz', skip=7, row.names=1, sep="\t", fill=TRUE,
++ 		        colClasses=c(list('character', NULL, NULL, NULL, NULL, NULL, NULL), rep('integer', 96)))
++ 		spike.in <- grepl('SPIKE', rownames(incoming))
++ 
++ 		# Quality control on cells (skipped mitochondrial check; all counts low, and all mitoprops are high - UMI?).
++ 		totals <- colSums(incoming[!spike.in,])
++ 		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
++ 		okay.libs <- totals > 1e4 # & colSums(incoming[is.mito,])/totals < 0.1 
++ 		incoming <- incoming[,okay.libs]
++ 
++ 	} else if (datatype=="brennecke") {
++         # Note that cell-level quality control has already been performed.
++         incoming <- read.table('nmeth.2645-S7.csv.gz', header=TRUE, row.names=1, sep=',', colClasses=c('character', rep('integer', 92)))
++         gene.length <- as.vector(incoming[,1])
++         incoming <- incoming[,-1]
++         spike.in <- grepl('^ERCC', rownames(incoming))
++ 
++     }
++ 
++ 	countsCell <- incoming[!spike.in,]
++     countsCell <- countsCell[rowSums(countsCell) >= ncol(countsCell),]
++ 	spike.param <- spikeParam(incoming[spike.in,])
++ 	diag.done <- FALSE
++ 
++     #########################################################################
++     # Using our custom method.
++ 
++ 	for (my.var in c(0.001, 0.01, 0.1)) { 
++ 		set.seed(34271)
++ 		results <- top.res <- list()
++ 
++ 		for (i in seq(0,20)) {
++ 			# Running original data (once for each dataset), then resampled versions.
++ 			if (i) { countsSpike <- resampleSpikes(spike.param, var.log=my.var) }
++ 			else { countsSpike <- spike.param$counts }
++ 
++             # Fitting the trend to the spike-in variances.
++             out <- fitTechTrend(countsSpike, trend="loess")
++ 			if (!diag.done) { 
++ 				pdf(paste0("diagnostics_", datatype, ".pdf"))
++                 plot(out$mean, out$var)
++                 sort.ab <- sort(out$mean)
++                 lines(sort.ab, out$trend(sort.ab), col="red", lwd=2)
++ 				dev.off()
++ 			}
++ 
++             # Computing the biological component.
++             out2 <- getBioVar(countsCell, out)
++             my.rank <- rank(-out2$bio)
++             top.ranked <- lapply(top.hits, function(x) { my.rank <= x })            
++ 			if (i) { 
++ 				top.res[[i]] <- sapply(seq_along(top.hits), function(j) { sum(best[[j]] & !top.ranked[[j]]) })
++ 			} else {
++ 				best <- top.ranked
++ 			}
++ 		
++ 			if (!diag.done) { 
++ 				output <- data.frame(GeneID=rownames(countsCell), Mean=out2$mean, Total=out2$total, Bio=out2$bio, Tech=out2$tech)
++ 				write.table(file=paste0("out_custom_", datatype, ".tsv"), output[order(output$Bio, decreasing=TRUE),], 
++ 					row.names=FALSE, quote=FALSE, sep="\t", col.names=TRUE)
++ 				diag.done <- TRUE
++ 			}
++ 		}
++ 	
++ 		top.lost <- do.call(rbind, top.res)
++         colnames(top.lost) <- paste0("Top", top.hits)
++ 		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="custom", top.lost), 
++ 			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
++ 		filled <- TRUE
++ 	}
++ 
++     #########################################################################
++     # Using Brennecke's method on the original counts.
++ 
++     for (my.var in c(0.001, 0.01, 0.1)) { 
++ 		set.seed(3427)
++ 		results <- top.res <- list()
++ 
++         for (i in seq(0,20)) {
++ 			# Running original data (once for each dataset), then resampled versions.
++ 			if (i) { countsSpike <- resampleSpikes(spike.param, var.log=my.var) }
++ 			else { countsSpike <- spike.param$counts }
++ 
++             spike.sums <- colSums(countsSpike)
++             spike.sums <- spike.sums/exp(mean(log(spike.sums)))
++             sfSpike <- sfCell <- spike.sums
++ 
++ #           # Equivalent to original normalization strategy
++ #           sfCell <- estimateSizeFactorsForMatrix(countsCell)
++ #           sfSpike <- estimateSizeFactorsForMatrix(countsSpike)
++ 
++             nCountsSpike <- t(t(countsSpike)/sfSpike)
++             nCountsCell <- t(t(countsCell)/sfCell)
++ 
++             # Copied straight from the supplementary materials.
++             meansSpike <- rowMeans( nCountsSpike )
++             varsSpike <- rowVars( nCountsSpike )
++             cv2Spike <- varsSpike / meansSpike^2
++             
++             meansCell <- rowMeans( nCountsCell )
++             varsCell <- rowVars( nCountsCell )
++             cv2Cell <- varsCell / meansCell^2
++ 
++             minMeanForFitA <- unname( quantile( meansSpike[ which( cv2Spike > .3 ) ], .8 ) )
++             useForFitA <- meansSpike >= minMeanForFitA
++             fitA <- glmgam.fit( cbind( a0 = 1, a1tilde = 1/meansSpike[useForFitA] ), cv2Spike[useForFitA] )
++ 
++             minBiolDisp <- .5^2
++             xi <- mean( 1 / sfSpike )
++             m <- ncol(countsCell)
++             psia1thetaA <- mean( 1 / sfSpike ) + ( coefficients(fitA)["a1tilde"] - xi ) * mean( sfSpike / sfCell )
++             cv2thA <- coefficients(fitA)["a0"] + minBiolDisp + coefficients(fitA)["a0"] * minBiolDisp
++             testDenomA <- ( meansCell * psia1thetaA + meansCell^2 * cv2thA ) / ( 1 + cv2thA/m )
++ #            pA <- 1 - pchisq( varsCell * (m-1) / testDenomA, m-1 )
++ #            padjA <- p.adjust( pA, "BH" )
++             lpA <- pchisq( varsCell * (m-1) / testDenomA, m-1, lower=FALSE, log=TRUE)
++    
++             # Getting the top-ranked hits.    
++             my.rank <- rank(lpA)
++             top.ranked <- lapply(top.hits, function(x) { my.rank <= x })            
++ 			if (i) { 
++ 				top.res[[i]] <- sapply(seq_along(top.hits), function(j) { sum(best[[j]] & !top.ranked[[j]]) })
++ 			} else {
++ 				best <- top.ranked
++ 			}
++ 		
++ 			if (!diag.done) { 
++ 				output <- data.frame(GeneID=rownames(countsCell), CV2=cv2Cell, logPValue=lpA)
++ 				write.table(file=paste0("out_brennecke_", datatype, ".tsv"), output[order(output$Bio, decreasing=TRUE),], 
++ 					row.names=FALSE, quote=FALSE, sep="\t", col.names=TRUE)
++ 				diag.done <- TRUE
++ 			}
++ 		}
++ 	
++ 		top.lost <- do.call(rbind, top.res)
++         colnames(top.lost) <- paste0("Top", top.hits)
++ 		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="brennecke", top.lost), 
++ 			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
++ 		filled <- TRUE
++ 	}
++ }
+Warning messages:
+1: In glmgam.fit(cbind(a0 = 1, a1tilde = 1/meansSpike[useForFitA]),  :
+  Too much damping - convergence tolerance not achievable
+2: In glmgam.fit(cbind(a0 = 1, a1tilde = 1/meansSpike[useForFitA]),  :
+  Too much damping - convergence tolerance not achievable
+3: In glmgam.fit(cbind(a0 = 1, a1tilde = 1/meansSpike[useForFitA]),  :
+  Too much damping - convergence tolerance not achievable
+> 
+> ###########################################################################
+> 
+> file.rename(temp, "results.txt")
+[1] TRUE
+> sessionInfo()
+R version 3.2.2 (2015-08-14)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 14.04.3 LTS
+
+locale:
+ [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    
+ [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   
+ [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] statmod_1.4.23     matrixStats_0.50.1 scran_0.1.1        simpaler_0.99.0   
+[5] edgeR_3.12.0       limma_3.26.6      
+
+loaded via a namespace (and not attached):
+ [1] locfit_1.5-9.1       lattice_0.20-33      IRanges_2.4.6       
+ [4] zoo_1.7-12           grid_3.2.2           DBI_0.3.1           
+ [7] stats4_3.2.2         dynamicTreeCut_1.62  RSQLite_1.0.0       
+[10] S4Vectors_0.8.7      Biobase_2.30.0       parallel_3.2.2      
+[13] BiocGenerics_0.16.1  AnnotationDbi_1.32.3
+> 
+> ###########################################################################
+> # End.
+> 
+> proc.time()
+   user  system elapsed 
+ 99.039   0.332  99.396 
