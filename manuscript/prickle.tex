@@ -170,6 +170,47 @@ Otherwise, the experiments must be repeated for each study, to obtain an appropr
 %Performance evaluation is based on the number of DE genes detected between cell lines (true positives) against that detected within cell lines (false positives).
 %We hope to show that considering the variability in the spike-in quantity will improve DE detection.
 
+
+\newpage
+
+\section{Simulations}
+
+\subsection{Overview}
+The aim is to determine whether results are sensitive to spike-in variability, for downstream analyses that depend on the assumption of constant spike-ins.
+Simulations are prepared from real data sets containing counts for spike-in transcripts.
+Specifically, the added volume/capture efficiency of spike-ins for each well is resampled and the spike-in counts are rescaled to reflect this new volume or efficiency.
+The results of the analysis on the simulated data are then compared to the original results.
+Any changes indicate that the analysis is sensitive to spike-in variability.
+The advantage of this approach is that it only modifies the scale of the spike-in counts -- the counts for the cellular genes are used directly and do not need to be simulated.
+
+\subsection{Simulation design}
+For each data set, the sum of the spike-in counts (referred to here as the spike-in total) was computed for each cell.
+The variance of the log$_2$-transformed spike-in totals across cells will include technical components as well as variance due to spike-in addition and capture efficiency.
+The latter -- denoted here as $s^2$ -- must be removed prior to simulation.
+Otherwise, resampling will introduce variance for addition/efficiency on top of what is already present, leading to overrepresentation of $s^2$ in the simulation variance.
+Removal was achieved by scaling the log$_2$-totals such that the variance was reduced by $s^2$ without changing the mean.
+The scaled log-values were converted back to ``processed'' totals that contain no variability due to addition or efficiency.
+
+The simulation was performed by sampling a new value for the combined addition/efficiency effect in each cell.
+Specifically, the effect for each cell was sampled independently from a $2^X$ distribution where $X \sim \mathcal{N}(0, s^2)$.
+This was used to scale the processed total to obtain a simulated total for each cell.
+Counts for individual spike-in transcripts were then scaled to reflect this new total in each cell.
+In this manner, the variance due to addition or efficiency is re-incorporated into the variance of the simulated totals across cells.
+
+To scale the counts, a quantile adjustment approach was used to preserve the mean-variance relationship of the data.
+A generalized linear model (GLM) was fitted to the counts across all cells for each spike-in gene, using the mglmOneGroup function in edgeR \cite{mccarthy2012differential, robinson2010edgeR} with an all-intercept design matrix.
+An abundance-dependent trend was also fitted to the NB dispersions across all spike-in genes using the estimateDisp function.
+In both cases, the original log-totals were used as the offsets for all cells.
+The fitted GLM value and dispersion for each gene were treated as the true parameters of the NB distribution used to sample the observed count in each cell.
+The simulated mean count for each gene in each cell was computed by taking the exponential of the sum of the log-simulated total for that cell and the GLM coefficient for that gene.
+This was used as the mean of a simulated NB distribution, using the same value for the dispersion.
+The quantile of each original count in its true distribution was mapped to a quantile in the simulated distribution, using the q2qnbinom function \cite{robinson2008small}.
+This new quantile was used as the simulated count for the corresponding gene and cell.
+
+% Assumes that spike-ins are, actually, not variable? Not really, just to get a gauge.
+
+
+
 {\small
 \bibliography{refnorm}
 \bibliographystyle{unsrt}
