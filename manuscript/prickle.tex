@@ -225,7 +225,7 @@ Thus, $s^2$ was set to $X$ to provide a realistic simulation.
 \subsection{Implementation of downstream analyses}
 
 \subsubsection{Detecting differential expressed genes}
-Two scRNA-seq data sets were obtained -- one from a study with mouse embryonic stem cells and fibroblasts \cite{islam2011characterization} and another from a study with GL2 and QC \textit{Arabidopsis Thaliana} cells \cite{brennecke2013accounting}.
+Two scRNA-seq data sets were obtained -- one from a study with mouse embryonic stem cells (mESCs) and fibroblasts \cite{islam2011characterization} and another from a study with root epidermal and root center \textit{Arabidopsis Thaliana} cells \cite{brennecke2013accounting}.
 In each study, DE genes were detected between cell types using edgeR \cite{lund2012detecting} and monocle \cite{trapnell2014dynamics}.
 The former represents methods designed for analyses of bulk RNA-seq data, while the latter represents specialized single-cell methods.
 For each method, spike-in normalization was performed by scaling the counts such that the spike-in totals were the same between cells.
@@ -235,6 +235,14 @@ The proportion of common genes in the top set of 20-2000 genes with the smallest
 This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
 
 \subsubsection{Ranking highly variable genes}
+Three scRNA-seq data sets were obtained -- one from a study of mouse haematopoietic stem cells \cite{wilson2015combined}, one from a study of murine immune cells \cite{brennecke2013accounting} and another from a study of mESCs \cite{islam2014quantitative}.
+In each data sets, highly variable genes (HVGs) were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
+The first approach is based on the method of Brennecke \textit{et al.} \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
+The top set of HVGs was identified as those genes with the smallest $p$-values.
+The second approach examines the variance of the log-counts, which provides some more robustness against outlier expression patterns.
+Here, the top set of HVGs was identified as those with the largest biological components of the variance.
+For both methods, the top set of 20-2000 genes was compared between the original and simulated analyses.
+This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
 
 \subsubsection{Dimensionality reduction}
 

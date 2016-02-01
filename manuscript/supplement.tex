@@ -209,14 +209,15 @@ This increases the chance that each half will behave similarly, such that spike-
 
 \section{Implementation details for the downstream analyses}
 
-\subsection{Methods for differential expression}
-For the mouse study, count data was obtained from the NCBI Gene Expression Omnibus under the accession GSE29087 \cite{islam2011characterization}.
+\subsection{Methods for detecting differentially expressed genes}
+For the mouse study, count data was obtained from the NCBI Gene Expression Omnibus (GEO) under the accession GSE29087 \cite{islam2011characterization}.
 A cell was considered to be of low quality and discarded if the sum of counts was below 10$^5$ or the proportion of mitochondrial reads was above 10\%.
-Counts for the spiked-in synthetic transcripts were summed and used as the spike-in totals for each cell.
-For the \textit{A. thaliana} study, count data was obtained as Supplementary Table~8 \cite{brennecke2013accounting}.
+The sum of counts for the spiked-in synthetic transcripts was used as the spike-in total for each cell.
+For the \textit{A. thaliana} study, counts were obtained from Supplementary Table~8 of the original publication \cite{brennecke2013accounting}.
 Quality control on the cells was not required as it had already been performed.
 Counts for human transcripts in the pooled HeLa RNA were summed and used as the spike-in totals.
-In both data sets, low-abundance cellular genes (i.e., those with an average count below 1) were removed.
+In both data sets, low-abundance cellular genes (i.e., those with an average count below 1) were filtered out.
+This is because low counts contain little evidence for DE. 
 
 For edgeR v3.12.0, the quasi-likelihood (QL) framework was used to detect DE genes \cite{lund2012detecting}.
 Briefly, an abundance-dependent trend was fitted to the NB dispersions of all genes.
@@ -231,6 +232,39 @@ For Monocle v1.4.0, each count was divided by the spike-in total for the corresp
 These expression values were used for DE testing between groups with the likelihood ratio test in the differentialGeneTest function.
 The Benjamini-Hochberg correction was then applied to control the FDR.
 This was performed with both the original and simulated spike-in totals.
+
+\subsection{Methods for detecting highly variable genes}
+For the haematopoietic stem cell study, count data was obtained from the NCBI GEO using the accession GSE61533 \cite{wilson2015combined}.
+Cell-level quality control was applied as previously described.
+For the immune cell study, data was obtained from Supplementary Table~5 of the original publication \cite{brennecke2013accounting}.
+No quality control was applied on the cells as it had already been performed.
+For the mESC study, data was obtained from NCBI GEO using the accession GSE46980 \cite{islam2014quantitative}.
+Cells were removed if the sum of counts was below 10$^4$ -- this threshold is lower than previously described, as the counts are for UMIs rather than reads.
+Filtering on mitochondrial proportions was also not performed for this data set, as proportions for all cells were consistently above 10\%.
+In all data sets, spike-in totals were defined as the sum of counts for the ERCC transcripts.
+Low-abundance genes with average counts below 1 were also filtered out, as low counts are unlikely to be highly variable.
+
+The first approach to detect HVGs is largely based on the method described by Brennecke \textit{et al.} \cite{brennecke2013accounting}.
+The only modification involves defining the spike-in totals as the size factors.
+This effectively scales the counts in each library so that the spike-in totals are the same.
+Normalized expression values were computed by dividing the counts by the size factors for both the spike-in transcripts and the cellular genes.
+In contrast, the original implementation defines a separate set of size factors for spike-ins and cellular genes -- this is not done here as it defeats the purpose of using spike-ins to normalize the cellular counts.
+The rest of the method was implemented as originally described.
+Briefly, the squared coefficient of variation (CV$^2$) of the normalized expression across all cells was computed for each spike-in transcript and cellular gene.
+A Gamma GLM was fitted to the CV$^2$ against the mean for a high-abundance subset of the spike-in transcripts.
+Each cellular gene was then tested for whether its CV$^2$ was significantly greater than the fitted GLM value at the same mean.
+A significant increase in the CV$^2$ above a minimum threshold (by default, 0.25) indicates that there is a substantial biological component to the gene's variability, beyond the technical noise that is characterized by the spike-in variability.
+This procedure yields a $p$-value with which putative HVGs can be ranked.
+
+The second approach to detect HVGs is based on computing the variance of log-counts.
+Normalized log-expression values were defined as the log-ratio of each count with the spike-in total for the corresponding cell.
+The variance of the log-expression was computed across all cells for each spike-in transcript.
+A loess curve of degree 1 was then fitted to the log-variance against the mean for all spike-in transcripts, representing the mean-variance relationship due to technical noise.
+The variance of the log-expression was also computed for each cellular gene.
+Interpolation of the loess curve at the mean for each cellular gene was used to obtain an estimate for the technical variance for that gene.
+This was subtracted from the total variance to yield the biological component of the variance for each gene.
+Putative HVGs were then ranked based on the largest biological components.
+The use of log-expression values protects against calling HVGs from outlier expression patterns, i.e., genes with very high expression in one cell and zero or near-zero counts in all other cells.
 
 \newpage
 \section{Dealing with variable spike-in behaviour}
