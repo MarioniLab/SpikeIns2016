@@ -122,7 +122,7 @@ for (datatype in c("brennecke", "islam")) {
 	# Also running NB models without any EB shrinkage, only using the tagwise dispersions.
 
 	diag.done <- FALSE
-        for (my.var in c(0.001, 0.01, 0.1)) {
+    for (my.var in c(0.001, 0.01, 0.1)) {
 		set.seed(231234)
 		results <- top.res <- list()
 		
@@ -192,8 +192,11 @@ for (datatype in c("brennecke", "islam")) {
 
 			pdat <- AnnotatedDataFrame(data=data.frame(grouping=grouping))
 			sampleNames(pdat) <- colnames(normalized)
-			HSMM <- new("CellDataSet", exprs=normalized, phenoData=pdat, expressionFamily=negbinomial())
+			HSMM <- new("CellDataSet", exprs=normalized, phenoData=pdat)
 
+            if (datatype=="islam") { # for convenience, otherwise we'll be here for days. 
+                HSMM <- HSMM[1:2000,]
+            }
 			out <- differentialGeneTest(HSMM, fullModelFormulaStr="expression~grouping", cores=10) 
 
 			# Choosing stuff. 
