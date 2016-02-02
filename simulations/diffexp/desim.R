@@ -192,7 +192,7 @@ for (datatype in c("brennecke", "islam")) {
 
 			pdat <- AnnotatedDataFrame(data=data.frame(grouping=grouping))
 			sampleNames(pdat) <- colnames(normalized)
-			HSMM <- new("CellDataSet", exprs=normalized, phenoData=pdat)
+			HSMM <- newCellDataSet(cellData=normalized, phenoData=pdat)
 
             if (datatype=="islam") { # for convenience, otherwise we'll be here for days. 
                 HSMM <- HSMM[1:2000,]
