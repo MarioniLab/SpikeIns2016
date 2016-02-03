@@ -236,7 +236,7 @@ This was repeated for 10 simulation iterations, and the average proportions acro
 
 \subsubsection{Ranking highly variable genes}
 Three scRNA-seq data sets were obtained -- one from a study of mouse haematopoietic stem cells \cite{wilson2015combined}, one from a study of murine immune cells \cite{brennecke2013accounting} and another from a study of mESCs \cite{islam2014quantitative}.
-In each data sets, highly variable genes (HVGs) were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
+In each data set, highly variable genes (HVGs) were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
 The first approach is based on the method of Brennecke \textit{et al.} \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
 The top set of HVGs was identified as those genes with the smallest $p$-values.
 The second approach examines the variance of the log-counts, which provides some more robustness against outlier expression patterns.
@@ -244,8 +244,14 @@ Here, the top set of HVGs was identified as those with the largest biological co
 For both methods, the top set of 20-2000 genes was compared between the original and simulated analyses.
 This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
 
-\subsubsection{Dimensionality reduction}
-
+\subsubsection{Dimensionality reduction and clustering}
+A scRNA-seq data set was obtained from a study of mESCs cultured under different conditions \cite{kolod2015single}.
+A PCA plot was constructed from the original log-counts after spike-in normalization.
+This was repeated for each simulation iteration, and the position of each cell on the simulated plot was mapped back to the corresponding location on the original plot.
+In this manner, the sensitivity of the cell placement to spike-in variability was assessed.
+Hierarchical clustering was also performed on the normalized log-counts using Euclidean distances or rank correlations.
+The stability of each cluster was assessed based on the number of occurrences of that cluster across simulation iterations.
+See Section~Y in the Supplementary Materials for further implementation details.
 
 {\small
 \bibliography{refnorm}
