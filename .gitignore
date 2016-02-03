@@ -29,7 +29,6 @@ simulations/variance/results_bren.txt
 simulations/diffexp/GSE29087_L139_expression_tab.txt.gz
 simulations/diffexp/brennecke.R
 simulations/diffexp/brennecke.Rout.save
-simulations/diffexp/desim.Rout.save
 simulations/diffexp/diagnostics_brennecke.pdf
 simulations/diffexp/diagnostics_islam.pdf
 simulations/diffexp/islam.R
@@ -39,7 +38,7 @@ simulations/diffexp/outEB_brennecke.tsv
 simulations/diffexp/outEB_islam.tsv
 simulations/diffexp/outNB_brennecke.tsv
 simulations/diffexp/outNB_islam.tsv
-simulations/diffexp/results.txt
+simulations/diffexp/ref_results.txt
 simulations/diffexp/shrinkfree.R
 simulations/diffexp/shrinkfree.Rout.save
 
