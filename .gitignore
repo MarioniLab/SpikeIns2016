@@ -42,3 +42,18 @@ simulations/diffexp/ref_results.txt
 simulations/diffexp/shrinkfree.R
 simulations/diffexp/shrinkfree.Rout.save
 
+simulations/clustering/ESpresso
+simulations/clustering/clusters_ola_95.pdf
+simulations/clustering/clusters_ola_pure.pdf
+simulations/clustering/data_2_4_15947.txt.gz
+simulations/clustering/ola.R
+simulations/clustering/ola.Rout.save
+simulations/clustering/pca_effect_ola.pdf
+simulations/clustering/pca_effect_scialdone.pdf
+simulations/clustering/technoise_ola.pdf
+simulations/clustering/technoise_scialdone.pdf
+simulations/clustering/tsne_effect_ola.pdf
+simulations/clustering/tsne_effect_scialdone.pdf
+simulations/clustering/tsne_example_ola.pdf
+simulations/clustering/tsne_example_scialdone.pdf
+
