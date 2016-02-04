@@ -47,7 +47,7 @@ This means that any cell-specific biases in the latter may not be captured by th
 
 In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
 We use mixtures of two distinct spike-in RNA sets to quantify the variability of the added spike-in volume across cells.
-We also characterize the differences in behaviour between the two sets, to determine if cell-specific biases change between different RNA populations.
+We also characterize the variability in behaviour between the two sets, to determine if cell-specific biases change between different RNA populations.
 Both factors are quantitatively negligible and have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
 These results suggest that spike-ins can be safely used for routine normalization of scRNA-seq data.
 
@@ -62,14 +62,42 @@ These results suggest that spike-ins can be safely used for routine normalizatio
 % On the other hand, any non-DE genes with no change in the molecule number will be called as significant in standard normalization, which is definitively wrong.
 % You could have your cake and eat it by separating the DE list into up/down changes for easier examination of the up/down changes.
 
-\section{Assessing the variability of spike-in addition}
-The first experiment uses two distinct spike-in RNA populations.
-For example, ERCC spike-ins can be used as one population, while pooled cellular RNA from a bulk population can be used as the other population.
-Equal volumes of each spike-in population are added into a well and converted into a library with an appropriate protocol (Figure~\ref{fig:expdesign}).
-This process is repeated for multiple wells, and sequencing is performed on all of the generated libraries.
-For each library, reads are mapped back to the genome and counted into genes.
-The total count across all genes is computed for each population, and the log-ratio of the total counts between the two spike-ins is calculated.
-The variability of this log-ratio across wells represents the technical variability of the entire protocol, including the addition of the spike-in volume as well as library preparation.
+\section{Results}
+
+\subsection{Overview of the mixture experiments}
+We used two spike-in sets -- the External RNA Controls Consortium (ERCC) set and the Spike-in RNA Variants (SIRV) set.
+Equal volumes of each spike-in set were added into a well and converted into a library with the Smart-seq2 protocol.
+This process was repeated for multiple wells, and sequencing was performed on all of the generated libraries.
+For each library, reads were mapped back to the genome and counted into genes.
+The total count across all genes was computed for each spike-in set, and the log-ratio of the total counts between the two sets was calculated (denoted here as $\theta_i$).
+The variance of this log-ratio across wells contains the variance in the addition of each spike-in volume $\sigma_{vol}^2$;
+    variance in the behaviour of each spike-in set $\mbox{var}(\log \phi_{is})$, where $\phi_{is}$ represents the relative capture efficiency of transcripts in set $s$;
+    and additional technical variability from library preparation and sequencing $\sigma^2_{lib(s)}$.
+In other words, for $s=1$ (ERCC) and 2 (SIRV), the variance of $\theta_i$ can be decomposed to 
+\[
+    \mbox{var}(\theta_i) = 2\sigma_{vol}^2 + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2}) \;.
+\]
+
+The experiment was repeated after mixing the two spike-in sets before addition into each well. 
+The variance of the log-ratio of the total counts of the two spike-in sets was then computed across wells (denoted here as $\theta_i'$).
+Here, the ratio of the added volumes of two spike-in sets is constant across all wells.
+This means that variability in volume addition will not contribute to variability of $\theta_i'$, i.e.,
+\[
+    \mbox{var}(\theta_i') = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2}) \;.
+\]
+Subtracting the estimated variance from that of the first experiment yields an estimate of $\sigma_{vol}^2$.
+It is also possible to achieve further decomposition of the variance by considering the variance of the log-ratios between transcripts in the same spike-in set.
+The assumption is that, on average, different transcripts from the same spike-in set will have the same capture efficiency.
+Any variance should be solely due to technical variability -- this allows $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ to be estimated and subtracted from $\mbox{var}(\theta_i')$ to obtain $\mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2})$.
+The latter is useful as it represents the variability in the relative capture efficiency (and thus, cell-specific bias) between the different spike-in sets.
+
+Both experiments were performed with a cell in each well, sourced from a homogeneous cell line.
+The log-ratio between spike-in and cellular counts was computed for each well.
+The variance of this log-ratio across wells includes the biological variability in total RNA across cells.
+This serves as a reference to which the spike-in-based components of the technical variability can be compared. 
+
+A schematic of the experimental design is provided in Figure~\ref{fig:expdesign}.
+The mathematical framework underlying the variance decomposition is described in Section~1 of the Supplementary Materials.
 
 % It should be stressed that the specific choice of population does not matter.
 % Once the variance is estimated, it can be applied to other studies involving different RNA populations.
@@ -89,28 +117,6 @@ Components of the variability can be separated by comparing the variances of the
 }
 \label{fig:expdesign}
 \end{figure}
-
-The second experiment uses the same two spike-in populations, but pools them beforehand.
-The mixed population is aliquoted into separate wells and used to generate libraries.
-Sequencing of this population is performed, and the variability of the log-ratio of the total counts of the two spike-ins is computed.
-This reflects the variability of the library generation and sequencing steps, as the relative volume of each spike-in population is constant for all aliquots.
-Subtracting this variability from the overall technical variability of the first experiment yields the net variability of the volume addition step.
-If spike-in quantities are consistent between cells, the magnitude of the net variability should be low.
-Similarly, if the technical variability is dominated by library preparation, minor variability in the spike-in volume may not be a concern.
-%This variability may not be negligible in a single-cell protocol, due to the difficulty of reliably capturing small numbers of transcript molecules.
-
-The final experiment is that of a realistic single-cell transcriptome study, where one spike-in is added to RNA from individual cells.
-This is repeated for multiple wells - obviously, with a different cell in each well.
-The log-ratio between spike-in and cellular counts is computed for each well.
-The variability of this log-ratio across wells includes the biological variability in total RNA across cells.
-This is compared to the technical variability, i.e., of spike-in volume addition and library generation/sequencing.
-We can then determine whether the overall variability of the log-ratios is dominated by the biological or technical component.
-If the former is much larger than the latter, any variability in the spike-in volume may be considered negligible.
-This suggests that the assumption of equal spike-in quantities might be reasonable for normalization.
-
-In summary, the results from these experiments will allow us to measure the magnitude of the variability in the addition of spike-in volumes for single-cell experiments.
-If substantial spike-in variability is present, this experimental framework will also allow us to explore approaches to improve consistency.
-For example, can variability be reduced by increasing the volume of spike-in solution added to each well?
 
 \section{Evaluating the effect of spike-in variability on existing software}
 The effect of variable spike-in quantities can be more rigorously evaluated in the context of downstream analyses.
