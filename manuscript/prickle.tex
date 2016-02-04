@@ -75,11 +75,11 @@ This process was repeated for multiple wells, and sequencing was performed on al
 For each library, reads were mapped back to the genome and counted into genes.
 The total count across all genes was computed for each spike-in set, and the log-ratio of the total counts between the two sets was calculated (denoted here as $\theta_i$).
 The variance of this log-ratio across wells contains the variance in the addition of each spike-in volume $\sigma_{vol}^2$;
-    variance in the behaviour of each spike-in set $\mbox{var}(\log \phi_{is})$, where $\phi_{is}$ represents the relative capture efficiency of transcripts in set $s$;
+    variance in the difference in behaviour between spike-in sets, where $\psi_i$ represents the fold change in the capture efficiency between sets;
     and additional technical variability from library preparation and sequencing $\sigma^2_{lib(s)}$.
 In other words, for $s=1$ (ERCC) and 2 (SIRV), the variance of $\theta_i$ can be decomposed to 
 \[
-    \mbox{var}(\theta_i) = 2\sigma_{vol}^2 + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2}) \;.
+    \mbox{var}(\theta_i) = 2\sigma_{vol}^2 + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \;.
 \]
 
 The experiment was repeated after mixing the two spike-in sets before addition into each well. 
@@ -87,13 +87,13 @@ The variance of the log-ratio of the total counts of the two spike-in sets was t
 Here, the ratio of the added volumes of two spike-in sets is constant across all wells.
 This means that variability in volume addition will not contribute to variability of $\theta_i'$, i.e.,
 \[
-    \mbox{var}(\theta_i') = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2}) \;.
+    \mbox{var}(\theta_i') = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \;.
 \]
 Subtracting the estimated variance from that of the first experiment yields an estimate of $\sigma_{vol}^2$.
-It is also possible to achieve further decomposition of the variance by considering the variance of the log-ratios between transcripts in the same spike-in set.
-The assumption is that, on average, different transcripts from the same spike-in set will have the same capture efficiency.
-Any variance should be solely due to technical variability -- this allows $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ to be estimated and subtracted from $\mbox{var}(\theta_i')$ to obtain $\mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2})$.
-The latter is useful as it represents the variability in the relative capture efficiency (and thus, cell-specific bias) between the different spike-in sets.
+Further decomposition can be achieved by considering the variance of the log-ratios between transcripts in the same spike-in set.
+The assumption is that, on average, different transcripts from the same set will have the same capture efficiency.
+Thus, any variance in the intra-set log-ratios should only contain technical variability.
+This allows $\sigma^2_{lib(1)}$ and $\sigma^2_{lib(2)}$ to be estimated -- subtraction will then yield $\mbox{var}(\log \psi_i)$.
 
 Both experiments were performed with a cell in each well, sourced from a homogeneous cell line.
 The log-ratio between spike-in and cellular counts was computed for each well.
