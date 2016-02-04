@@ -66,8 +66,9 @@ $^2$EMBL European Bioinformatics Institute, Wellcome Genome Campus, Hinxton, Cam
 \section{Decomposing the variance for log-ratios of spike-ins}
 
 \subsection{Overview of basic definitions}
-The first step of the protocol involves adding spike-in populations together.
-Consider the following definitions:
+The first step of the experiment involves adding spike-in populations to each well of a microtiter plate.
+(We will use ``well'' and ``cell'' interchangeably here, as each well contains one cell.)
+Consider these definitions:
 \begin{center}
     \begin{tabular}{l p{0.9\textwidth}}
 $C_{t_s}$  & The concentration in molecules per unit of volume for transcript $t_s$ in spike-in population $s$. \\
@@ -83,16 +84,14 @@ After the spike-in volumes are added together, library preparation is performed 
 Consider the following definitions:
 \begin{center}
 \begin{tabular}{l p{0.9\textwidth}}
-$R_{t_s}$ & The optimal number of cDNA fragments generated from each molecule of $t_s$. \\
-$\psi_{i}$ & The overall efficiency of cDNA generation in well $i$ for all transcripts. \\
-$\phi_{is}$ & The relative efficiency of cDNA generation in well $i$ for all transcripts of population $s$. \\
+$R_{t_s}$ & The ``baseline'' number of cDNA fragments generated from each molecule of $t_s$. \\
+$\phi_{is}$ & The efficiency of cDNA generation in well $i$ for all transcripts of population $s$. \\
 $\delta_{it_s}$ & The cDNA fragment-per-transcript molecule conversion rate for transcript $t_s$ in well $i$.
 \end{tabular}
 \end{center}
 $R_{t_s}$ is a constant as it depends on the inherent properties of each transcript.
-$\psi_{i}$ is a random variable that represents well-specific biases in library preparation.
-Additional biases in each well are modelled by $\phi_{is}$, which represents well- and population-specific behaviour.
-These parameters are related by $\delta_{it_s} = R_{t_s} \phi_{is} \psi_i$.
+$\phi_{is}$ is a random variable that represents well-specific biases for each spike-in population.
+These parameters are related by $\delta_{it_s} = R_{t_s} \phi_{is}$.
 
 Finally, define $\nu_{ig}$ as the number of transcript molecules for gene $g$ in the cellular RNA for the cell in well $i$.
 This is a random variable that includes the biological variability in gene expression.
@@ -100,6 +99,8 @@ Let $\delta_{ig}$ represent the cDNA fragment-per-transcript conversion rate for
 
 All random variables are assumed to be independent unless they have been explicitly related by equalities, e.g., $\zeta_{it_s}$ and $\eta_{is}$.
 This is justified by the fact that they describe separate processes in the protocol.
+The other exception is that $\phi_{is}$ may not be independent between $s$, as capture efficiencies of different populations may be affected by the same factors in each well.
+However, they are still independent of the other variables.
 
 \subsection{Constructing the distribution of the total counts}
 For spike-in populations $s=1, 2, \ldots$, the cDNA fragment-to-read conversion factor for each well is
@@ -112,11 +113,11 @@ In contrast, for UMI data, the fragment-to-UMI conversion factor is simply $\rho
 
 The conditional expectation of the total read count across all transcripts in population $s$ for well $i$ is
 \[
-    \mu_{is} = \rho_i  \textstyle\sum_{t_s} \delta_{it_s} \zeta_{it_s} = \rho_i  \eta_{is} \psi_i \phi_{is} \sum_{t_s} R_{t_s} C_{t_s} \;.
+    \mu_{is} = \rho_i  \textstyle\sum_{t_s} \delta_{it_s} \zeta_{it_s} = \rho_i  \eta_{is} \phi_{is} \sum_{t_s} R_{t_s} C_{t_s} \;.
 \]
 The observed total $y_{is}$ is assumed to be log-normally distributed, conditional on the other parameters, i.e., 
 \[
-    \log y_{is} | \{ \eta_{is}, \phi_{is} \forall s \}, \psi_i, \{ \delta_{ig}, \nu_{ig} \forall g \} \sim \mathcal{N}(\log \mu_{is}, \sigma^2_{lib(s)})
+    \log y_{is} | \{ \eta_{is}, \phi_{is} \forall s \}, \{ \delta_{ig}, \nu_{ig} \forall g \} \sim \mathcal{N}(\log \mu_{is}, \sigma^2_{lib(s)})
 \]
 where $\sigma^2_{lib(s)}$ represents the variability due to sequencing of population $s$.
 We consider that $\sigma^2_{lib(s)} = f(A_s)$ for some monotonic decreasing function $f$ of the abundance $A_s$ for $s$.
@@ -124,7 +125,7 @@ This models the decrease in variability with increasing abundance, a trend that 
 
 For simplicity, we define $A_s = E(\log \mu_{is})$ rather than $A_s = \log \mu_{is}$.
 This is an approximation as the variability should depend on the size of the total count within each well, rather than on its expectation across all wells.
-Nonetheless, this approximation is useful as it simplifies the following derivations, by ensuring that we do not have to consider the effect of variability in $\eta_{is}$, $\psi_i$, etc. on the value of $\sigma^2_{lib(s)}$.
+Nonetheless, this approximation is useful as it simplifies the following derivations, by ensuring that we do not have to consider the effect of variability in $\eta_{is}$, $\phi_{is}$, etc. on the value of $\sigma^2_{lib(s)}$.
 We also assume that totals are conditionally independent between spike-in populations.
 This is because we have already conditioned on the well-specific biases that are common to the populations within each well.
 Thus, any remaining variation due to random technical noise should be independent for each population.
@@ -135,26 +136,27 @@ Based on the distribution of the total counts, $\theta_i$ is conditionally distr
 \[
     \theta_i |  \{ \eta_{is}, \phi_{is} \forall s \} \sim \mathcal{N}( \log \mu_{i1} - \log \mu_{i2}, \sigma^2_{lib(1)} + \sigma^2_{lib(2)} ) \;. 
 \]
-There is no dependence on $\delta_{ig}$, $\nu_{ig}$ or $\psi_i$, as these terms cancel out during calculation of $\theta_i$ for each well.
+There is no dependence on $\delta_{ig}$ or $\nu_{ig}$ as these terms cancel out during calculation of $\theta_i$ for each well.
 This can be illustrated by examining the conditional expectation for $\theta_i$, i.e.,
 \begin{align*}
     E(\theta_i |  \{ \eta_{is}, \phi_{is} \forall s \})
     &= \log \mu_{ix} - \log \mu_{iy} \\
-    &= \log \left( \frac{\rho_i \eta_{i1} \psi_i \phi_{i1} \sum_{t_1} R_{t_1} C_{t_1}}{\rho_i \eta_{i2} \psi_i \phi_{i2} \sum_{t_2} R_{t_2} C_{t_2}} \right) \\
-    &= \log \eta_{i1} - \log \eta_{i2} +  \log \phi_{i1} - \log \phi_{i2} + Z \quad\mbox{for some constant } Z \;.
+    &= \log \left( \frac{\rho_i \eta_{i1} \phi_{i1} \sum_{t_1} R_{t_1} C_{t_1}}{\rho_i \eta_{i2} \phi_{i2} \sum_{t_2} R_{t_2} C_{t_2}} \right) \\
+    &= \log \eta_{i1} - \log \eta_{i2} +  \log (\phi_{i1} / \phi_{i2})  + Z \quad\mbox{for some constant } Z \;.
 \end{align*}
 
 Assume that both $\log \eta_{i1}$ and $\log \eta_{i2}$ are distributed with the same variance $\sigma^2_{vol}$.
 The use of the same variance is justified by the fact that the same spike-in volume is added for both $s=1$ and $2$, such that the variability should be the same for both volumes.
 This means that the variance of $\theta_i$ can be written as
 \[
-    \mbox{var}(\theta_i) = 2\sigma_{vol}^2 + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2}) \;. 
+\mbox{var}(\theta_i) = 2\sigma_{vol}^2 + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)
 % Easily derived using the law of total variances.
 % Normal distribution for R_i is obvious, based on product of PDFs (int[ P(X=x|u)*P(u) du ] gives a exp(x^2), eventually, and you can work this out to validate the variance).
 % Both claims tested in simulations (sample variances of normal distribution with normal mean match up with expected truth, no rejections on a Shapiro-Wilk test).
 \]
+where $\psi_i = \phi_{i1}/\phi_{i2}$.
 This can be estimated as the sample variance of the log-ratios across all wells in the first experiment. 
-For convenience in downstream statistical tests, it is helpful to assume that $\log \eta_{is}$ and $\log \phi_{is}$ are normally distributed for each population $s$.
+For convenience in downstream statistical tests, it is helpful to assume that $\log \eta_{is}$ for each $s$ and $\log \psi_i$ are normally distributed.
 This ensures that $\theta_i$ will also follow a normal distribution.
 
 \subsection{Deriving the variance of the log-ratios with premixing}
@@ -162,7 +164,7 @@ In the second experiment, mixing of spike-in populations occurs beforehand such 
 More specifically, $\eta_{i1}=\eta_{i2}$ in each well such that they cancel out in calculating $\theta_i$ and do not contribute to the variance.
 This means that the variance of the log-ratio (denoted here as $\theta_i'$) can be written as
 \[
-    \mbox{var}(\theta_i') = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2})
+    \mbox{var}(\theta_i') = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)
 \]
 and can be estimated as the sample variance of the log-ratios in this experiment.
 Subtraction of the estimated variance of $\theta_i'$ from that of $\theta_i$ from the first experiment can be used to obtain an estimate of $\sigma^2_{vol}$.
@@ -189,17 +191,17 @@ This is true for both experiments, as $\eta_{i1} = \eta_{i1_a} = \eta_{i1_b}$ wi
 Now, consider the variance of the log-ratio of the total count for each half to the second population $s=2$.
 This is written as
 \begin{align*}
-    \mbox{var}(\theta_{i(a)}') &= \sigma^2_{lib(1_a)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) + \mbox{var}(\log \phi_{i2}) \\
-    \mbox{var}(\theta_{i(b)}') &= \sigma^2_{lib(1_b)} + \sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) + \mbox{var}(\log \phi_{i2})
+    \mbox{var}(\theta_{i(a)}') &= \sigma^2_{lib(1_a)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \\
+    \mbox{var}(\theta_{i(b)}') &= \sigma^2_{lib(1_b)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)
 \end{align*}
 using only the samples in the second experiment (where variability in volume addition need not be considered).
 We now perform some basic arithmetic on the variances of the log-ratios:
 \begin{align*}
-    &\mbox{var}(\theta_{i(a)}') +  \mbox{var}(\theta_{i(b)}') - \mbox{var}(\theta_{i(ab)}') = 2 [\sigma^2_{lib(2)} + \mbox{var}(\log \phi_{i1}) + \mbox{var}(\log \phi_{i2}) ] \\
+    &\mbox{var}(\theta_{i(a)}') +  \mbox{var}(\theta_{i(b)}') - \mbox{var}(\theta_{i(ab)}') = 2 [\sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)] \\
     &\mbox{var}(\theta_i') - \textstyle\frac{1}{2}[\mbox{var}(\theta_{i(a)}') + \mbox{var}(\theta_{i(b)}') - \mbox{var}(\theta_{i(ab)}') ] = \sigma^2_{lib(1)}
 \end{align*}
 We repeat this after splitting $s=2$ into halves to obtain an estimate of $\sigma^2_{lib(2)}$.
-These values can be subtracted from $\mbox{var}(\theta_i')$ to estimate the variance in spike-in-specific behaviour, i.e., $\mbox{var}(\log \phi_{i1}) +  \mbox{var}(\log \phi_{i2})$.
+These values can be subtracted from $\mbox{var}(\theta_i')$ to estimate the variance in the fold-differences in spike-in-specific behaviour, i.e., $\mbox{var}(\log \psi_i)$.
 
 Note that our model does not consider transcript-specific variability in behaviour in each well.
 If such variability exists, it will not cancel out when calculating $\theta_{i(ab)}')$ and will instead be treated as part of the technical variability.
