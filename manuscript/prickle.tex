@@ -28,26 +28,30 @@ One commonly used normalization strategy is to use a set of genes that have cons
 This set can consist of pre-defined ``house-keeping'' genes, or it can be empirically defined under the assumption that most genes are not differentially expressed (DE) between cells.
 Counts are scaled to eliminate (presumably artifactual) differences in the coverage of this set across cells.
 This removes spurious differences like those caused by composition bias, i.e., where greater sequencing of upregulated transcripts proportionally reduces the sequencing of all other genes \cite{robinson2010tmm}.
-The scaled counts can then be compared between libraries.
+The scaled counts can then be compared between cells in downstream analyses.
 This gene-based approach works well for bulk sequencing experiments where the population-wide gene expression profile is stable.
-However, it may not be suitable for single-cell experiments where technical noise and biological heterogeneity complicate the identification of a non-DE set. 
+However, it may not be suitable for single-cell experiments where technical noise and biological heterogeneity complicate the identification of a reliable non-DE set. 
 For example, house-keeping genes may be turned on or off by transcriptional bursting \cite{marinov2014singlecell}, while cell cycling and other processes may trigger large-scale changes in the transcriptional programme that preclude the assumption of a non-DE majority.
 
 An alternative normalization strategy involves the use of spike-in RNA for which the identity and quantity of all transcripts is known \cite{stegle2015computational}.
-The same volume of spike-in RNA solution is added to each cell and processed along with the cellular transcripts.
-This yields a set of read or UMI counts for both cellular and spike-in genes in each cell.
+The same amount of spike-in RNA is added to each cell, and the spike-in transcripts are processed along with their endogenous counterparts into a library for sequencing.
+This yields a set of read (or UMI) counts for both endogenous and spike-in transcripts in each cell.
 Normalization is performed by scaling the counts for each cell such that the counts for the spike-in genes are, on average, the same between cells.
 The central assumption of this approach is that the same amount of spike-in RNA is added to each cell.
 Thus, any differences in the coverage of the spike-in genes between cells must be artifactual in origin and should be removed by scaling.
+
 The use of spike-ins for normalization seems preferable as it avoids making strong assumptions about the biology of single cells.
 However, a major criticism of this approach in bulk experiments is that the volume of spike-in RNA cannot be consistently added to each sample \cite{robinson2010tmm}.
-Variable addition of spike-in RNA would mean that the assumption of equal spike-ins betwen cells is violated, compromising the effectiveness of normalization \cite{risso2014normalization}.
-Another criticism is that synthetic spike-in transcripts may not behave in the same manner as the cellular transcripts \cite{grun2015design}.
-This means that any cell-specific biases in the latter may not be captured by the former.
+Variable addition of spike-in RNA would mean that the assumption of equal spike-in amounts betwen cells is violated, compromising the effectiveness of normalization \cite{risso2014normalization}.
+Another criticism is that synthetic spike-in transcripts may not behave in the same manner as the endogenous transcripts \cite{grun2015design}.
+This means that any cell-specific biases in capture efficiency for the latter may not be captured by the former.
+For relative quantification of gene expression, any cell-to-cell variability in the differences in behaviour is most problematic.
+This is because such differences will not cancel out between cells when scaling is performed to equalize spike-in coverage.
+As a result, cell-specific biases would not be completely removed by normalization.
 
 In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
-We use mixtures of two distinct spike-in RNA sets to quantify the variability of the added spike-in volume across cells.
-We also characterize the variability in behaviour between the two sets, to determine if cell-specific biases change between different RNA populations.
+We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells.
+We also estimate the variability in differential behaviour between the sets, to determine how cell-specific biases change between different RNA populations.
 Both factors are quantitatively negligible and have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
 These results suggest that spike-ins can be safely used for routine normalization of scRNA-seq data.
 
