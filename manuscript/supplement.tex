@@ -126,9 +126,8 @@ This models the decrease in variability with increasing abundance, a trend that 
 For simplicity, we define $A_s = E(\log \mu_{is})$ rather than $A_s = \log \mu_{is}$.
 This is an approximation as the variability should depend on the size of the total count within each well, rather than on its expectation across all wells.
 Nonetheless, this approximation is useful as it simplifies the following derivations, by ensuring that we do not have to consider the effect of variability in $\eta_{is}$, $\phi_{is}$, etc. on the value of $\sigma^2_{lib(s)}$.
-We also assume that totals are conditionally independent between spike-in sets.
-This is because we have already conditioned on the well-specific biases that are common to the sets within each well.
-Thus, any remaining variation due to random technical noise should be independent for each set.
+We also assume that the totals are conditionally independent between different spike-in sets.
+We have already conditioned on well-specific biases, so any remaining variation due to random technical noise should be independent.
 
 \subsection{Deriving the variance of the log-ratios upon separate addition}
 Denote the log-ratio of the total counts between two spike-in sets $s=1, 2$ as $\theta_i = \log(y_{i1}/y_{i2})$ for well $i$.
@@ -169,7 +168,7 @@ This means that the variance of the log-ratio (denoted here as $\theta_i'$) can 
 and can be estimated as the sample variance of the log-ratios in this experiment.
 Subtraction of the estimated variance of $\theta_i'$ from that of $\theta_i$ from the first experiment can be used to obtain an estimate of $\sigma^2_{vol}$.
 Note that this assumes that $E(\log \mu_{is})$ is the same for each spike-in set between the first and second experiments, i.e., the average count size for each set is the same between experiments.
-This ensures that there are no abundance-related changes in the technical variability of each set.
+This ensures that there are no abundance-related changes in the technical variability of each set, i.e., $ \sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
 In general, this assumption is reasonable if premixing of the two sets is done in a 1:1 ratio (volume-by-volume) and the total added volume of premixed spike-in is equal to the total volume for separate additions in the first experiment.
 
 % It's possible to do something more complicated with a Poisson sampling distribution that's conditional on the mean.
