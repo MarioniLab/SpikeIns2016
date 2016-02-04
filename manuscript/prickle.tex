@@ -3,7 +3,6 @@
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage[font={small,it}]{caption}
 \usepackage{amsmath}
 
 \title{When normalization gets prickly: are spike-ins good enough for single-cell RNA sequencing data?}
@@ -108,16 +107,13 @@ The mathematical framework underlying the variance decomposition is described in
 
 \begin{figure}[H]
 \begin{center}
-%\includegraphics[width=0.8\textwidth]{expdesign.pdf}
+\includegraphics[width=\textwidth]{pics/plate_setup.pdf}
 \end{center}
-\caption{Proposed experimental design to assess the variability of spike-ins.
-The first experiment (A) involves adding an equal volume of each spike-in population (red or blue) into each well, and sequencing each well.
-The variance in the log-ratios of the populations across wells represents the technical variability of the spike-in procedure.
-The second experiment (B) involves adding an equal volume of a pooled mixture of the two spike-ins into each well, and sequencing each well.
-Here, the variance represents the specific variability introduced by library generation and sequencing.
-The third experiment (C) involves adding an equal volume of one spike-in population (red) into each well with RNA from a single cell, and sequencing each well.
-This measures the overall variability, including the biological variability in the total RNA of each cell.
-Components of the variability can be separated by comparing the variances of the log-ratios.
+\caption{Schematic of the experimental design to assess the variability of spike-ins in a plate-based scRNA-seq protocol.
+The first experiment (A) involves adding an equal volume of each spike-in set into each well during the reverse transcription (RT) step.
+The second experiment (B) involves adding an equal volume of a pooled mixture of the two spike-ins into each well, again during the RT step (done twice for consistency).
+Sequencing is performed and the log-ratio of the total count between spike-in sets is computed for each well.
+Components of the spike-in variability can be separated by estimating the variance of the log-ratios across wells and comparing the estimates between experiments.
 }
 \label{fig:expdesign}
 \end{figure}
