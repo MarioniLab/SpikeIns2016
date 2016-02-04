@@ -16,6 +16,7 @@
 \section{Introduction}
 Single-cell RNA sequencing (scRNA-seq) is a powerful technique for studying transcriptional activity in individual cells.
 Briefly, RNA is isolated from single cells, converted into cDNA and sequenced using massively parallel sequencing technologies \cite{shapiro2013singlecell}.
+This can be done on microfluidics platforms, or increasingly, with plate-based protocols such as Smart-seq2 \cite{picelli2014full} that are compatible with existing techniques like indexed fluorescence-activated cell sorting (FACS).
 Gene expression can be quantified by mapping the read sequences to the genome and counting the number of reads mapped to each gene.
 To avoid amplification biases, individual transcript molecules can be tagged with unique molecular identifiers (UMIs) \cite{islam2014quantitative}, such that sequencing to saturation and counting UMIs will yield the number of transcripts of each gene in a cell.
 %However, sequencing to saturation may not be economically feasible for hundreds or thousands of cells.
@@ -44,7 +45,7 @@ Variable addition of spike-in RNA would mean that the assumption of equal spike-
 Another criticism is that synthetic spike-in transcripts may not behave in the same manner as the cellular transcripts \cite{grun2015design}.
 This means that any cell-specific biases in the latter may not be captured by the former.
 
-In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies.
+In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
 We use mixtures of two distinct spike-in RNA sets to quantify the variability of the added spike-in volume across cells.
 We also characterize the differences in behaviour between the two sets, to determine if cell-specific biases change between different RNA populations.
 Both factors are quantitatively negligible and have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
