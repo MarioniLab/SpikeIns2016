@@ -14,73 +14,52 @@
 \maketitle
 
 \section{Introduction}
-Single-cell RNA sequencing is a rapidly growing area of research that allows detailed study of the transcriptional activity of individual cells.
+Single-cell RNA sequencing (scRNA-seq) is a powerful technique for studying transcriptional activity in individual cells.
 Briefly, RNA is isolated from single cells, converted into cDNA and sequenced using massively parallel sequencing technologies \cite{shapiro2013singlecell}.
-Gene expression can be quantified by mapping the read sequences back to the genome, and counting the number of reads mapped to each gene.
+Gene expression can be quantified by mapping the read sequences to the genome and counting the number of reads mapped to each gene.
 To avoid amplification biases, individual transcript molecules can be tagged with unique molecular identifiers (UMIs) \cite{islam2014quantitative}, such that sequencing to saturation and counting UMIs will yield the number of transcripts of each gene in a cell.
-However, sequencing to saturation may not be economically feasible for hundreds or thousands of cells.
-In addition, not all molecules will be captured due to cell-specific inefficiencies in reverse transcription \cite{stegle2015computational}.
-As a result, the count for each gene will usually reflect the proportion of transcripts rather than the absolute quantity within each cell (Figure~\ref{fig:cellexample}).
-The latter is more relevant as it can be meaningfully compared between cells for any given gene, whereas the former depends on the expression of all other genes in the cell.
-Thus, some normalization is necessary to adjust the read count into a useful measure of gene expression.
+%However, sequencing to saturation may not be economically feasible for hundreds or thousands of cells.
+However, not all molecules will be captured and sequenced due to cell-specific inefficiencies in reverse transcription \cite{stegle2015computational}.
+The presence of these cell-specific biases compromises the use of the read/UMI count as a quantitative measure of gene expression.
+Some normalization is necessary to remove these biases before counts can be meaningfully compared between cells.
 
-\begin{figure}[H]
-\begin{center}
-%\includegraphics[width=0.6\textwidth]{motivation.pdf}
-\end{center}
-\caption{Need for normalization in single-cell transcriptome sequencing.
-RNA is extracted from each cell, converted to cDNA and sequenced.
-Each transcript molecule is coloured according to the identity of the gene.
-Read (or UMI) counts for each gene are also shown, with a total sequencing depth of 100 reads for each cell.
-These counts represent proportions rather than the absolute number of molecules in each cell.
-For example, counts are identical for all genes in the first and second cells, despite the differences in the total number of transcript molecules. 
-Similarly, even though the number of transcripts is the same, the count for the red gene is lower in the third cell compared to the first cell.
-}
-\label{fig:cellexample}
-\end{figure}
-
-One popular normalization approach is to use a set of genes that have constant expression across cells.
-The set can consist of pre-defined ``house-keeping'' genes, or it can be empirically defined under the assumption that most genes are not differentially expressed (DE) between cells.
-Counts are scaled to eliminate (presumably artifactual) differences in the coverage of this set across libraries.
-This removes proportion-based differences, e.g., where greater sequencing of upregulated transcripts proportionally reduces the sequencing of all other genes \cite{robinson2010tmm}.
+One commonly used normalization strategy is to use a set of genes that have constant expression across cells.
+This set can consist of pre-defined ``house-keeping'' genes, or it can be empirically defined under the assumption that most genes are not differentially expressed (DE) between cells.
+Counts are scaled to eliminate (presumably artifactual) differences in the coverage of this set across cells.
+This removes spurious differences like those caused by composition bias, i.e., where greater sequencing of upregulated transcripts proportionally reduces the sequencing of all other genes \cite{robinson2010tmm}.
 The scaled counts can then be compared between libraries.
 This gene-based approach works well for bulk sequencing experiments where the population-wide gene expression profile is stable.
-However, it may not be suitable for single-cell experiments where stochasticity dominates (Figure~\ref{fig:maexample}).
-For example, house-keeping genes may be turned on or off by transcriptional bursting \cite{marinov2014singlecell}, while cell cycling may trigger large-scale changes in the transcriptional programme that preclude the assumption of a non-DE majority.
+However, it may not be suitable for single-cell experiments where technical noise and biological heterogeneity complicate the identification of a non-DE set. 
+For example, house-keeping genes may be turned on or off by transcriptional bursting \cite{marinov2014singlecell}, while cell cycling and other processes may trigger large-scale changes in the transcriptional programme that preclude the assumption of a non-DE majority.
 
-\begin{figure}[H]
-\begin{center}
-%\includegraphics[width=0.4\textwidth,trim=0mm 0mm 0mm 20mm,clip]{ma_cellular.png}
-%\includegraphics[width=0.4\textwidth,trim=0mm 0mm 0mm 20mm,clip]{ma_spiked.png}
-\end{center}
-\caption{MA plots for cellular (left) and spike-in (right) transcripts, using data from the Brennecke \emph{et al.} study \cite{brennecke2013accounting}.
-For the cellular transcripts, the plot compares genewise log-counts between single QC and GL2 cells.
-For the spike-ins, the plot compares genewise log-counts between the same libraries for pooled HeLa RNA spike-in.
-All log-values are computed with a prior count of 2, where genes with zero counts are marked in orange.
-Multiple masses are present for the cellular genes, whereas only one mass is present for the spike-in genes.
-The spike-in mass is also well-defined whereas the cellular masses are much noisier.
-In short, no obvious non-DE majority is present among the cellular genes.
-This is attributable to biological variability given that both plots should be affected by technical noise.
-}
-\label{fig:maexample}
-\end{figure}
-
-Another normalization strategy involves the use of spike-in RNA for which the identity and quantity of all transcripts is known \cite{stegle2015computational}.
-The same volume of spike-in RNA solution is added to each cell, usually during cell lysis. 
-Massively parallel sequencing generates reads - and, upon mapping, counts - for both cellular and spike-in genes.
-Normalization is performed by scaling the counts in each library such that the counts for the spike-in genes are, on average, the same between libraries.
-The central assumption of this approach is that the same amount of spike-in RNA is added to each cell \cite{marinov2014singlecell,stegle2015computational}.
-Thus, any differences in the coverage of the spike-in genes between libraries are artifactual in origin and must be removed by scaling.
-Again, this includes proportion-based differences, such that the scaled counts can be easily compared between cells. 
-
+An alternative normalization strategy involves the use of spike-in RNA for which the identity and quantity of all transcripts is known \cite{stegle2015computational}.
+The same volume of spike-in RNA solution is added to each cell and processed along with the cellular transcripts.
+This yields a set of read or UMI counts for both cellular and spike-in genes in each cell.
+Normalization is performed by scaling the counts for each cell such that the counts for the spike-in genes are, on average, the same between cells.
+The central assumption of this approach is that the same amount of spike-in RNA is added to each cell.
+Thus, any differences in the coverage of the spike-in genes between cells must be artifactual in origin and should be removed by scaling.
 The use of spike-ins for normalization seems preferable as it avoids making strong assumptions about the biology of single cells.
-However, one major criticism of this approach is that the volume of spike-in RNA cannot be consistently added to each sample \cite{robinson2010tmm}.
+However, a major criticism of this approach in bulk experiments is that the volume of spike-in RNA cannot be consistently added to each sample \cite{robinson2010tmm}.
 Variable addition of spike-in RNA would mean that the assumption of equal spike-ins betwen cells is violated, compromising the effectiveness of normalization \cite{risso2014normalization}.
-We propose to conduct a series of experiments to estimate the variability of spike-in quantities in single-cell transcriptome studies.
-In doing so, the effectiveness of spike-in normalization can be properly evaluated.
-Generation of data will be accompanied by the development of appropriate statistical routines to analyze the data, and to incorporate the findings into downstream analyses such as detection of DE genes.
+Another criticism is that synthetic spike-in transcripts may not behave in the same manner as the cellular transcripts \cite{grun2015design}.
+This means that any cell-specific biases in the latter may not be captured by the former.
 
-% Grun and van Oudenaarden also advise against using spike-ins, mostly on the basis of them not behaving the same as the cellular transcripts.
+In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies.
+We use mixtures of two distinct spike-in RNA sets to quantify the variability of the added spike-in volume across cells.
+We also characterize the differences in behaviour between the two sets, to determine if cell-specific biases change between different RNA populations.
+Both factors are quantitatively negligible and have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
+These results suggest that spike-ins can be safely used for routine normalization of scRNA-seq data.
+
+% The advantage of spike-ins is that it can capture cell size and doesn't require a non-DE majority.
+% However, is the cell size interesting, or should it be normalized out (in which case accurate spike-in addition wouldn't be required at all)?
+% It's most obviously useful for cell cycle considerations -- possibly also cancer and in some aspects of differentiation.
+% The Islam non-UMI dataset is one example where there seems to be a 20-50-fold increase in counts in the MEFs vs mESCs.
+% 
+% I guess spike-in normalization is more technically correct, even if you end up getting every gene as being DE (technically true in terms of molecules, but possibly irrelevant).
+% Rankings definitely change - spike-in normalization would favour genes that are upregulated on top of an increase in RNA content (as these would be hugely significant).
+% Standard normalization would have no preference as you seek the balance between the two extremes.
+% On the other hand, any non-DE genes with no change in the molecule number will be called as significant in standard normalization, which is definitively wrong.
+% You could have your cake and eat it by separating the DE list into up/down changes for easier examination of the up/down changes.
 
 \section{Assessing the variability of spike-in addition}
 The first experiment uses two distinct spike-in RNA populations.
