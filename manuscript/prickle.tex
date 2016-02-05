@@ -118,56 +118,19 @@ Components of the spike-in variability can be separated by estimating the varian
 \label{fig:expdesign}
 \end{figure}
 
-\section{Evaluating the effect of spike-in variability on existing software}
-The effect of variable spike-in quantities can be more rigorously evaluated in the context of downstream analyses.
-Popular analyses include detection of DE genes between two or more biological conditions, and clustering of cells based on their expression profiles to identify distinct subpopulations.
-We propose to assess the effect of spike-in variability on the behaviour of these analyses.
-More specifically, we aim to determine whether each analysis is sensitive to realistic violations of the assumption of equal spike-in quantities.
+\subsection{Variability due to spike-in addition or behaviour is negligible}
 
-DE detection can be performed using established methods for bulk data like edgeR \cite{robinson2010edgeR} or DESeq \cite{anders2010differential}, or with dedicated single-cell methods like Monocle \cite{trapnell2014dynamics} and SAMstrt \cite{katayama2013samstrt}.
-The performance of each method can be described in terms of detection power (i.e., detection of truly DE genes) and control of the error rate (i.e., false detection of non-DE genes).
-We plan to simulate single-cell gene counts where the spike-in quantity in each sample varies randomly, based on the estimated variability from previous experiments.
-This simulation will involve multiple cells across different biological conditions, with some DE genes introduced as true positives.
-We will apply each method to detect these DE genes, where normalization uses the assumption of equal spike-in quantities.
-The effect of spike-in variability on performance can then be evaluated.
-
-Clustering of cells is often done informally through dimensionality-reduction techniques such as Principal Component Analysis (PCA) or t-Distributed Stochastic Neighbor Embedding (t-SNE) \cite{van2008visualizing,julia2015sincell}.
-This collapses the relative positioning of cells in high-dimensional expression space to a 2- or 3-dimensional representation from which distinct clusters can be more easily identified. 
-Each cluster is interpretated as a subpopulation that may be of biological interest, e.g., a different cell type, cycling or apoptotic cells.
-We propose to simulate expression data for several subpopulations of cells with variable spike-in quantities.
-We normalize expression values under the assumption of equal spike-in quantities, and then we identify clusters from the normalized data with PCA and t-SNE.
-Of particular concern is whether spike-in variability reduces the separation between the clusters for different subpopulations, or even results in the formation of spurious clusters.
-
-\section{Integrating spike-in variability in DE analyses}
-Most statistical pipelines for DE analyses assume that the scaling factors used in normalization are known.
-They fail to account for uncertainty in the estimation of these factors, which may result in suboptimal performance when the spike-in quantities are variable.
-However, this kind of uncertainty can be easily incorporated in a Bayesian framework.
-In particular, the BASIC software package performs a Bayesian DE analysis for single-cell data \cite{cata?}.
-We propose to augment the statistical routines in this package to account for the estimated variability in the spike-ins, and to assess the effect of doing so on performance.
-We also plan to check whether the estimated variability of the spike-ins changes significantly between runs.
-If not, the first and second experiments in Figure~\ref{fig:expdesign} can be done once for any given system.
-The variability estimate can then be re-used for all analyses that use the same spike-in and sequencing protocol.
-Otherwise, the experiments must be repeated for each study, to obtain an appropriate variability estimate that point in time.
-
-
-%The final experiment uses RNA from single cells to gauge the effect of variable spike-ins on the detection of DE genes.
-%Two homogeneous cell lines are chosen for sequencing, with multiple cells for each line and spike-ins added to each cell.
-%The data is used for a DE analysis, using statistical methods that don't use spike-ins; do use spike-ins, but don't account for variability in the added volume; or do use spike-ins, and account for variable volume.
-%Performance evaluation is based on the number of DE genes detected between cell lines (true positives) against that detected within cell lines (false positives).
-%We hope to show that considering the variability in the spike-in quantity will improve DE detection.
-
-
-\newpage
-
-\section{Simulating the effect of spike-in variability}
-
-\subsection{Overview}
+\subsection{Assessing the downstream effect of variability with simulations}
 The aim is to determine whether results are sensitive to spike-in variability, for downstream analyses that depend on the assumption of constant spike-ins.
 Simulations are prepared from real data sets containing counts for spike-in transcripts.
 Specifically, the added volume/capture efficiency of spike-ins for each well is resampled and the spike-in counts are rescaled to reflect this new volume or efficiency.
 The results of the analysis on the simulated data are then compared to the original results.
 Any changes indicate that the analysis is sensitive to spike-in variability.
 The advantage of this approach is that it only modifies the scale of the spike-in counts -- the counts for the cellular genes are used directly and do not need to be simulated.
+
+\section{Discussion}
+
+\section{Methods}
 
 \subsection{Simulation design}
 For each data set, the sum of the spike-in counts (i.e., the spike-in total) was computed for each cell.
@@ -212,7 +175,7 @@ Thus, $s^2$ was set to $X$ to provide a realistic simulation.
 
 \subsubsection{Detecting differential expressed genes}
 Two scRNA-seq data sets were obtained -- one from a study with mouse embryonic stem cells (mESCs) and fibroblasts \cite{islam2011characterization} and another from a study with root epidermal and root center \textit{Arabidopsis Thaliana} cells \cite{brennecke2013accounting}.
-In each study, DE genes were detected between cell types using edgeR \cite{lund2012detecting} and monocle \cite{trapnell2014dynamics}.
+In each study, DE genes were detected between cell types using edgeR \cite{robinson2010edgeR,lund2012detecting} and monocle \cite{trapnell2014dynamics}.
 The former represents methods designed for analyses of bulk RNA-seq data, while the latter represents specialized single-cell methods.
 For each method, spike-in normalization was performed by scaling the counts such that the spike-in totals were the same between cells.
 The set of DE genes in the original data was then identified at a FDR of 5\% (see Section~Y in the Supplementary Materials for implementation details of each method).
