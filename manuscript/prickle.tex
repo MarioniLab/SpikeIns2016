@@ -127,10 +127,10 @@ Components of the spike-in variability can be separated by estimating the varian
 % Normality.
 
 \subsection{Assessing the downstream effect of variability with simulations}
-The aim is to determine whether results are sensitive to spike-in variability, for downstream analyses that depend on the assumption of constant spike-ins.
-Simulations are prepared from real data sets containing counts for spike-in transcripts.
-Specifically, the added volume/capture efficiency of spike-ins for each well is resampled and the spike-in counts are rescaled to reflect this new volume or efficiency.
-The results of the analysis on the simulated data are then compared to the original results.
+We then assessed whether the results of downstream analyses were sensitive to spike-in variability, especially for those analyses that depend on the assumption of constant spike-ins for normalization.
+Simulations were prepared from real data sets containing counts for spike-in transcripts.
+Specifically, the added volume and relative capture efficiency of spike-ins for each well were resampled and the spike-in counts were rescaled to reflect this new volume/efficiency.
+The results of the analysis on the simulated data were then compared to the original results.
 Any changes indicate that the analysis is sensitive to spike-in variability.
 The advantage of this approach is that it only modifies the scale of the spike-in counts -- the counts for the cellular genes are used directly and do not need to be simulated.
 
@@ -160,24 +160,25 @@ To determine the variability of $\psi_i$, each spike-in set was partitioned into
 This was done by sorting all transcripts in each set by their average counts; assigning all odd-ranked transcripts to one half; and assigning the remaining transcripts to the other half.
 The log-ratios between the sums of the two halves were then used to estimate $\mbox{var}(\log \psi_i)$.
 
-\subsection{Simulation design}
-For each data set, the sum of the spike-in counts (i.e., the spike-in total) was computed for each cell.
-The variance of the log$_2$-transformed spike-in totals across cells includes technical noise; variability in sequencing depth and capture efficiency between wells; and the variance of spike-in addition and population-specific behaviour.
+\subsection{Simulation design for resampling spike-in variability}
+For each data set, the sum of the spike-in counts (referred to here as the spike-in total) was computed for each cell.
+The variance of the log$_2$-transformed spike-in totals across cells includes sampling noise during library preparation or sequencing, variability in sequencing depth, and the variance of spike-in addition and capture efficiency between wells.
 The final component (denoted here as $s^2$) represents spike-in variability and must be removed prior to simulation.
-Otherwise, resampling will introduce variance for addition/behaviour on top of what is already present, leading to overrepresentation of $s^2$ in the variance of the simulated totals.
+Otherwise, resampling will introduce variance for addition/efficiency on top of what is already present, leading to overrepresentation of $s^2$ in the variance of the simulated totals.
 Removal was achieved by scaling the log$_2$-totals such that the variance across wells was reduced by $s^2$ without changing the mean.
 The scaled log-values were then transformed back to ``processed'' totals that contain no variability due to addition or behaviour.
 
-The simulation was performed by sampling a new value for the combined addition/efficiency effect in each cell.
-Specifically, the effect for each cell was sampled independently from a $2^X$ distribution where $X \sim \mathcal{N}(0, s^2)$.
+Simulations were performed by sampling a new value for the combined addition/efficiency effect in each cell.
+Specifically, the effect for each cell was sampled independently from a $2^X$ distribution where $X \sim \mbox{Normal}(0, s^2)$.
 This was used to scale the processed total to obtain a simulated total for each cell.
 Counts for individual spike-in transcripts were then scaled to reflect this new total in each cell.
-In this manner, the variance due to addition or efficiency is re-incorporated into the variance of the simulated totals across cells.
+In this manner, the variance due to addition or capture efficiency was re-incorporated into the variance of the simulated totals across cells.
+Note that addition and efficiency do not have to be simulated separately as they have the same effects in this framework -- a decrease in the spike-in total due to a decrease in the added spike-in volume cannot be distinguished from that due to reduced capture efficiency.
 
-To scale the counts, a quantile adjustment approach was used to preserve the mean-variance relationship of the data.
+To scale the counts, a quantile adjustment approach was used to preserve the empirical mean-variance relationship.
 A generalized linear model (GLM) was fitted to the counts across all cells for each spike-in gene, using the mglmOneGroup function in edgeR \cite{mccarthy2012differential, robinson2010edgeR} with an all-intercept design matrix.
 An abundance-dependent trend was also fitted to the NB dispersions across all spike-in genes using the estimateDisp function.
-In both cases, the original log-totals were used as the offsets for all cells.
+In both cases, the original (natural) log-totals were used as the offsets for all cells.
 The fitted GLM value and dispersion for each gene were treated as the true parameters of the NB distribution used to sample the observed count in each cell.
 The simulated mean count for each gene in each cell was computed by taking the exponential of the sum of the log-simulated total for that cell and the GLM coefficient for that gene.
 This was used as the mean of a simulated NB distribution, using the same value for the dispersion.
@@ -193,16 +194,10 @@ This new quantile was used as the simulated count for the corresponding gene and
 % For example, if it turned out that you added half the amount of spike-in to one well, it wouldn't distort the estimation of the (conditional) mean.
 % Okay, maybe the trended dispersion would be a bit weird, because technical variability should depend on the amount of RNA, but some inaccuracy there is forgivable.
 
-The value of $s^2$ was set based on the estimated values for $\sigma^2_{vol} = X$ and $\mbox{var}(\psi_{is})$ in the previous section.
-Technically, only the sum of $\mbox{var}(\psi_{is})$ across both spike-in populations was estimated 
-    -- this is assumed to be evenly split between populations to obtain $\mbox{var}(\psi_{is}) = X$ for each $s$.
-The sum of the variance components for addition and efficiency is then equal to $X$.
-Thus, $s^2$ was set to $X$ to provide a realistic simulation.
+The value of $s^2$ was set based on the previously estimated value for $\sigma^2_{vol} + \mbox{var}(\log \psi_{i}) \approx 0.05$.
 
 \subsection{Implementation of downstream analyses}
-
-\subsubsection{Detecting differential expressed genes}
-Two scRNA-seq data sets were obtained -- one from a study with mouse embryonic stem cells (mESCs) and fibroblasts \cite{islam2011characterization} and another from a study with root epidermal and root center \textit{Arabidopsis Thaliana} cells \cite{brennecke2013accounting}.
+For the DE analyses, two scRNA-seq data sets were obtained -- one from a study with mouse embryonic stem cells (mESCs) and fibroblasts \cite{islam2011characterization} and another from a study with root epidermal and root center \textit{Arabidopsis Thaliana} cells \cite{brennecke2013accounting}.
 In each study, DE genes were detected between cell types using edgeR \cite{robinson2010edgeR,lund2012detecting} and monocle \cite{trapnell2014dynamics}.
 The former represents methods designed for analyses of bulk RNA-seq data, while the latter represents specialized single-cell methods.
 For each method, spike-in normalization was performed by scaling the counts such that the spike-in totals were the same between cells.
@@ -211,9 +206,8 @@ This was repeated for the simulated data, and the proportion of genes common to 
 The proportion of common genes in the top set of 20-2000 genes with the smallest $p$-values was also computed between the original and simulated analyses.
 This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
 
-\subsubsection{Ranking highly variable genes}
-Three scRNA-seq data sets were obtained -- one from a study of mouse haematopoietic stem cells \cite{wilson2015combined}, one from a study of murine immune cells \cite{brennecke2013accounting} and another from a study of mESCs \cite{islam2014quantitative}.
-In each data set, highly variable genes (HVGs) were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
+For detecting highly variable genes (HVGs), three scRNA-seq data sets were obtained -- one from a study of mouse haematopoietic stem cells \cite{wilson2015combined}, one from a study of murine immune cells \cite{brennecke2013accounting} and another from a study of mESCs \cite{islam2014quantitative}.
+In each data set, HVGs were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
 The first approach is based on the method of Brennecke \textit{et al.} \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
 The top set of HVGs was identified as those genes with the smallest $p$-values.
 The second approach examines the variance of the log-counts, which provides some more robustness against outlier expression patterns.
@@ -221,8 +215,7 @@ Here, the top set of HVGs was identified as those with the largest biological co
 For both methods, the top set of 20-2000 genes was compared between the original and simulated analyses.
 This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
 
-\subsubsection{Dimensionality reduction and clustering}
-A scRNA-seq data set was obtained from a study of mESCs cultured under different conditions \cite{kolod2015single}.
+For dimensionality reduction and clustering, a scRNA-seq data set was obtained from a study of mESCs cultured under different conditions \cite{kolod2015single}.
 A PCA plot was constructed from the original log-counts after spike-in normalization.
 This was repeated for each simulation iteration, and the position of each cell on the simulated plot was mapped back to the corresponding location on the original plot.
 In this manner, the sensitivity of the cell placement to spike-in variability was assessed.
