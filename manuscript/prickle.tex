@@ -4,6 +4,8 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+\urlstyle{same}
 
 \title{When normalization gets prickly: are spike-ins good enough for single-cell RNA sequencing data?}
 \author{Aaron Lun}
@@ -119,6 +121,10 @@ Components of the spike-in variability can be separated by estimating the varian
 \end{figure}
 
 \subsection{Variability due to spike-in addition or behaviour is negligible}
+% Mention switched order.
+% No effect of different cell treatments.
+% Same total count for spike-ins between premixed and not premixed.
+% Normality.
 
 \subsection{Assessing the downstream effect of variability with simulations}
 The aim is to determine whether results are sensitive to spike-in variability, for downstream analyses that depend on the assumption of constant spike-ins.
@@ -131,6 +137,28 @@ The advantage of this approach is that it only modifies the scale of the spike-i
 \section{Discussion}
 
 \section{Methods}
+
+\subsection{Spike-in mixture experiments with Smart-seq2}
+% On a single plate, so no plate effects.
+
+\subsection{Data analysis for the mixture experiments}
+Reads were mapped to the mm10 build of the mouse genome, along with the sequences for transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
+Mapping was performed using the subread aligner v1.5.0 \cite{liao2013subread} in single-end RNA-seq mode with only unique alignments being retained.
+Reads with mapping qualities greater than or equal to 10 were counted into exonic regions of genes using the featureCounts function in the Rsubread package v1.20.1 \cite{liao2014featurecounts}.
+This was performed using the NCBI mouse annotation GRCm38 along with the annotation for the ERCC and SIRV transcripts to obtain a count for each mouse and spike-in gene in each well.
+
+In each well, the sum of counts across all transcripts in each spike-in set was computed.
+The log$_2$-ratio between the count sums of the ERCC and SIRV sets was calculated.
+To estimate $\mbox{var}(\theta_i)$, a linear model was fitted to the log-ratios for all wells where the two spike-in sets were added separately.
+This used a one-way layout where each combination of treatment (control or oncogene-induced) and spike-in addition order (ERCC or SIRV first) was treated as a separate group.
+The variance was estimated as the mean of the squared residual effects.
+This was repeated for $\mbox{var}(\theta_i')$ using all wells where premixed spike-ins were added.
+Here, only two groups were considered as addition order was irrelevant.
+
+Variance decomposition was performed as described in Section~1 of the Supplementary Materials using the above estimates.
+To determine the variability of $\psi_i$, each spike-in set was partitioned into two roughly similar halves.
+This was done by sorting all transcripts in each set by their average counts; assigning all odd-ranked transcripts to one half; and assigning the remaining transcripts to the other half.
+The log-ratios between the sums of the two halves were then used to estimate $\mbox{var}(\log \psi_i)$.
 
 \subsection{Simulation design}
 For each data set, the sum of the spike-in counts (i.e., the spike-in total) was computed for each cell.
