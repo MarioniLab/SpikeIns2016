@@ -93,8 +93,9 @@ This means that variability in volume addition will not contribute to variabilit
 Subtracting the estimated variance from that of the first experiment yields an estimate of $\sigma_{vol}^2$.
 Further decomposition can be achieved by considering the variance of the log-ratios between transcripts in the same spike-in set.
 The assumption is that, on average, different transcripts from the same set will have the same capture efficiency.
-Thus, any variance in the intra-set log-ratios should only contain technical variability.
-This allows $\sigma^2_{lib(1)}$ and $\sigma^2_{lib(2)}$ to be estimated -- subtraction will then yield $\mbox{var}(\log \psi_i)$.
+If one were to split the set into two halves and compute the log-ratio between them, the variance of those log-ratios would not contain any contribution from the variance in the fold change in efficiency (as this should be equal to unity for all wells).
+Instead, any variance should consist solely of the additional technical variability $\sigma^2_{lib(s)}$.
+This can be used to estimate $ \sigma^2_{lib(1)}$ and $\sigma^2_{lib(2)}$, both of which can then be subtracted from $\mbox{var}(\theta_i')$ to yield an estimate of $\mbox{var}(\log \psi_i)$.
 
 Both experiments were performed with a cell in each well, sourced from a homogeneous cell line.
 The log-ratio between spike-in and cellular counts was computed for each well.
@@ -127,12 +128,14 @@ Components of the spike-in variability can be separated by estimating the varian
 % Normality.
 
 \subsection{Assessing the downstream effect of variability with simulations}
-We then assessed whether the results of downstream analyses were sensitive to spike-in variability, especially for those analyses that depend on the assumption of constant spike-ins for normalization.
+We assessed whether the results of downstream analyses were sensitive to spike-in variability, especially for those analyses that depend on the assumption of constant spike-ins for normalization.
 Simulations were prepared from real data sets containing counts for spike-in transcripts.
 Specifically, the added volume and relative capture efficiency of spike-ins for each well were resampled and the spike-in counts were rescaled to reflect this new volume/efficiency.
 The results of the analysis on the simulated data were then compared to the original results.
 Any changes indicate that the analysis is sensitive to spike-in variability.
 The advantage of this approach is that it only modifies the scale of the spike-in counts -- the counts for the cellular genes are used directly and do not need to be simulated.
+The variance of the sampling distribution for the volume/efficiency is also based on the experimental estimates of spike-in variance.
+This ensures that sensitivity will be assessed under realistic conditions. 
 
 \section{Discussion}
 
@@ -142,10 +145,10 @@ The advantage of this approach is that it only modifies the scale of the spike-i
 % On a single plate, so no plate effects.
 
 \subsection{Data analysis for the mixture experiments}
-Reads were mapped to the mm10 build of the mouse genome, along with the sequences for transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
+Reads were mapped to the mm10 build of the mouse genome with additional sequences for transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
 Mapping was performed using the subread aligner v1.5.0 \cite{liao2013subread} in single-end RNA-seq mode with only unique alignments being retained.
 Reads with mapping qualities greater than or equal to 10 were counted into exonic regions of genes using the featureCounts function in the Rsubread package v1.20.1 \cite{liao2014featurecounts}.
-This was performed using the NCBI mouse annotation GRCm38 along with the annotation for the ERCC and SIRV transcripts to obtain a count for each mouse and spike-in gene in each well.
+This was performed using the NCBI GRCm38 mouse annotation along with the annotation for the ERCC and SIRV transcripts, to obtain a count for each endogenous and spike-in gene in each well.
 
 In each well, the sum of counts across all transcripts in each spike-in set was computed.
 The log$_2$-ratio between the count sums of the ERCC and SIRV sets was calculated.
@@ -153,7 +156,7 @@ To estimate $\mbox{var}(\theta_i)$, a linear model was fitted to the log-ratios 
 This used a one-way layout where each combination of treatment (control or oncogene-induced) and spike-in addition order (ERCC or SIRV first) was treated as a separate group.
 The variance was estimated as the mean of the squared residual effects.
 This was repeated for $\mbox{var}(\theta_i')$ using all wells where premixed spike-ins were added.
-Here, only two groups were considered as addition order was irrelevant.
+Here, the model only contained two groups as addition order was irrelevant.
 
 Variance decomposition was performed as described in Section~1 of the Supplementary Materials using the above estimates.
 To determine the variability of $\psi_i$, each spike-in set was partitioned into two roughly similar halves.
@@ -195,6 +198,7 @@ This new quantile was used as the simulated count for the corresponding gene and
 % Okay, maybe the trended dispersion would be a bit weird, because technical variability should depend on the amount of RNA, but some inaccuracy there is forgivable.
 
 The value of $s^2$ was set based on the previously estimated value for $\sigma^2_{vol} + \mbox{var}(\log \psi_{i}) \approx 0.05$.
+This ensures that a realistic variance is used when sampling spike-in volume and efficiency in each well.
 
 \subsection{Implementation of downstream analyses}
 For the DE analyses, two scRNA-seq data sets were obtained -- one from a study with mouse embryonic stem cells (mESCs) and fibroblasts \cite{islam2011characterization} and another from a study with root epidermal and root center \textit{Arabidopsis Thaliana} cells \cite{brennecke2013accounting}.
