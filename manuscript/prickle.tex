@@ -17,7 +17,7 @@
 \section{Introduction}
 Single-cell RNA sequencing (scRNA-seq) is a powerful technique for studying transcriptional activity in individual cells.
 Briefly, RNA is isolated from single cells, converted into cDNA and sequenced using massively parallel sequencing technologies \cite{shapiro2013singlecell}.
-This can be done on microfluidics platforms, or increasingly, with plate-based protocols such as Smart-seq2 \cite{picelli2014full} that are compatible with existing techniques like indexed fluorescence-activated cell sorting (FACS).
+This can be done on microfluidics platforms or with protocols such as Smart-seq2 \cite{picelli2014full} that use microtiter plates.
 Gene expression can be quantified by mapping the read sequences to the genome and counting the number of reads mapped to each gene.
 To avoid amplification biases, individual transcript molecules can be tagged with unique molecular identifiers (UMIs) \cite{islam2014quantitative}, such that sequencing to saturation and counting UMIs will yield the number of transcripts of each gene in a cell.
 %However, sequencing to saturation may not be economically feasible for hundreds or thousands of cells.
@@ -45,10 +45,7 @@ The use of spike-ins for normalization seems preferable as it avoids making stro
 However, a major criticism of this approach in bulk experiments is that the volume of spike-in RNA cannot be consistently added to each sample \cite{robinson2010tmm}.
 Variable addition of spike-in RNA would mean that the assumption of equal spike-in amounts betwen cells is violated, compromising the effectiveness of normalization \cite{risso2014normalization}.
 Another criticism is that synthetic spike-in transcripts may not behave in the same manner as the endogenous transcripts \cite{grun2015design}.
-This means that any cell-specific biases in capture efficiency for the latter may not be captured by the former.
-For relative quantification of gene expression, any cell-to-cell variability in the differences in behaviour is most problematic.
-This is because such differences will not cancel out between cells when scaling is performed to equalize spike-in coverage.
-As a result, cell-specific biases would not be completely removed by normalization.
+Any cell-specific biases in capture efficiency for the latter may not be captured by the former, rendering normalization inaccurate.
 
 In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
 We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells.
@@ -91,7 +88,11 @@ This means that variability in volume addition will not contribute to variabilit
     \mbox{var}(\theta_i') = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \;.
 \]
 Subtracting the estimated variance from that of the first experiment yields an estimate of $\sigma_{vol}^2$.
-Further decomposition can be achieved by considering the variance of the log-ratios between transcripts in the same spike-in set.
+
+The variance of $\psi_i$ is relevant as it determines the effect of differences in behaviour between different RNA populations.
+If the relative capture efficiency of spike-in to endogenous transcripts was the same (non-unity) value in all wells, it would have no effect on relative quantification of gene expression, as the difference in behaviour would cancel out when normalized expression values are compared between cells.
+However, if the relative efficiency varies across cells, cancellation would not occur such that cell-specific biases would affect the comparison between cells.
+To estimate $\mbox{var}(\psi_i)$, further decomposition of $\mbox{var}(\theta_i')$ can be achieved by considering the variance of the log-ratios between transcripts in the same spike-in set.
 The assumption is that, on average, different transcripts from the same set will have the same capture efficiency.
 If one were to split the set into two halves and compute the log-ratio between them, the variance of those log-ratios would not contain any contribution from the variance in the fold change in efficiency (as this should be equal to unity for all wells).
 Instead, any variance should consist solely of the additional technical variability $\sigma^2_{lib(s)}$.
