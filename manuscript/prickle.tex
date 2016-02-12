@@ -41,11 +41,17 @@ Normalization is performed by scaling the counts for each cell such that the cou
 The central assumption of this approach is that the same amount of spike-in RNA is added to each cell.
 Thus, any differences in the coverage of the spike-in genes between cells must be artifactual in origin and should be removed by scaling.
 
-The use of spike-ins for normalization seems preferable as it avoids making strong assumptions about the biology of single cells.
-However, a major criticism of this approach in bulk experiments is that the volume of spike-in RNA cannot be consistently added to each sample \cite{robinson2010tmm}.
-Variable addition of spike-in RNA would mean that the assumption of equal spike-in amounts betwen cells is violated, compromising the effectiveness of normalization \cite{risso2014normalization}.
-Another criticism is that synthetic spike-in transcripts may not behave in the same manner as the endogenous transcripts \cite{grun2015design}.
+The use of spike-ins for normalization seems preferable to the non-DE approach as it avoids making strong assumptions about the biology of single cells.
+However, a major criticism of spike-ins in bulk experiments is that the same volume of spike-in RNA cannot be consistently added to each sample \cite{robinson2010tmm}.
+Variable addition of spike-ins would violate the assumption of equal spike-in quantities per cell, compromising the effectiveness of normalization \cite{risso2014normalization}.
+Another criticism is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \cite{grun2015design}.
 Any cell-specific biases in capture efficiency for the latter may not be captured by the former, rendering normalization inaccurate.
+
+The aforementioned issues with normalization are equally applicable to both plate- and microfluidics-based protocols.
+Microfluidics platforms such as the Fluidigm C1 \cite{pollen2014lowcoverage} attempt to mitigate the effect of cell-specific biases by tightly controlling the reaction conditions during cDNA generation.
+This is not without its own complications -- the C1 chips must be matched to the cell size, and cell capture is susceptible to doublet formation (where two cells are processed into a single library) \cite{fluidigm2016white}.
+In contrast, plate-based protocols tend to be cheaper to run and are compatible with existing laboratory techniques such as indexed fluorescently-activated cell sorting (FACS).
+Thus, we focus on normalization of data from plate-based protocols, to reflect their increasing use in single-cell studies (CITE BIG GUYS).
 
 In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
 We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells.
