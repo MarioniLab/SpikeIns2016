@@ -23,14 +23,14 @@ for (datatype in c("brennecke", "islam")) {
 		counts <- read.table("GSE29087_L139_expression_tab.txt.gz", 
 			colClasses=c(list("character", NULL, NULL, NULL, NULL, NULL, NULL), rep("integer", 96)), skip=6, sep='\t', row.names=1)
 		is.spike <- grepl("SPIKE", rownames(counts))
-		grouping <- factor(c(rep("ESC", 48), rep("MEF", 48)))
+		grouping <- factor(c(rep(c("ESC", "MEF", "Neg"), c(48, 44, 4))))
 		
 		# Quality control on individual cells.
 		totals <- colSums(counts[!is.spike,])
 		is.mito <- grepl("^mt-", rownames(counts)) & !is.spike
 		okay.libs <- totals >= 1e5 & colSums(counts[is.mito,])/totals < 0.1 
 		counts <- counts[,okay.libs]
-		grouping <- grouping[okay.libs]
+		grouping <- droplevels(grouping[okay.libs])
 		
 	} else if (datatype=="brennecke") {
 		countsAll <- read.table('nmeth.2645-S10.csv.gz', header=TRUE, row.names=1, sep=',', colClasses=c('character', rep('integer', 13)))
