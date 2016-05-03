@@ -180,33 +180,40 @@ In general, this assumption is reasonable if premixing of the two sets is done i
 \subsection{Estimating the variance of the set-specific capture efficiency}
 Some work is required to decompose the components of $\mbox{var}(\theta_i')$, in order to separate technical variability from the variability of the $\phi_{is}$ terms.
 This can be done by splitting one of the spike-in sets into two halves.
-Divide transcripts in $s=1$ into two halves, i.e., $s=1_a$ and $1_b$.
-As $\phi_{i1} = \phi_{i1_a} = \phi_{i1_b}$ for transcripts from the same spike-in set, they cancel out when computing the log-ratio between the total counts of the two halves.
-Thus, the variance of the log-ratio (denoted here as $\theta_{i(ab)}'$) will simplify to 
+Divide transcripts in $s=1$ into two halves $1_a$ and $1_b$.
+Each transcript is assigned to one half such that the total count for each half is equal to the sum of counts for all assigned transcripts.
+We assume that the average capture efficiency is the same for each half as all transcripts are taken from the same spike-in set.
+This means that $\phi_{i1} = \phi_{i1_a} = \phi_{i1_b}$, such that the capture efficiency term cancels out in the calculation of the log-ratio $\theta_{i(1_{ab})}'$ between the total counts of the two halves.
+Thus, the variance of the log-ratio will simplify to 
 \[
-    \mbox{var}(\theta_{i(ab)}') = \sigma^2_{lib(1_a)} + \sigma^2_{lib(1_b)} \;.
+    \mbox{var}(\theta_{i(1_{ab})}') = \sigma^2_{lib(1_a)} + \sigma^2_{lib(1_b)} \;.
 \]
-This is true for both experiments, as $\eta_{i1} = \eta_{i1_a} = \eta_{i1_b}$ within a single set.
-Now, consider the variance of the log-ratio of the total count for each half to the second set $s=2$.
+This is true for both premixed and separate-addition experiments, as there is no variability in the added volume between two halves of the same spike-in set, i.e.,  $\eta_{i1} = \eta_{i1_a} = \eta_{i1_b}$.
+Now, consider the variance of the log-ratio of the total count for each half $s=1_a, 1_b$ to the second spike-in set $s=2$.
 This is written as
 \begin{align*}
-    \mbox{var}(\theta_{i(a)}') &= \sigma^2_{lib(1_a)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \\
-    \mbox{var}(\theta_{i(b)}') &= \sigma^2_{lib(1_b)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)
+    \mbox{var}(\theta_{i(1_a)}') &= \sigma^2_{lib(1_a)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \\
+    \mbox{var}(\theta_{i(1_b)}') &= \sigma^2_{lib(1_b)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \;,
 \end{align*}
-using only the samples in the second experiment (where variability in volume addition need not be considered).
+using only the samples in the second premixed experiment where variability in volume addition need not be considered.
 We now perform some basic arithmetic on the variances of the log-ratios:
 \begin{align*}
-    &\mbox{var}(\theta_{i(a)}') +  \mbox{var}(\theta_{i(b)}') - \mbox{var}(\theta_{i(ab)}') = 2 [\sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)] \\
-    &\mbox{var}(\theta_i') - \textstyle\frac{1}{2}[\mbox{var}(\theta_{i(a)}') + \mbox{var}(\theta_{i(b)}') - \mbox{var}(\theta_{i(ab)}') ] = \sigma^2_{lib(1)}
+    &\mbox{var}(\theta_{i(1_a)}') +  \mbox{var}(\theta_{i(1_b)}') - \mbox{var}(\theta_{i(1_{ab})}') = 2 [\sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)] \\
+    &\mbox{var}(\theta_i') - \textstyle\frac{1}{2}[\mbox{var}(\theta_{i(1_a)}') + \mbox{var}(\theta_{i(1_b)}') - \mbox{var}(\theta_{i(1_{ab})}') ] = \sigma^2_{lib(1)}
 \end{align*}
 We repeat this after splitting $s=2$ into halves to obtain an estimate of $\sigma^2_{lib(2)}$.
-These values can be subtracted from $\mbox{var}(\theta_i')$ to estimate the variance in the fold-differences in spike-in-specific behaviour, i.e., $\mbox{var}(\log \psi_i)$.
+These values can be subtracted from $\mbox{var}(\theta_i')$ to estimate the variance in the fold-differences in spike-in-specific efficiency, i.e., $\mbox{var}(\log \psi_i)$.
 
-Note that our model does not consider transcript-specific variability in behaviour in each well.
-If such variability exists, it will not cancel out when calculating $\theta_{i(ab)}')$ and will instead be treated as part of the technical variability.
-This results in overestimation of $\sigma^2_{lib(s)}$ and underestimation of the variance in spike-in-specific behaviour.
+Note that our calculations assume that there is no variability in capture efficiency between the two halves of each spike-in set.
+This may not be true of synthetic sets with few transcripts (e.g., 92 in ERCC, 7 in SIRV) where transcript-specific efficiencies may not average out within each half.
+If variability in efficiency exists between halves, it will not cancel out when calculating $\theta_{i(1_{ab})}'$.
+This is likely to result in overestimation of $\sigma^2_{lib(s)}$ and underestimation of the variance in spike-in-specific efficiency.
 To mitigate this effect, we split the transcripts so that the distribution of transcript abundances is similar between halves.
-This increases the chance that each half will behave similarly, such that spike-in-specific behaviour will cancel out between halves in each well when calculating the log-ratio.
+This increases the chance that each half will have similar average efficiencies.
+The value of $\mbox{var}(\theta_i')$ can also be treated as an upper bound for $\mbox{var}(\log \psi_i)$, reached when technical variability is absent, i.e., $\sigma^2_{lib(s)}=0$ for both $s=1,2$.
+
+% Imagine that var(theta_i(ab)') is increased by x; this means that the true value of the estimated sigma^2_lib1 is actually sigma^2_lib1 + x.
+% Hence, overestimation; assuming that the variability in behaviour relative to the second spike-in set doesn't change (which is why we have 'likely' not 'certainly').
 
 \section{Implementation details for the downstream analyses}
 
