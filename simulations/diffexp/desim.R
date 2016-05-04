@@ -86,7 +86,7 @@ for (datatype in c("kolod", "islam")) {
 			if (!diag.done) {
 				pdf(paste0("diagnostics_", datatype, ".pdf"))
 				plotBCV(y) # Nice downward trend
-				plotMDS(cpm(y, log=TRUE), col=c("red", "blue")[(as.integer(grouping)==1)+1L]) # Mostly separated
+				plotMDS(edgeR::cpm(y, log=TRUE), col=c("red", "blue")[(as.integer(grouping)==1)+1L]) # Mostly separated
 				dev.off()
 			}
 
