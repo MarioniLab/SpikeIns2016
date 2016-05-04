@@ -23,9 +23,11 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 		spike.in <- grepl('^ERCC', rownames(incoming))
 
 		# Quality control on cells.
-		totals <- colSums(incoming[!spike.in,])
+		totals <- colSums(incoming)
 		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
-		okay.libs <- totals > 1e5 & colSums(incoming[is.mito,])/totals < 0.1 
+		okay.libs <- !isOutlier(totals, n=3, log=TRUE, type="lower") & 
+                     !isOutlier(colSums(incoming[is.mito,])/totals, n=3, type="higher") & 
+                     !isOutlier(colSums(incoming[spike.in,])/totals, n=3, type="higher")
 		incoming <- incoming[,okay.libs]
 
 	} else if (datatype=="islam") { 
@@ -33,10 +35,12 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 		        colClasses=c(list('character', NULL, NULL, NULL, NULL, NULL, NULL), rep('integer', 96)))
 		spike.in <- grepl('SPIKE', rownames(incoming))
 
-		# Quality control on cells (skipped mitochondrial check; all counts low, and all mitoprops are high - UMI?).
+		# Quality control on cells.
 		totals <- colSums(incoming[!spike.in,])
 		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
-		okay.libs <- totals > 1e4 # & colSums(incoming[is.mito,])/totals < 0.1 
+		okay.libs <- !isOutlier(totals, n=3, log=TRUE, type="lower") & 
+                     !isOutlier(colSums(incoming[is.mito,])/totals, n=3, type="higher") & 
+                     !isOutlier(colSums(incoming[spike.in,])/totals, n=3, type="higher")
 		incoming <- incoming[,okay.libs]
 
 	} else if (datatype=="brennecke") {
@@ -48,9 +52,10 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 
     }
 
-	countsCell <- incoming[!spike.in,]
-    countsCell <- countsCell[rowSums(countsCell) >= ncol(countsCell),]
-	spike.param <- spikeParam(incoming[spike.in,])
+    # Filtering out crappy spikes.
+    high.ab <- rowMeans(incoming) >= 1
+	countsCell <- as.matrix(incoming[high.ab & !spike.in,])
+	spike.param <- spikeParam(incoming[high.ab & spike.in,])
 	diag.done <- FALSE
 
     #########################################################################
@@ -65,8 +70,13 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 			if (i) { countsSpike <- resampleSpikes(spike.param, var.log=my.var) }
 			else { countsSpike <- spike.param$counts }
 
+            sce <- newSCESet(countData=rbind(countsCell, countsSpike))
+            isSpike(sce) <- rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(countsSpike)))
+            sce <- computeSpikeFactors(sce)
+            sce <- normalize(sce)
+
             # Fitting the trend to the spike-in variances.
-            out <- fitTechTrend(countsSpike, trend="loess")
+            out <- trendVar(sce, trend="loess")
 			if (!diag.done) { 
 				pdf(paste0("diagnostics_", datatype, ".pdf"))
                 plot(out$mean, out$var)
@@ -76,7 +86,7 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 			}
 
             # Computing the biological component.
-            out2 <- getBioVar(countsCell, out)
+            out2 <- decomposeVar(sce, out)
             my.rank <- rank(-out2$bio)
             top.ranked <- lapply(top.hits, function(x) { my.rank <= x })            
 			if (i) { 
@@ -86,16 +96,17 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 			}
 		
 			if (!diag.done) { 
-				output <- data.frame(GeneID=rownames(countsCell), Mean=out2$mean, Total=out2$total, Bio=out2$bio, Tech=out2$tech)
+				output <- out2
+                colnames(output) <- c("Mean", "Total", "Bio", "Tech")
 				write.table(file=paste0("out_custom_", datatype, ".tsv"), output[order(output$Bio, decreasing=TRUE),], 
-					row.names=FALSE, quote=FALSE, sep="\t", col.names=TRUE)
+                            quote=FALSE, sep="\t", col.names=NA)
 				diag.done <- TRUE
 			}
 		}
 	
 		top.lost <- do.call(rbind, top.res)
         colnames(top.lost) <- paste0("Top", top.hits)
-		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="custom", top.lost), 
+		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="VarLog", top.lost), 
 			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
 		filled <- TRUE
 	}
@@ -158,14 +169,14 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 			if (!diag.done) { 
 				output <- data.frame(GeneID=rownames(countsCell), CV2=cv2Cell, logPValue=lpA)
 				write.table(file=paste0("out_brennecke_", datatype, ".tsv"), output[order(output$Bio, decreasing=TRUE),], 
-					row.names=FALSE, quote=FALSE, sep="\t", col.names=TRUE)
+                            quote=FALSE, sep="\t", col.names=NA)
 				diag.done <- TRUE
 			}
 		}
 	
 		top.lost <- do.call(rbind, top.res)
         colnames(top.lost) <- paste0("Top", top.hits)
-		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="brennecke", top.lost), 
+		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="CV2", top.lost), 
 			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
 		filled <- TRUE
 	}
