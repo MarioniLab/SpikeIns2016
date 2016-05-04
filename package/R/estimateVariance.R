@@ -163,12 +163,13 @@ decomposeVariance <- function(y, design)
     premix.var <- estimateVariance(ratios=ratios[premixed], design=premixed.design)
     volume.var <- 0.5*(total.var - premix.var)
 
-    # Following the REML definition when the subtraction is negative (reconstructing the matrix, just in case it didn't have premixed in it).
     combined.design <- rbind(do.call(cbind, c(list(separate.design), rep(list(0), ncol(premixed.design)))),
                              do.call(cbind, c(rep(list(0), ncol(separate.design)), list(premixed.design))))
     if (volume.var < 0) {
-        premix.var <- total.var <- estimateVariance(ratios=c(ratios[separate], ratios[premixed]), design=combined.design)
-        volume.var <- 0
+        # Following the REML definition when the subtraction is negative (reconstructing the matrix, just in case it didn't have premixed in it).
+        # But maybe it's a bit too confusing to have to redefine everything: I think we'll just put up with negative values.
+#        premix.var <- total.var <- estimateVariance(ratios=c(ratios[separate], ratios[premixed]), design=combined.design) 
+#        volume.var <- 0
         volume.sig <- 1
     } else {
         volume.sig <- testVariance(var1=total.var, var2=premix.var, design1=separate.design, 

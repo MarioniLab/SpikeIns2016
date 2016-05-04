@@ -24,7 +24,7 @@ resampleSpikes <- function(param, var.log)
 #
 # written by Aaron Lun
 # created 14 October 2015
-# last modified 29 January 2016 
+# last modified 4 May 2016 
 {
 	# Removing the effect of spike-in variability from the original library sizes.
 	log.lib <- log2(param$lib.size)
@@ -38,8 +38,10 @@ resampleSpikes <- function(param, var.log)
 	fc <- 2^rnorm(length(new.lib.size), 0, sd=sqrt(var.log))
 	new.fitted <- outer(param$mean, fc*new.lib.size)
 	new.counts <- edgeR::q2qnbinom(param$counts, input=param$fitted, output=new.fitted, dispersion=param$dispersion)
-	new.counts <- round(pmax(new.counts, 0)) # Making it reasonably count-like.
-	dim(new.counts) <- dim(param$counts)
+
+    new.counts <- round(pmax(new.counts, 0)) # Making it reasonably count-like.
+    dim(new.counts) <- dim(param$counts)
+    dimnames(new.counts) <- dimnames(param$counts)
 	return(new.counts)
 }
 
