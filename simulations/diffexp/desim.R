@@ -111,7 +111,7 @@ for (datatype in c("kolod", "islam")) {
 		}
 
 		final <- do.call(rbind, results)
-        colnames(final) <- "Total"
+        colnames(final) <- "AllDE"
 		top.lost <- do.call(rbind, top.set)
         colnames(top.lost) <- paste0("Top", top.hits)
 
@@ -158,7 +158,7 @@ for (datatype in c("kolod", "islam")) {
 		}
 
 		final <- do.call(rbind, results)
-        colnames(final) <- "Total"
+        colnames(final) <- "AllDE"
 		top.lost <- do.call(rbind, top.set)
         colnames(top.lost) <- paste0("Top", top.hits)
 
@@ -208,7 +208,7 @@ for (datatype in c("kolod", "islam")) {
 		}
 
 		final <- do.call(rbind, results)
-        colnames(final) <- "Total"
+        colnames(final) <- "AllDE"
 		top.lost <- do.call(rbind, top.set)
         colnames(top.lost) <- paste0("Top", top.hits)
 
