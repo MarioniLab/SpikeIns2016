@@ -56,12 +56,13 @@ for (datatype in c("kolod", "islam")) {
 	design <- model.matrix(~grouping)
 	filter.keep <- rowMeans(counts) >= 1
     spike.param <- spikeParam(counts[is.spike & filter.keep,])
+    cell.counts <- counts[!is.spike & filter.keep,]
 
 	#################################################################################
 	# Running edgeR first.
 
 	# Filtering out crappy genes.
-	y.ref <- DGEList(counts[!is.spike & filter.keep,])
+	y.ref <- DGEList(cell.counts)
 	diag.done <- FALSE
 
     for (my.var in c(0.001, 0.01, 0.1)) {
@@ -134,9 +135,8 @@ for (datatype in c("kolod", "islam")) {
 
 			# Normalizing by spike-in total counts (scaled to the total library size).
 			spike.totals <- colSums(spike.data)
-			keep <- !is.spike & filter.keep
-            spike.totals <- spike.totals/mean(spike.totals) * mean(colSums(counts[keep,]))
-			normalized <- edgeR::cpm(counts[keep,], lib.size=spike.totals)
+            spike.totals <- spike.totals/mean(spike.totals) * mean(colSums(cell.counts))
+			normalized <- edgeR::cpm(cell.counts, lib.size=spike.totals)
 
 			pdat <- AnnotatedDataFrame(data=data.frame(grouping=grouping))
 			sampleNames(pdat) <- colnames(normalized)
@@ -181,14 +181,13 @@ for (datatype in c("kolod", "islam")) {
 
             # Normalizing by spike-in total counts (again, scaled to the total library size).
             spike.totals <- colSums(spike.data)
-            keep <- !is.spike & filter.keep
-            spike.totals <- spike.totals/mean(spike.totals) * mean(colSums(counts[keep,]))
-            lcpms <- log2(t(counts[keep,]+1)/spike.totals*1e6)
+            spike.totals <- spike.totals/mean(spike.totals) * mean(colSums(cell.counts))
+            lcpms <- log2(t(cell.counts+1)/spike.totals*1e6)
 
             suppressMessages({
                 sca <- FromMatrix('SingleCellAssay', lcpms, data.frame(wellKey=rownames(lcpms)), data.frame(primerid=colnames(lcpms)))
                 cData(sca) <- cbind(cData(sca), grouping)
-                cData(sca)$cngeneson <- colMeans(counts>0)
+                cData(sca)$cngeneson <- colMeans(cell.counts>0)
                                                           
                 mfit <- zlm.SingleCellAssay(~ grouping + cngeneson, sca, method="bayesglm", ebayes=TRUE, ebayesControl=list(method="MLE", model="H1"))
                 mlrt <- lrTest(mfit, Hypothesis(colnames(design)[ncol(design)], colnames(coef(mfit, "D")))) # cngeneson is added at the end, so it shouldn't affect terms before it.
