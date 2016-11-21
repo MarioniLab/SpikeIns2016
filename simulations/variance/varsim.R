@@ -17,6 +17,7 @@ top.hits <- c(20, 200, 2000)
 # Running across all data types (saving diagnostics along the way)
 
 for (datatype in c("wilson", "islam", "brennecke")) { 
+    loess.span <- 0.2
 
 	if (datatype=="wilson") { 
 		incoming <- read.table('GSE61533_HTSEQ_count_results.tsv.gz', header=TRUE, row.names=1, colClasses=c('character', rep('integer', 96)))
@@ -25,9 +26,10 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 		# Quality control on cells.
 		totals <- colSums(incoming)
 		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
-		okay.libs <- !isOutlier(totals, n=3, log=TRUE, type="lower") & 
-                     !isOutlier(colSums(incoming[is.mito,])/totals, n=3, type="higher") & 
-                     !isOutlier(colSums(incoming[spike.in,])/totals, n=3, type="higher")
+		okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
+                     !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
+                     !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
+                     !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
 		incoming <- incoming[,okay.libs]
 
 	} else if (datatype=="islam") { 
@@ -38,10 +40,12 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 		# Quality control on cells.
 		totals <- colSums(incoming[!spike.in,])
 		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
-		okay.libs <- !isOutlier(totals, n=3, log=TRUE, type="lower") & 
-                     !isOutlier(colSums(incoming[is.mito,])/totals, n=3, type="higher") & 
-                     !isOutlier(colSums(incoming[spike.in,])/totals, n=3, type="higher")
+		okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
+                     !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
+                     !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
+                     !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
 		incoming <- incoming[,okay.libs]
+        loess.span <- 0.3
 
 	} else if (datatype=="brennecke") {
         # Note that cell-level quality control has already been performed.
@@ -71,17 +75,17 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 			else { countsSpike <- spike.param$counts }
 
             sce <- newSCESet(countData=rbind(countsCell, countsSpike))
-            isSpike(sce) <- rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(countsSpike)))
+            sce <- calculateQCMetrics(sce, feature_controls=list(Spike=rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(countsSpike)))))
+            isSpike(sce) <- "Spike"
             sce <- computeSpikeFactors(sce)
             sce <- normalize(sce)
 
             # Fitting the trend to the spike-in variances.
-            out <- trendVar(sce, trend="loess")
+            out <- trendVar(sce, trend="semiloess", span=loess.span)
 			if (!diag.done) { 
 				pdf(paste0("diagnostics_", datatype, ".pdf"))
                 plot(out$mean, out$var)
-                sort.ab <- sort(out$mean)
-                lines(sort.ab, out$trend(sort.ab), col="red", lwd=2)
+                curve(out$trend(x), col="red", lwd=2, add=TRUE)
 				dev.off()
 			}
 
