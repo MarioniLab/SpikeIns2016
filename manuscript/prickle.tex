@@ -8,7 +8,7 @@
 \urlstyle{same}
 
 \title{When normalization gets prickly: are spike-ins good enough for single-cell RNA sequencing data?}
-\author{Aaron Lun}
+\author{Aaron Lun, Fernando Calero, Bertie G\"ottgens, John Marioni}
 
 \begin{document}
 
@@ -16,42 +16,37 @@
 
 \section{Introduction}
 Single-cell RNA sequencing (scRNA-seq) is a powerful technique for studying transcriptional activity in individual cells.
-Briefly, RNA is isolated from single cells, converted into cDNA and sequenced using massively parallel sequencing technologies \cite{shapiro2013singlecell}.
-This can be done on microfluidics platforms or with protocols such as Smart-seq2 \cite{picelli2014full} that use microtiter plates.
-Gene expression can be quantified by mapping the read sequences to the genome and counting the number of reads mapped to each gene.
-To avoid amplification biases, individual transcript molecules can be tagged with unique molecular identifiers (UMIs) \cite{islam2014quantitative}, such that sequencing to saturation and counting UMIs will yield the number of transcripts of each gene in a cell.
-%However, sequencing to saturation may not be economically feasible for hundreds or thousands of cells.
-However, not all molecules will be captured and sequenced due to cell-specific inefficiencies in reverse transcription \cite{stegle2015computational}.
-The presence of these cell-specific biases compromises the use of the read/UMI count as a quantitative measure of gene expression.
-Some normalization is necessary to remove these biases before counts can be meaningfully compared between cells.
+Briefly, RNA is isolated from single cells, reverse transcribed into cDNA and sequenced using massively parallel sequencing technologies \cite{shapiro2013singlecell}.
+This can be done on microfluidics platforms like the Fluidigm C1 \cite{pollen2014lowcoverage}, or with protocols such as Smart-seq2 \cite{picelli2014full} that use microtiter plates.
+Gene expression is quantified by mapping the read sequences to the genome and counting the number of reads mapped to each gene.
+To avoid amplification biases, individual transcript molecules can also be tagged with unique molecular identifiers (UMIs) \cite{islam2014quantitative}, such that sequencing to saturation and counting UMIs will yield the number of transcripts of each gene in a cell.
+Regardless of whether reads or UMIs are used, not all transcript molecules will be captured and sequenced due to cell-specific inefficiencies in reverse transcription \cite{stegle2015computational}.
+The presence of these cell-specific biases compromises the direct use of the read/UMI count as a quantitative measure of gene expression.
+Normalization is required to remove these biases before counts can be meaningfully compared between cells.
 
-One commonly used normalization strategy is to use a set of genes that have constant expression across cells.
-This set can consist of pre-defined ``house-keeping'' genes, or it can be empirically defined under the assumption that most genes are not differentially expressed (DE) between cells.
-Counts are scaled to eliminate (presumably artifactual) differences in the coverage of this set across cells.
-This removes spurious differences like those caused by composition bias, i.e., where greater sequencing of upregulated transcripts proportionally reduces the sequencing of all other genes \cite{robinson2010tmm}.
-The scaled counts can then be compared between cells in downstream analyses.
+A common normalization strategy for RNA-seq data uses a set of genes that have constant expression across cells.
+This set can consist of pre-defined ``house-keeping'' genes, or it can be empirically defined under the assumption that most genes are not differentially expressed (DE) between cells \cite{lun2016pooling,anders2010differential,robinson2010tmm}.
+Counts are scaled to eliminate differences in the coverage of this non-DE set across cells.
+Here, the assumption is that these differences between cells must be technical in origin, e.g., due to differences in library size or composition bias \cite{robinson2010tmm}.
+Downstream analyses are then applied to the scaled counts to avoid obtaining misleading results.
 This gene-based approach works well for bulk sequencing experiments where the population-wide gene expression profile is stable.
-However, it may not be suitable for single-cell experiments where technical noise and biological heterogeneity complicate the identification of a reliable non-DE set. 
-For example, house-keeping genes may be turned on or off by transcriptional bursting \cite{marinov2014singlecell}, while cell cycling and other processes may trigger large-scale changes in the transcriptional programme that preclude the assumption of a non-DE majority.
+However, it may not be suitable for single-cell experiments where the presence of strong biological heterogeneity complicates the identification of a reliable non-DE set. 
+For example, house-keeping genes may be turned on or off by transcriptional bursting, while cell cycling and other processes may trigger large-scale changes in the transcriptional programme that preclude the assumption of a non-DE majority.
 
-An alternative normalization strategy involves the use of spike-in RNA for which the identity and quantity of all transcripts is known \cite{stegle2015computational}.
-The same amount of spike-in RNA is added to each cell, and the spike-in transcripts are processed along with their endogenous counterparts into a library for sequencing.
+An alternative normalization strategy uses spike-in RNA for which the identity and quantity of all transcripts is known \cite{stegle2015computational}.
+The same amount of spike-in RNA is added to each cell, and the spike-in transcripts are processed along with their endogenous counterparts into a sequencing library.
 This yields a set of read (or UMI) counts for both endogenous and spike-in transcripts in each cell.
 Normalization is performed by scaling the counts for each cell such that the counts for the spike-in genes are, on average, the same between cells.
-The central assumption of this approach is that the same amount of spike-in RNA is added to each cell.
-Thus, any differences in the coverage of the spike-in genes between cells must be artifactual in origin and should be removed by scaling.
+The central assumptions of this approach are that (i) the same amount of spike-in RNA is added to each cell, and (ii) the spike-in and endogenous transcripts are similarly affected by cell-to-cell fluctuations in capture efficiency.
+Under these assumptions, any differences in the coverage of the spike-in transcripts between cells must be artifactual in origin and should be removed by scaling.
+One particular advantage of this strategy is that it does not make any assumptions about the endogenous expression profile, unlike the non-DE approach described above.
+This means that spike-in normalization can be applied in situations where large-scale changes in expression (e.g., related to changes in total RNA content) are expected and of interest \cite{lun2016stepbystep}.
 
-The use of spike-ins for normalization seems preferable to the non-DE approach as it avoids making strong assumptions about the biology of single cells.
-However, a major criticism of spike-ins in bulk experiments is that the same volume of spike-in RNA cannot be consistently added to each sample \cite{robinson2010tmm}.
-Variable addition of spike-ins would violate the assumption of equal spike-in quantities per cell, compromising the effectiveness of normalization \cite{risso2014normalization}.
-Another criticism is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \cite{grun2015design}.
-Any cell-specific biases in capture efficiency for the latter may not be captured by the former, rendering normalization inaccurate.
-
-The aforementioned issues with normalization are equally applicable to both plate- and microfluidics-based protocols.
-Microfluidics platforms such as the Fluidigm C1 \cite{pollen2014lowcoverage} attempt to mitigate the effect of cell-specific biases by tightly controlling the reaction conditions during cDNA generation.
-This is not without its own complications -- the C1 chips must be matched to the cell size, and cell capture is susceptible to doublet formation (where two cells are processed into a single library) \cite{fluidigm2016white}.
-In contrast, plate-based protocols tend to be cheaper to run and are compatible with existing laboratory techniques such as indexed fluorescently-activated cell sorting (FACS).
-Thus, we focus on normalization of data from plate-based protocols, to reflect their increasing use in single-cell studies (CITE BIG GUYS).
+However, there are several criticisms of spike-in normalization that challenge the validity of its central assumptions.
+The first is that the same quantity of spike-in RNA may not be consistently added to each sample \cite{robinson2010tmm}, while the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \cite{grun2015design}.
+Any differences in spike-in quantity or behaviour across cells will compromise the accuracy of spike-in normalization \cite{risso2014normalization}.
+This would complicate the analysis of data sets where a non-DE majority cannot be assumed -- if spike-in normalization cannot be used, there is no obvious alternative for removing cell-specific biases.
+However, whether or not the aforementioned criticisms are valid in real scRNA-seq experiments is yet to be determined.
 
 In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
 We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells.
@@ -127,6 +122,13 @@ Components of the spike-in variability can be separated by estimating the varian
 }
 \label{fig:expdesign}
 \end{figure}
+
+The aforementioned issues with normalization are equally applicable to both plate- and microfluidics-based protocols.
+Microfluidics platforms such as the Fluidigm C1 \cite{pollen2014lowcoverage} attempt to mitigate the effect of cell-specific biases by tightly controlling the reaction conditions during cDNA generation.
+This is not without its own complications -- the C1 chips must be matched to the cell size, and cell capture is susceptible to doublet formation (where two cells are processed into a single library) \cite{fluidigm2016white}.
+In contrast, plate-based protocols tend to be cheaper to run and are compatible with existing laboratory techniques such as indexed fluorescently-activated cell sorting (FACS).
+Thus, we focus on normalization of data from plate-based protocols, to reflect their increasing use in single-cell studies (CITE BIG GUYS).
+
 
 \subsection{Variability in spike-in addition or efficiency is negligible}
 % Mention switched order.
