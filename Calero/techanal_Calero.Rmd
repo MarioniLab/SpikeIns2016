@@ -1,0 +1,227 @@
+---
+title: Examining the variability of spike-in addition
+author: Aaron Lun
+date: 26 January 2016
+output:
+  html_document:
+      fig_caption: no
+---
+
+```{r, echo=FALSE, results='hide'}
+knitr::opts_chunk$set(fig.path="figure-tech/", error=FALSE)
+```
+
+# Introduction
+
+Here, we examine the variability of spike-in addition using the mixture experiment.
+First, we load the counts for all genes and define their categories, i.e., mouse cellular, ERCC or SIRV spike-ins.
+
+```{r}
+all.counts <- read.table("genic_counts.tsv", header=TRUE, row.names=1)
+gene.lengths <- all.counts[,1]
+all.counts <- all.counts[,-1]
+is.ercc <- grepl("ERCC", rownames(all.counts))
+is.sirv <- grepl("SIRV", rownames(all.counts))
+is.mouse <- !is.ercc & !is.sirv
+colSums(data.frame(ERCC=sum(is.ercc), SIRV=sum(is.sirv), Mouse=sum(is.mouse)))
+```
+
+We also define the grouping for each sample. 
+Here we have two factors making up six groups in total.
+The first factor is whether an oncogene has been induced in the cell line.
+The second factor is how the spike-ins have been added -- ERCCs followed by SIRVs, SIRVs followed by ERCCs, or as a premixed set.
+
+```{r, message=FALSE}
+library(simpaler)
+is.induced <- grepl("S50[5-8]", colnames(all.counts))
+ercc.first <- grepl("N70[1-4]", colnames(all.counts))
+sirv.first <- grepl("N70[5-8]", colnames(all.counts))
+premixed <- grepl("N7(09|10|11|12)", colnames(all.counts))
+spike.data <- setupSpikes(all.counts, spike1=is.ercc, spike2=is.sirv, 
+    separate=ercc.first|sirv.first, premixed=premixed,
+    ercc.first=ercc.first, sirv.first=sirv.first, induced=is.induced)
+spike.data$genes$mouse <- is.mouse
+colSums(data.frame(Induced=is.induced, ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
+```
+
+# Quality control
+
+We examine the distribution of the sum of counts across all samples, in order to identify samples for which cell capture or library preparation have failed.
+First, we compute the count sums for each category of genes.
+
+```{r}
+mouse.sums <- colSums(all.counts[spike.data$genes$mouse,])
+spike.data$samples$mouse <- mouse.sums
+ercc.sums <- spike.data$samples$sum1
+sirv.sums <- spike.data$samples$sum2
+summary(data.frame(Mouse=mouse.sums, ERCC=ercc.sums, SIRV=sirv.sums))
+```
+
+We then have a look at the distributions of the count sums.
+
+```{r counthist, fig.height=5, fig.width=10}
+par(mfrow=c(1,3))
+hist(mouse.sums, breaks=20, main="Mouse sums", col="grey")
+hist(ercc.sums, breaks=20, main="ERCC sums", col="grey")
+hist(sirv.sums, breaks=20, main="SIRV sums", col="grey")
+```
+
+We remove libraries with outliers in any of the count sums.
+
+```{r, message=FALSE}
+library(scran)
+keep <- !(isOutlier(mouse.sums, n=3, log=TRUE, type="lower") | 
+          isOutlier(ercc.sums, n=3, log=TRUE, type="lower") | 
+          isOutlier(sirv.sums, n=3, log=TRUE, type="lower"))
+spike.data <- spike.data[,keep]
+sum(keep)
+```
+
+Note that we'll be working with count sums, so we don't bother removing low-abundance genes.
+
+# Exploring the variability of the spike-in ratios
+
+We examine the distribution of the log-ratios for the ERCC to SIRV counts for each combination of factors.
+First, we set up the groups in the following manner.
+
+```{r}
+spike.type <- 1*spike.data$samples$ercc.first+2*spike.data$samples$sirv.first+3*spike.data$samples$premixed
+stopifnot(all(spike.type >= 1 & spike.type <= 3))
+spike.in <- c("ERCC+SIRV", "SIRV+ERCC", "Premixed")[spike.type]
+induced <- ifelse(spike.data$samples$induced, "Induced", "Control")
+grouping <- paste0(induced, ".", spike.in)
+log.spikes <- spike.data$samples$ratio
+```
+
+We then construct histograms for each combination of factors.
+Nothing too irregular here -- perhaps only an outlier for the induced premixed set.
+We can remove this prior to further consideration.
+
+```{r ratiohist, fig.width=6, fig.height=12}
+par(mfrow=c(3, 2))
+by.group <- split(log.spikes, grouping)
+ref <- hist(log.spikes, plot=FALSE, breaks=10)
+for (g in names(by.group)) {
+    hist(by.group[[g]], main=g, breaks=ref$breaks, ylim=c(0, 10), col="grey")
+}
+```
+
+We estimate the variance of each group, to check that the order of addition and the biological condition doesn't affect the estimates.
+This means that we can pool them together for more precision in the actual analysis.
+There doesn't seem to be any significant difference, though the number of samples is probably too low to get a reliable gauge.
+
+```{r}
+keep <- spike.data$samples$separate
+diagnoseVariance(spike.data[,keep], grouping[keep])
+keep <- spike.data$samples$premixed
+diagnoseVariance(spike.data[,keep], grouping[keep])
+```
+
+We repeat this after merging the separate addition groups by the order of addition or by the biological group.
+This provides some more power to detect differences (if there are any) by increasing the number of samples.
+
+```{r}
+keep <- spike.data$samples$separate
+design <- model.matrix(~0+grouping)
+diagnoseVariance(spike.data[,keep], spike.data$samples$ercc.first[keep], design[keep,])
+diagnoseVariance(spike.data[,keep], spike.data$samples$induced[keep], design[keep,])
+```
+
+We fit separate linear models to the samples with separate and premixed spike-in additions.
+We then have a look at the variance estimates (or specifically, the standard deviation estimates in `sigma`).
+As it turns out, they're pretty similar, which suggests that there is minimal variability from spike-in addition.
+
+```{r}
+diagnoseVariance(spike.data, spike.data$samples$premixed, design)
+```
+
+This can be examined more visually by looking at the distribution of the residuals.
+We check whether they're reasonably normal.
+Some minor deviation at the tails, perhaps -- but all in all, normality is probably a good approximation.
+
+```{r, fig.width=10, fig.height=5}
+keep <- spike.data$samples$separate
+sep.fit <- estimateVariance(spike.data[,keep], design[keep,], getfit=TRUE)
+sep.resids <- residuals(sep.fit)
+keep <- spike.data$samples$premixed
+premix.fit <- estimateVariance(spike.data[,keep], design[keep,], getfit=TRUE)
+premix.resids <- residuals(premix.fit)
+par(mfrow=c(1,2))
+qqnorm(sep.resids)
+qqline(sep.resids)
+qqnorm(premix.resids)
+qqline(premix.resids)
+```
+
+<!--
+# Checking the MADs
+
+We can also do this for the median absolute deviation, computed by treating the residual effects as observations.
+This provides some protection against any outliers that might be present.
+There's no increase here (at all, let alone one that is significant).
+
+```{r}
+#sep.mad <- mad(tail(effects(sep.fit), df.residual(sep.fit)))
+#premix.mad <- mad(tail(effects(premix.fit), df.residual(premix.fit)))
+#sep.mad
+#premix.mad
+```
+-->
+
+# Decomposing the variance components
+
+The decomposition can be done simply using the `decomposeVariances` function.
+We can examine the variance of the added (log-)volume, by subtracting the variance of the log-ratios in the premixed experiment from the variance of separate additions.
+We also test this difference for significance using a standard chi-squared test.
+
+```{r}
+out <- decomposeVariance(spike.data, design)
+out$direct
+```
+
+Note that this only applies when the count sizes are comparable between the separate and premixed additions.
+Otherwise, the technical component of the variance will be different between the two estimates.
+Fortunately, this seems to be the case here, so we can proceed safely.
+
+```{r}
+summary(sirv.sums[premixed])
+summary(sirv.sums[!premixed])
+summary(ercc.sums[premixed])
+summary(ercc.sums[!premixed])
+```
+
+We also calculate the variability of spike-in behaviour between wells.
+Most spike-ins are artificial and will behave differently to well-specific conditions.
+This results in variable differences in capture efficiency, etc. that has a similar effect to variable addition.
+
+To estimate this variability, we break up the spike-ins into two halves and estimate the ratio between them.
+Behaviour should be consistent between transcripts in the same spike-in set, so this variability should only represent technical noise.
+With some work, we can figure out the technical variance of each spike-in set (i.e., from sequencing and stochastic capture variability),
+and separate this from the behavioural variability, i.e., the variance in the relative capture efficiency between the spike-in sets.
+
+```{r}
+out$split
+```
+
+# Computing the variability in cellular RNA
+
+For reference, we examine the variability in the spike-ins to the cellular counts.
+This easily exceeds the variability due to spike-in addition or behaviour, which suggests that those two factors don't really matter for practical purposes.
+
+```{r}
+cellular <- log2(colSums(spike.data$counts[spike.data$genes$mouse,])/spike.data$samples$sum1)
+estimateVariance(ratios=cellular, design=design)
+```
+
+# Session information
+
+```{r}
+sessionInfo()
+```
+
+We also save the object to file for downstream uses (e.g., plotting).
+
+```{r}
+saveRDS(spike.data, file="techsaved.rds")
+```
+
