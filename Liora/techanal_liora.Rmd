@@ -228,6 +228,14 @@ cellular <- log2(colSums(spike.data$counts[spike.data$genes$mouse,])/spike.data$
 estimateVariance(ratios=cellular, design=design)
 ```
 
+We also compute the variability of each of the spike-in totals across all cells, blocking on the various conditions.
+Again, this provides a contrast to each of the individual variance components, as it implies their effect on the normalization across cells is small.
+
+```{r}
+estimateVariance(ratios=log2(spike.data$samples$sum1), design=design)
+estimateVariance(ratios=log2(spike.data$samples$sum2), design=design)
+```
+
 # Session information
 
 ```{r}
