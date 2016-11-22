@@ -1,0 +1,16 @@
+Hopefully, the number of genes with cross-mapping activity is negligible.
+If you want to be conservative, you can ignore all genes that exhibit *any* cross-mapping.
+However, I suspect this won't make much of a difference, if the number of genes removed is small.
+You'll still get cross-mapping elsewhere due to sequencing errors, exon junction reads, etc. which will probably make up the bulk of errors.
+We're also probably missing stuff because we haven't looked at every base in the genome, only extracting read sequences every 5-10 bp.
+
+I guess the conclusion here is that the vast majority of transcriptomic or genomic regions do not have cross-mapping.
+The actual effect of cross-mapping depends on the level to which the offending regions are transcibed, which is unknown.
+In practice, the requirement for unique mapping should provide minimize cross-mapping by refusing to align reads with two candidate locations on different genomes.
+You'd only really have a threat if you get a mutation that makes it more like another species, which seems unlikely.
+
+For the purposes of the spike-in experiments, you might get extra variability due to cross-mapping from variable mouse genes to either spike-in set.
+However, this should be observable in the control experiment, so you should be able to subtract it out fairly easily.
+Cross-mapping between spike-in populations, or from the mouse to both spike-in populations, is more troublesome; variances would shrink to zero.
+Best results may be obtained by keeping the ERCCs as one population in all experiments, as they're pretty robust to cross-mapping.
+
