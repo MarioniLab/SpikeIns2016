@@ -8,7 +8,7 @@
 \urlstyle{same}
 
 \title{When normalization gets prickly: are spike-ins good enough for single-cell RNA sequencing data?}
-\author{Aaron Lun, Fernando Calero, Bertie G\"ottgens, John Marioni}
+\author{Aaron Lun, Fernando Calero, Liora Vilmovsky, Bertie G\"ottgens, John Marioni}
 
 \begin{document}
 
@@ -125,7 +125,7 @@ This can also be written as
 \[
 \theta_i = \log V_{i1} + \varepsilon_{i1} - \log V_{i2} - \varepsilon_{i2} + R_i
 \]
-where $R_i = \log(R_{i1}/R_{i2})$ and represents the fold-difference in the average capture efficiency between the two sets (i.e., the difference in behaviour of the spike-ins).
+where $R_i = \log(R_{i1}/R_{i2})$ and represents the fold change in the average capture efficiency between the two sets (i.e., the difference in behaviour of the spike-ins).
 Computing the variance of $\theta_i$ yields
 \[
 \variance(\theta_i) = 2 \sigma^2_{vol} + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(R_i)
@@ -149,21 +149,32 @@ To obtain an estimate of the variance of the volume addition step, simple arithm
 \[
 \sigma^2_{vol} = \frac{\variance(\theta_i) - \variance(\theta'_i)}{2} \;.
 \]
-It should be stressed that this variance estimate is relevant to all experiments using the same protocol for spike-in addition, even if the identity or concentration of the spike-in set are different.
+It should be stressed that this variance estimate is relevant to all experiments using the same protocol for spike-in addition, even if the identity or concentration of the spike-in set is different.
 
-The variance of $R_i$ is also relevant as it determines the effect of differences in behaviour between different RNA populations.
-Even when the capture efficiency differs between spike-in and endogenous transcripts, spike-in normalization may still be accurate, \textit{provided that the fold difference in capture efficiency is the same in all wells}.
-This is because any consistent difference in efficiency would scale the counts in all libraries to the same extent, thus effectively cancelling out upon scaling normalization.
-However, if the relative efficiency varies across cells, the accuracy of spike-in normalization would be compromised.
-The estimated variance of $\theta'_i$ provides an upper bound for the variance of $R_i$, i.e., the difference in efficiency between the ERCC and SIRV sets.
-These two sets of transcripts have substantial differences in their biophysical properties (Supplementary Figure XXX), similar to the differences between synthetic and endogenous transcripts. 
-This suggests that $\variance(R_i)$ can provide a rough estimate of the variance in relative capture efficiency between the spike-in and cellular RNA.
+\subsection{Estimating the variance of capture efficiency}
+The variance of $R_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
+Even when the capture efficiency differs between sets, spike-in normalization may still be appropriate \textit{provided that the fold change in capture efficiency is the same in all wells}.
+Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
+This scales up the counts for the spike-in transcripts in all libraries by the same amount, which cancels out between libraries (i.e., the fold changes between counts for endogenous or spike-in transcripts in different libraries are unaffected).
+However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
+This is because changes in the capture efficiency for the spike-in transcripts are confounded with changes in efficiency for all transcripts in the well, precluding the use of spike-ins to normalize the counts for the endogenous trancripts.
+
+The estimated variance of $\theta'_i$ provides an upper bound for the variance of $R_i$.
+This quantifies the extent to which normalization is affected by differences in efficiency between two transcript sets.
+Obviously, $R_i$ is computed between two spike-in sets whereas the differences between synthetic spike-in and endogenous transcripts are likely to be greater.
+Nonetheless, the SIRV and ERCC spike-ins do vary in their biophysical properties (Supplementary Figure XXX).
+For example, the SIRV transcripts have more variable length and lower GC content compared to the ERCC transcripts.
+This suggests that the variance of $R_i$ will include some of the differences in behaviour between synthetic and endogenous RNA, and will be useful as a rough estimate to the order of magnitude of those differences.
 
 \subsection{Variability in spike-in addition or efficiency is negligible}
 % Mention switched order.
 % No effect of different cell treatments.
 % Same total count for spike-ins between premixed and not premixed.
 % Normality.
+
+It is worth noting that $T_{is}$ can also be interpreted as the log-transformed \textit{size factor} for the library generated from $i$.
+During spike-in normalization, all counts for this library are divided by the size factor to obtain normalized expression values.
+
 
 \subsection{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses were sensitive to spike-in variability, especially for those analyses that depend on the assumption of constant spike-ins for normalization.
