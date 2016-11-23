@@ -1,7 +1,7 @@
 ---
 title: Examining the variability of spike-in addition
 author: Aaron Lun
-date: 6 September 2016
+date: 26 January 2016
 output:
   html_document:
       fig_caption: no
@@ -26,35 +26,6 @@ is.mouse <- !is.ercc & !is.sirv
 colSums(data.frame(ERCC=sum(is.ercc), SIRV=sum(is.sirv), Mouse=sum(is.mouse)))
 ```
 
-We define the well identities for each sample, using information in the metadata and manifest files.
-(The former stores the Sanger ID:well number, and the latter stores the file name:Sanger ID. 
-Hence the need for the contortions below.)
-
-```{r}
-manifest <- read.csv("manifest.csv", header=TRUE)
-metadata <- read.csv("metadata.csv", header=TRUE)
-num.ids <- sub("[^\\.]+\\.", "", colnames(all.counts))
-ref.ids <- sub(".*#", "", metadata[,4])
-metadata <-  metadata[match(num.ids, ref.ids),]
-manifest <- manifest[match(metadata$Sanger.sample.ID, manifest$SANGER.SAMPLE.ID),]
-well.ids <- sub(".*_", "", manifest$SUPPLIER.SAMPLE.NAME)
-colnames(all.counts) <- well.ids
-```
-
-We check the positive and negative controls.
-The positive control at A01 uses 50 cells which should suppress the coverage of the spike-in transcripts (assuming that library quantification was performed).
-In contrast, the negative control at H12 uses no cells, which means that the spike-ins will dominate the sequencing output for that library.
-We remove these prior to further analyses.
-
-```{r}
-data.frame(Mouse=sum(all.counts[is.mouse,"A01"]), 
-    ERCC=sum(all.counts[is.ercc,"A01"]), SIRV=sum(all.counts[is.sirv,"A01"]))
-data.frame(Mouse=sum(all.counts[is.mouse,"H12"]), 
-    ERCC=sum(all.counts[is.ercc,"H12"]), SIRV=sum(all.counts[is.sirv,"H12"]))
-discard <- is.na(well.ids) | well.ids %in% c("A01", "H12") 
-all.counts <- all.counts[,!discard]
-```
-
 We also define the grouping for each sample. 
 Here we have two factors making up six groups in total.
 The first factor is whether an oncogene has been induced in the cell line.
@@ -62,14 +33,15 @@ The second factor is how the spike-ins have been added -- ERCCs followed by SIRV
 
 ```{r, message=FALSE}
 library(simpaler)
-ercc.first <- grepl("[A-Z]0[1234]", colnames(all.counts))
-sirv.first <- grepl("[A-Z]0[5678]", colnames(all.counts))
-premixed <- grepl("[A-Z](09|10|11|12)", colnames(all.counts))
+is.induced <- grepl("S50[5-8]", colnames(all.counts))
+ercc.first <- grepl("N70[1-4]", colnames(all.counts))
+sirv.first <- grepl("N70[5-8]", colnames(all.counts))
+premixed <- grepl("N7(09|10|11|12)", colnames(all.counts))
 spike.data <- setupSpikes(all.counts, spike1=is.ercc, spike2=is.sirv, 
     separate=ercc.first|sirv.first, premixed=premixed,
-    ercc.first=ercc.first, sirv.first=sirv.first)
+    ercc.first=ercc.first, sirv.first=sirv.first, induced=is.induced)
 spike.data$genes$mouse <- is.mouse
-colSums(data.frame(ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
+colSums(data.frame(Induced=is.induced, ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
 ```
 
 # Quality control
@@ -115,16 +87,18 @@ First, we set up the groups in the following manner.
 ```{r}
 spike.type <- 1*spike.data$samples$ercc.first+2*spike.data$samples$sirv.first+3*spike.data$samples$premixed
 stopifnot(all(spike.type >= 1 & spike.type <= 3))
-grouping <- c("ERCC+SIRV", "SIRV+ERCC", "Premixed")[spike.type]
+spike.in <- c("ERCC+SIRV", "SIRV+ERCC", "Premixed")[spike.type]
+induced <- ifelse(spike.data$samples$induced, "Induced", "Control")
+grouping <- paste0(induced, ".", spike.in)
 log.spikes <- spike.data$samples$ratio
 ```
 
 We then construct histograms for each combination of factors.
-Nothing too irregular here, though it seems that the ERCC-first has a couple of outliers.
-We'll leave them in just in case they represent genuine variability in addition.
+Nothing too irregular here -- perhaps only an outlier for the induced premixed set.
+We can remove this prior to further consideration.
 
-```{r ratiohist, fig.width=12, fig.height=6}
-par(mfrow=c(1, 3))
+```{r ratiohist, fig.width=6, fig.height=12}
+par(mfrow=c(3, 2))
 by.group <- split(log.spikes, grouping)
 ref <- hist(log.spikes, plot=FALSE, breaks=10)
 for (g in names(by.group)) {
@@ -132,13 +106,27 @@ for (g in names(by.group)) {
 }
 ```
 
-We estimate the variance of the separate addition groups.
-There's actually a moderate difference due to order of addition.
-All in all, though, both values are fairly small, so it's probably safe to pool them together for more precision in the actual analysis.
+We estimate the variance of each group, to check that the order of addition and the biological condition doesn't affect the estimates.
+This means that we can pool them together for more precision in the actual analysis.
+There doesn't seem to be any significant difference, though the number of samples is probably too low to get a reliable gauge.
 
 ```{r}
 keep <- spike.data$samples$separate
 diagnoseVariance(spike.data[,keep], grouping[keep])
+keep <- spike.data$samples$premixed
+diagnoseVariance(spike.data[,keep], grouping[keep])
+```
+
+We repeat this after merging the separate addition groups by the order of addition or by the biological group.
+This provides some more power to detect differences (if there are any) by increasing the number of samples.
+
+```{r}
+keep <- spike.data$samples$separate
+design <- model.matrix(~0+grouping)
+by.order <- diagnoseVariance(spike.data[,keep], spike.data$samples$ercc.first[keep], design[keep,])
+by.order
+by.induced <- diagnoseVariance(spike.data[,keep], spike.data$samples$induced[keep], design[keep,])
+by.induced
 ```
 
 We fit separate linear models to the samples with separate and premixed spike-in additions.
@@ -146,7 +134,6 @@ We then have a look at the variance estimates (or specifically, the standard dev
 As it turns out, they're pretty similar, which suggests that there is minimal variability from spike-in addition.
 
 ```{r}
-design <- model.matrix(~0+grouping)
 diagnoseVariance(spike.data, spike.data$samples$premixed, design)
 ```
 
@@ -191,7 +178,7 @@ We also test this difference for significance using a standard chi-squared test.
 
 ```{r}
 out <- decomposeVariance(spike.data, design)
-out$direct
+out
 ```
 
 Note that this only applies when the count sizes are comparable between the separate and premixed additions.
@@ -205,6 +192,7 @@ summary(ercc.sums[premixed])
 summary(ercc.sums[!premixed])
 ```
 
+<!--
 We also calculate the variability of spike-in behaviour between wells.
 Most spike-ins are artificial and will behave differently to well-specific conditions.
 This results in variable differences in capture efficiency, etc. that has a similar effect to variable addition.
@@ -217,6 +205,7 @@ and separate this from the behavioural variability, i.e., the variance in the re
 ```{r}
 out$split
 ```
+-->
 
 # Computing the variability in cellular RNA
 
@@ -232,14 +221,28 @@ We also compute the variability of each of the spike-in totals across all cells,
 Again, this provides a contrast to each of the individual variance components, as it implies their effect on the normalization across cells is small.
 
 ```{r}
-estimateVariance(ratios=log2(spike.data$samples$sum1), design=design)
-estimateVariance(ratios=log2(spike.data$samples$sum2), design=design)
+ercc.var <- estimateVariance(ratios=log2(spike.data$samples$sum1), design=design)
+ercc.var
+sirv.var <- estimateVariance(ratios=log2(spike.data$samples$sum2), design=design)
+sirv.var
 ```
 
 # Session information
 
 ```{r}
 sessionInfo()
+```
+
+We collect the results of interest and save them into an object.
+
+```{r}
+saveRDS(list(sfERCC.var=ercc.var, sfSIRV.var=sirv.var,
+             ratioERCCfirst.var=by.order$var[["TRUE"]], 
+             ratioERCCsecond.var=by.order$var[["FALSE"]], 
+             ratioOrder.sig=by.order$pval[1,2],
+             ratioSep.var=out$total, ratioPre.var=out$premixed,
+             ratioVol.var=out$volume, ratioVol.sig=out$pval),
+        file="results.rds")             
 ```
 
 We also save the object to file for downstream uses (e.g., plotting).
