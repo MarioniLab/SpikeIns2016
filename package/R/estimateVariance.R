@@ -55,7 +55,10 @@ estimateVariance <- function(y, design, ..., ratios, getfit=FALSE)
     else { design <- .restore_rank(design) }
     fit <- lm.fit(y=ratios, x=design, ...)
     if (getfit) { return(fit) }
-    sum(fit$effects[-seq_len(fit$rank)]^2)/fit$df.residual
+
+    var.est <- sum(fit$effects[-seq_len(fit$rank)]^2)/fit$df.residual
+    attributes(var.est)$standard.error <- var.est/sqrt(nrow(design)-ncol(design))
+    return(var.est)
 }
 
 .make_intercept <- function(n) { as.matrix(rep(1, n)) }
@@ -91,6 +94,7 @@ testVariance <- function(var1, var2, df1, df2, ratios1, ratios2, design1, design
     }
     type <- match.arg(type)
     var.ratio <- var1/var2
+    attributes(var.ratio) <- NULL
 
     upper.tail <- pf(var.ratio, df1, df2, lower=FALSE)
     if (type=="one-sided") {
@@ -145,13 +149,17 @@ diagnoseVariance <- function(y, groups, design)
         }
     }
     rownames(pairwise) <- colnames(pairwise) <- names(all.var)
-    return(list(var=unlist(all.var), pval=pairwise))
+    return(list(var=all.var, pval=pairwise))
 }
 
 decomposeVariance <- function(y, design) 
 # This decomposes the variances to their relevant components, given the count matrix in 'counts'.
 # We need an indication of which genes are in each spike-in set (spike1, spike2).
 # We also need to know which samples correspond to premixed and separate additions.
+#
+# written by Aaron Lun
+# created 26 January 2016
+# last modified 23 November 2016
 {
     ratios <- y$samples$ratio
     separate <- y$samples$separate
@@ -163,50 +171,23 @@ decomposeVariance <- function(y, design)
     premix.var <- estimateVariance(ratios=ratios[premixed], design=premixed.design)
     volume.var <- 0.5*(total.var - premix.var)
 
-    combined.design <- rbind(do.call(cbind, c(list(separate.design), rep(list(0), ncol(premixed.design)))),
-                             do.call(cbind, c(rep(list(0), ncol(separate.design)), list(premixed.design))))
+#    combined.design <- rbind(do.call(cbind, c(list(separate.design), rep(list(0), ncol(premixed.design)))),
+#                             do.call(cbind, c(rep(list(0), ncol(separate.design)), list(premixed.design))))
     if (volume.var < 0) {
         # Following the REML definition when the subtraction is negative (reconstructing the matrix, just in case it didn't have premixed in it).
         # But maybe it's a bit too confusing to have to redefine everything: I think we'll just put up with negative values.
 #        premix.var <- total.var <- estimateVariance(ratios=c(ratios[separate], ratios[premixed]), design=combined.design) 
-#        volume.var <- 0
+        volume.var <- 0
         volume.sig <- 1
     } else {
         volume.sig <- testVariance(var1=total.var, var2=premix.var, design1=separate.design, 
                                    design2=premixed.design, type="one-sided")
     }
-
-    # Computing the variance in behaviour.
-    for (s in seq_len(2)) { 
-        if (s==1L) {
-            spike <- y$genes$spike1
-            alt.sum <- y$samples$sum2
-            final.value <- "tech.var1"
-        } else {
-            spike <- y$genes$spike2
-            alt.sum <- y$samples$sum1
-            final.value <- "tech.var2"
-        }
-        
-        splitted <- splitSpikes(y$counts[spike,,drop=FALSE])
-        subsumA <- splitted$first
-        subsumB <- splitted$second
-        self.ratios <- log2(subsumA/subsumB) 
-
-        # Should not have behavioural variability between spike-ins from the same population.
-        self.tech.var <- estimateVariance(ratios=c(self.ratios[separate], self.ratios[premixed]), design=combined.design)
-        against.ratiosA <- log2(subsumA/alt.sum)
-        premix.varA <- estimateVariance(ratios=against.ratiosA[premixed], design=premixed.design)
-        against.ratiosB <- log2(subsumB/alt.sum)
-        premix.varB <- estimateVariance(ratios=against.ratiosB[premixed], design=premixed.design)
-
-        tech.var <- premix.var - 0.5*(premix.varA + premix.varB - self.tech.var)
-        tech.var <- pmax(tech.var, 0) # slightly biased, but avoid silly results.
-        assign(final.value, tech.var)
-    }
-    behave.var <- premix.var - tech.var1 - tech.var2
     
-    # Reporting the final breakdown of the variance components.
-    return(list(direct=data.frame(total=total.var, premixed=premix.var, volume=volume.var, pval=volume.sig),
-                split=data.frame(tech1=tech.var1, tech2=tech.var2, behaviour=behave.var)))
+    # Computing standard error of volume variance.
+    attributes(volume.var)$standard.error <- sqrt(attributes(total.var)$standard.error^2 + attributes(premix.var)$standard.error^2)/2
+
+    # Returning all results.
+    return(list(total=total.var, premixed=premix.var, volume=volume.var, pval=volume.sig))
 }
+
