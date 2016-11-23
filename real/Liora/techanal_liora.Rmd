@@ -116,6 +116,7 @@ First, we set up the groups in the following manner.
 spike.type <- 1*spike.data$samples$ercc.first+2*spike.data$samples$sirv.first+3*spike.data$samples$premixed
 stopifnot(all(spike.type >= 1 & spike.type <= 3))
 grouping <- c("ERCC+SIRV", "SIRV+ERCC", "Premixed")[spike.type]
+spike.data$samples$group <- grouping
 log.spikes <- spike.data$samples$ratio
 ```
 

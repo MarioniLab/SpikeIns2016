@@ -90,6 +90,7 @@ stopifnot(all(spike.type >= 1 & spike.type <= 3))
 spike.in <- c("ERCC+SIRV", "SIRV+ERCC", "Premixed")[spike.type]
 induced <- ifelse(spike.data$samples$induced, "Induced", "Control")
 grouping <- paste0(induced, ".", spike.in)
+spike.data$samples$group <- grouping
 log.spikes <- spike.data$samples$ratio
 ```
 
