@@ -73,9 +73,9 @@ These results suggest that spike-ins can be safely used for routine normalizatio
 We aimed to assess the variability in the added spike-in quantity across cells.
 To do so, we performed mixture experiments using two distinct spike-in sets (Figure~\ref{fig:expdesign}) -- the External RNA Controls Consortium (ERCC) set and the Spike-in RNA Variants (SIRV) set.
 An equal volume of each spike-in set was added separately to a single well of a 96-well microtiter plate.
-Each well also contained a cell (XXX cell line or trophoblasts) to mimic real experimental conditions.
-The pool of endogenous/spike-in RNA in each well was converted into a library with the Smart-seq2 protocol.
-This process was repeated for multiple wells and sequencing was performed on all of the generated libraries.
+Each well also contained a single mouse cell (416B cells or trophoblasts) to mimic real experimental conditions.
+The resulting pool of endogenous/spike-in RNA in each well was used to generate a library with the Smart-seq2 protocol.
+This process was repeated for multiple wells and sequencing was performed on all libraries.
 
 \begin{figure}[tbp]
 \begin{center}
@@ -91,14 +91,14 @@ Components of the spike-in variability can be separated by estimating the varian
 \end{figure}
 
 For each library, reads were mapped to the genome and assigned to genes to quantify expression.
-The total count was computed across all transcripts for each spike-in set in each well.
+The total count was computed across all transcripts of each spike-in set in each well.
 The log-ratio of the totals between the two sets was computed for each well, and the variance of this log-ratio was computed \textit{across} wells.
 Any variability in spike-in volume addition should manifest as an increase to the variability of the log-ratio, given that the spike-in sets were added independently to each well.
 
 We also repeated the experiment by adding volumes of spike-in solution where the two spike-in sets had been pre-mixed.
 This ensures that there is no variability in the relative quantities of the two set added to each well, thus providing a baseline level of variability in the protocol (e.g., due to 
 sequencing noise).
-The variance of volume addition was then estimated as the difference in the variance estimates from the pre-mixed control experiment and from the experiment with separate addition
+The variance of volume addition was then estimated as the difference in the variance estimates from the pre-mixed control wells and from the wells with separate addition of spike-ins.
 
 We used a protocol based on microtiter plates rather than microfluidics as it is easier to customise the spike-in addition step in the former.
 Our experimental design requires two separate additions of spike-in RNA to each reaction.
@@ -145,11 +145,41 @@ As $a$ is constant for all $i$, the variance of $\theta'_i$ is
 \[
 \variance(\theta'_i) = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(R_i) \;.
 \]
+This represents the technical variance attributable to the rest of the scRNA-seq protocol.
 To obtain an estimate of the variance of the volume addition step, simple arithmatic yields
 \[
 \sigma^2_{vol} = \frac{\variance(\theta_i) - \variance(\theta'_i)}{2} \;.
 \]
 It should be stressed that this variance estimate is relevant to all experiments using the same protocol for spike-in addition, even if the identity or concentration of the spike-in set is different.
+
+Using this mathematical framework, we proceeded to estimate the variance components from the data from our mixture experiments.
+We observed that the log-ratios $\theta_i$ and $\theta'_i$ computed from each plate were roughly normally distributed (Supplementary Figure~XXX).
+Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our variance estimate.
+This allows blocking on additional structure in the experimental design (Methods).
+We also noted that the distribution of $T_{is}$ was similar between separate-addition and premixed-addition wells within each plate (Supplementary Figure XXX).
+This means that we do not need to consider complex mean-variance relationships when comparing variance estimates, i.e., the contribution of $\sigma^2_{lib(s)}$ will not change between $\variance(\theta_i)$ and $\variance(\theta'_i)$ for each plate.
+Finally, we performed additional controls where we reversed the order of addition, i.e., SIRV spike-ins were added before the ERCC spike-ins.
+In general, the order did not affect the variance estimates for the separate-addition wells (Supplementary Figure XXX).
+
+Our results indicate that $\sigma^2_{vol}$ is consistently smaller than the variance in the rest of the protocol (Figure~\ref{fig:varestimates}).
+Indeed, no significant difference was detected between $\variance(\theta_i)$ and $\variance(\theta'_i)$ for each plate.
+This indicates that variability of spike-in volume addition is a minor contributor to the technical variability of the spike-in counts.
+To further put these estimates into context, consider that $T_{is}$ represents the log-transformed ``size factor'' for the library generated from well $i$.
+In other words, all counts in this library are scaled by $\exp(-T_{is})$ to correct for well/cell-specific biases during spike-in normalization.
+The variance of the log-size factors is several orders of magnitude larger than $\sigma^2_{vol}$.
+This suggests that the latter will not have a major effect on the outcome of spike-in normalization.
+
+\begin{figure}[btp]
+    \begin{center}
+        \includegraphics[height=2.2in,trim=0mm 10mm 0mm 10mm,clip]{../real/pics/variance_exp.pdf}
+        \includegraphics[height=2.2in,trim=0mm 10mm 0mm 10mm,clip]{../real/pics/variance_sf.pdf}
+    \end{center}
+    \caption{Variance estimates of the log$_2$-ratio between the ERCC and SIRV total counts (left), or the log-size factors computed from those totals (right).
+        Estimates were defined as the residual variance of a linear model fitted to the log-ratios or log-size factors across all cells (416B or trophoblasts) in each plate.
+        Error bars represent the standard errors of the estimates, assuming normally-distributed values.
+    }
+    \label{fig:varestimates}
+\end{figure}
 
 \subsection{Estimating the variance of capture efficiency}
 The variance of $R_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
@@ -159,22 +189,14 @@ This scales up the counts for the spike-in transcripts in all libraries by the s
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
 This is because changes in the capture efficiency for the spike-in transcripts are confounded with changes in efficiency for all transcripts in the well, precluding the use of spike-ins to normalize the counts for the endogenous trancripts.
 
-The estimated variance of $\theta'_i$ provides an upper bound for the variance of $R_i$.
+In our mathematical framework, the estimated variance of $\theta'_i$ provides an upper bound for the variance of $R_i$.
 This quantifies the extent to which normalization is affected by differences in efficiency between two transcript sets.
+We observe that $\variance(\theta'_i)$ is an order of magnitude lower than the variance of the log-size factors in each plate (Figure~\ref{fig:varestimates}).
+This indicates that the variance in efficiency across wells, while greater than $\sigma^2_{vol}$, is still relatively small compared to the other factors driving normalization, e.g., differences in cellular RNA content, well-to-well variability in capture efficiency for all transcripts.
 Obviously, $R_i$ is computed between two spike-in sets whereas the differences between synthetic spike-in and endogenous transcripts are likely to be greater.
 Nonetheless, the SIRV and ERCC spike-ins do vary in their biophysical properties (Supplementary Figure XXX).
 For example, the SIRV transcripts have more variable length and lower GC content compared to the ERCC transcripts.
-This suggests that the variance of $R_i$ will include some of the differences in behaviour between synthetic and endogenous RNA, and will be useful as a rough estimate to the order of magnitude of those differences.
-
-\subsection{Variability in spike-in addition or efficiency is negligible}
-% Mention switched order.
-% No effect of different cell treatments.
-% Same total count for spike-ins between premixed and not premixed.
-% Normality.
-
-It is worth noting that $T_{is}$ can also be interpreted as the log-transformed \textit{size factor} for the library generated from $i$.
-During spike-in normalization, all counts for this library are divided by the size factor to obtain normalized expression values.
-
+This suggests that $R_i$ will include some of the differences in behaviour between synthetic and endogenous RNA, such that $\variance(R_i)$ can be used as a rough estimate of the magnitude of the associated variability.
 
 \subsection{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses were sensitive to spike-in variability, especially for those analyses that depend on the assumption of constant spike-ins for normalization.
@@ -192,6 +214,8 @@ This ensures that sensitivity will be assessed under realistic conditions.
 
 \subsection{Spike-in mixture experiments with Smart-seq2}
 % On a single plate, so no plate effects.
+% Mention cutting up of plate, especially for the two conditions.
+% No effect of different cell treatments.
 
 \subsection{Data analysis for the mixture experiments}
 Reads were mapped to the mm10 build of the mouse genome with additional sequences for transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
