@@ -23,9 +23,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="373.14621"
-     inkscape:cy="694.68595"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="611.29988"
+     inkscape:cy="498.40383"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -3679,7 +3679,7 @@
            y="113.05026"
            id="text9339-9-2"
            sodipodi:linespacing="125%"><tspan
-             style="font-size:15.60295582px"
+             style="font-size:15.60295582000000003px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
              sodipodi:role="line"
              x="329.55142"
              y="113.05026"
@@ -4116,7 +4116,7 @@
            y="113.83878"
            id="text9339-9-8-7-7-7"
            sodipodi:linespacing="125%"><tspan
-             style="font-size:15.60295582px"
+             style="font-size:15.60295582000000003px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
              sodipodi:role="line"
              x="654.57141"
              y="113.83878"
@@ -4161,7 +4161,7 @@
            x="157.48616"
            style="font-size:12.27522087px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
            xml:space="preserve"><tspan
-             style="font-size:15.60295582px"
+             style="font-size:15.60295582000000003px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
              id="tspan9385-8-0"
              y="112.46365"
              x="157.48616"
@@ -4526,7 +4526,7 @@
            y="113.05026"
            id="text9339-9-9-8"
            sodipodi:linespacing="125%"><tspan
-             style="font-size:15.60295582px"
+             style="font-size:15.60295582000000003px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
              sodipodi:role="line"
              x="498.62817"
              y="113.05026"
@@ -4543,7 +4543,7 @@
            y="370.35135"
            x="455.22726"
            sodipodi:role="line"
-           style="font-size:12px;font-weight:bold">Premixed addition</tspan></text>
+           style="font-size:14px;font-weight:bold;-inkscape-font-specification:Liberation Sans Bold;font-family:Liberation Sans;font-style:normal;font-stretch:normal;font-variant:normal">Premixed addition</tspan></text>
       <path
          sodipodi:nodetypes="cccccccc"
          inkscape:connector-curvature="0"
@@ -4573,12 +4573,12 @@
        id="g7775"
        transform="translate(-4.5456865,-251.46706)">
       <rect
-         y="512.41357"
-         x="98.467773"
-         height="92.314728"
-         width="256.62296"
+         y="512.39984"
+         x="98.454033"
+         height="92.342209"
+         width="242.00758"
          id="rect7773"
-         style="fill:#f2f2f2;fill-opacity:1;stroke:#6f8a91;stroke-width:0.95578401999999996;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+         style="fill:#f2f2f2;fill-opacity:1;stroke:#6f8a91;stroke-width:0.92830592;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
       <g
          transform="translate(52.653218,-100.85681)"
          id="g3988">
@@ -4641,43 +4641,43 @@
              x="175.61517"
              y="630.28333"
              id="tspan9385-8-0-7"
-             style="font-size:12px;font-style:italic;-inkscape-font-specification:Sans Italic">ERCC spike-in transcripts</tspan></text>
+             style="font-size:12px;font-style:italic;-inkscape-font-specification:Liberation Sans Italic;font-family:Liberation Sans;font-weight:normal;font-stretch:normal;font-variant:normal">ERCC spike-in transcripts</tspan></text>
         <text
            xml:space="preserve"
            style="font-size:9.44068909px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-           x="173.35931"
+           x="172.539"
            y="651.41486"
            id="text9339-9-5-8-6-9"
            sodipodi:linespacing="125%"><tspan
              sodipodi:role="line"
-             x="173.35931"
+             x="172.539"
              y="651.41486"
              id="tspan9385-8-0-7-9"
-             style="font-size:12px;font-style:italic;-inkscape-font-specification:Sans Italic">SIRV spike-in transcripts</tspan></text>
+             style="font-size:12px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Italic">SIRV spike-in transcripts</tspan></text>
         <text
            xml:space="preserve"
            style="font-size:9.44068909px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-           x="197.6347"
+           x="192.13861"
            y="672.54639"
            id="text9339-9-5-8-6-3"
            sodipodi:linespacing="125%"><tspan
              sodipodi:role="line"
-             x="197.6347"
+             x="192.13861"
              y="672.54639"
              id="tspan9385-8-0-7-1"
-             style="font-size:12px;font-style:italic;-inkscape-font-specification:Sans Italic">Reverse transcriptase + primers</tspan></text>
+             style="font-size:12px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Italic">Reverse transcriptase + primers</tspan></text>
         <text
            xml:space="preserve"
            style="font-size:9.44068909px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-           x="182.09564"
+           x="178.90814"
            y="693.67792"
            id="text9339-9-5-8-6-4"
            sodipodi:linespacing="125%"><tspan
              sodipodi:role="line"
-             x="182.09564"
+             x="178.90814"
              y="693.67792"
              id="tspan9385-8-0-7-6"
-             style="font-size:12px;font-style:italic;-inkscape-font-specification:Sans Italic">DNA polymerase + primers</tspan></text>
+             style="font-size:12px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Italic">DNA polymerase + primers</tspan></text>
       </g>
     </g>
     <text
@@ -4718,92 +4718,92 @@
       <path
          sodipodi:nodetypes="ccc"
          style="fill:none;stroke:#000000;stroke-width:1.35795069px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 195.74433,769.33103 0,141.27447 315.19093,0"
+         d="m 216.45862,769.33103 0,141.27447 315.19093,0"
          id="path4774"
          inkscape:connector-curvature="0" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1.39787996px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 195.31528,770.10209 -4.04564,0"
+         d="m 216.02957,770.10209 -4.04564,0"
          id="path4776"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1.39787996px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 195.31528,835.79459 -4.04564,0"
+         d="m 216.02957,835.79459 -4.04564,0"
          id="path4776-9"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1.39787996px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 195.31528,901.48701 -4.04564,0"
+         d="m 216.02957,901.48701 -4.04564,0"
          id="path4776-9-4"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc" />
       <text
          xml:space="preserve"
          style="font-size:17.03199196px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-         x="184.61952"
+         x="205.3338"
          y="774.62952"
          id="text4814"
          sodipodi:linespacing="125%"><tspan
            sodipodi:role="line"
            id="tspan4816"
-           x="184.61952"
+           x="205.3338"
            y="774.62952"
-           style="font-size:10px">1</tspan></text>
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans">1</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:17.03199196px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-         x="183.59775"
+         x="204.31203"
          y="839.99756"
          id="text4814-3"
          sodipodi:linespacing="125%"><tspan
            sodipodi:role="line"
            id="tspan4816-4"
-           x="183.59775"
+           x="204.31203"
            y="839.99756"
-           style="font-size:10px">0</tspan></text>
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans">0</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:17.03199196px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-         x="179.73988"
+         x="200.45416"
          y="905.52356"
          id="text4814-3-0"
          sodipodi:linespacing="125%"><tspan
            sodipodi:role="line"
            id="tspan4816-4-4"
-           x="179.73988"
+           x="200.45416"
            y="905.52356"
-           style="font-size:10px">-1</tspan></text>
+           style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans">-1</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:17.33134079px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-         x="-891.87225"
-         y="170.17215"
+         x="-886.82147"
+         y="190.88643"
          id="text4872"
          sodipodi:linespacing="125%"
          transform="matrix(0,-1,1,0,0,0)"><tspan
-           style="font-size:12px;font-style:italic;font-weight:normal;-inkscape-font-specification:Sans Bold"
+           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Bold"
            sodipodi:role="line"
            id="tspan4874"
-           x="-891.87225"
-           y="170.17215">Log<tspan
-   style="font-size:12px;font-style:italic;font-weight:normal;baseline-shift:sub;-inkscape-font-specification:Sans Bold"
-   id="tspan4876">2</tspan>-[<tspan
+           x="-886.82147"
+           y="190.88643">Log<tspan
+   style="font-size:65.00091553%;baseline-shift:sub"
+   id="tspan3949">2</tspan>-[<tspan
    id="tspan11576"
-   style="font-size:12px;font-style:italic;font-weight:normal;fill:#ff0000">ERCC</tspan>/<tspan
+   style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Bold">ERCC</tspan>/<tspan
    id="tspan11578"
-   style="font-size:12px;font-style:italic;font-weight:normal;fill:#0000ff">SIRV</tspan>]</tspan></text>
+   style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#0000ff;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Bold">SIRV</tspan>]</tspan></text>
       <text
          sodipodi:linespacing="125%"
          id="text5217-1"
          y="924.37659"
-         x="252.77003"
+         x="257.77002"
          style="font-size:17.27448082px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
          xml:space="preserve"><tspan
-           style="font-size:12px;font-style:normal;font-weight:bold"
+           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Bold"
            y="924.37659"
-           x="252.77003"
+           x="257.77002"
            id="tspan5219-8"
            sodipodi:role="line">Separate</tspan></text>
       <rect
@@ -5056,12 +5056,12 @@
          y="828.70569"
          id="text9339-9-7-4-9-4"
          sodipodi:linespacing="125%"><tspan
-           style="font-size:12px;font-style:italic;text-align:start;text-anchor:start"
+           style="font-size:12px;font-style:italic;text-align:start;text-anchor:start;-inkscape-font-specification:Liberation Sans Italic;font-family:Liberation Sans;font-weight:normal;font-stretch:normal;font-variant:normal"
            sodipodi:role="line"
            x="470.37976"
            y="828.70569"
            id="tspan3591">Variance not caused </tspan><tspan
-           style="font-size:12px;font-style:italic;text-align:start;text-anchor:start"
+           style="font-size:12px;font-style:italic;text-align:start;text-anchor:start;-inkscape-font-specification:Liberation Sans Italic;font-family:Liberation Sans;font-weight:normal;font-stretch:normal;font-variant:normal"
            sodipodi:role="line"
            x="470.37976"
            y="843.70569"
@@ -5070,12 +5070,12 @@
          sodipodi:linespacing="125%"
          id="text5217-1-9"
          y="925.64514"
-         x="414.51559"
+         x="418.8013"
          style="font-size:17.27448082px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
          xml:space="preserve"><tspan
-           style="font-size:12px;font-style:normal;font-weight:bold"
+           style="font-size:12px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans Bold"
            y="925.64514"
-           x="414.51559"
+           x="418.8013"
            id="tspan5219-8-5"
            sodipodi:role="line">Premixed</tspan></text>
       <text
@@ -5085,12 +5085,12 @@
          y="829.03241"
          id="text9339-9-7-4-9-4-9"
          sodipodi:linespacing="125%"><tspan
-           style="font-size:12px;font-style:italic;text-align:start;text-anchor:start"
+           style="font-size:12px;font-style:italic;text-align:start;text-anchor:start;-inkscape-font-specification:Liberation Sans Italic;font-family:Liberation Sans;font-weight:normal;font-stretch:normal;font-variant:normal"
            sodipodi:role="line"
            x="312.48492"
            y="829.03241"
            id="tspan3591-9">Total</tspan><tspan
-           style="font-size:12px;font-style:italic;text-align:start;text-anchor:start"
+           style="font-size:12px;font-style:italic;text-align:start;text-anchor:start;-inkscape-font-specification:Liberation Sans Italic;font-family:Liberation Sans;font-weight:normal;font-stretch:normal;font-variant:normal"
            sodipodi:role="line"
            x="312.48492"
            y="844.03241"
@@ -5165,7 +5165,7 @@
            x="428.67929"
            style="font-size:9.44068909px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
            xml:space="preserve"><tspan
-             style="font-size:12px"
+             style="font-size:12px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans"
              id="tspan9385-8"
              y="215.95621"
              x="428.67929"
@@ -5181,7 +5181,7 @@
            y="216.40738"
            id="text9339-9"
            sodipodi:linespacing="125%"><tspan
-             style="font-size:12px"
+             style="font-size:12px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
              sodipodi:role="line"
              x="561.01215"
              y="216.40738"
@@ -5555,7 +5555,7 @@
            y="216.40738"
            id="text9339-9-9"
            sodipodi:linespacing="125%"><tspan
-             style="font-size:12px"
+             style="font-size:12px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
              sodipodi:role="line"
              x="691.04651"
              y="216.40738"
@@ -5751,7 +5751,7 @@
            y="217.01382"
            id="text9339-9-8-7-7"
            sodipodi:linespacing="125%"><tspan
-             style="font-size:12px"
+             style="font-size:12px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
              sodipodi:role="line"
              x="810.9801"
              y="217.01382"
@@ -6189,7 +6189,7 @@
            y="183.0784"
            x="219.38609"
            sodipodi:role="line"
-           style="font-size:12px;font-weight:bold">Separate addition</tspan></text>
+           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Liberation Sans;-inkscape-font-specification:Liberation Sans">Separate addition</tspan></text>
       <path
          style="fill:#ffb380;stroke:none"
          d="m 191.16148,237.36559 14.284,-5e-4 0,-4 7.78812,9.74574 -7.78812,9.87126 0,-4 -14.284,2.6e-4 z"
@@ -6221,12 +6221,12 @@
          x="156.52829"
          style="font-size:9.44068909px;font-style:normal;font-weight:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
          xml:space="preserve"><tspan
-           style="font-size:8px;font-style:italic;text-align:start;text-anchor:start;-inkscape-font-specification:Sans Italic"
+           style="font-size:10px;font-style:italic;text-align:start;text-anchor:start;-inkscape-font-specification:Liberation Sans Italic;font-family:Liberation Sans;font-weight:normal;font-stretch:normal;font-variant:normal"
            id="tspan9385-8-0-7-14"
            y="246.74414"
            x="156.52829"
            sodipodi:role="line">Lysis </tspan><tspan
-           style="font-size:8px;font-style:italic;text-align:start;text-anchor:start;-inkscape-font-specification:Sans Italic"
+           style="font-size:10px;font-style:italic;text-align:start;text-anchor:start;-inkscape-font-specification:Liberation Sans Italic;font-family:Liberation Sans;font-weight:normal;font-stretch:normal;font-variant:normal"
            y="256.74414"
            x="156.52829"
            sodipodi:role="line"
@@ -6589,8 +6589,8 @@
          id="tspan8850"
          x="488.56494"
          y="502.51691"
-         style="font-size:12px">Added <tspan
-   style="fill:#ff0000"
+         style="font-size:12px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Added <tspan
+   style="fill:#ff0000;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
    id="tspan8873">ERCC</tspan> volume</tspan></text>
     <text
        xml:space="preserve"
@@ -6603,8 +6603,8 @@
          id="tspan8850-2"
          x="488.73163"
          y="536.85748"
-         style="font-size:12px">Added <tspan
-   style="fill:#0000ff"
+         style="font-size:12px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Added <tspan
+   style="fill:#0000ff;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
    id="tspan8875">SIRV</tspan> volume</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
@@ -6629,11 +6629,11 @@
          id="tspan8850-2-2"
          x="298.92642"
          y="603.52991"
-         style="font-size:12px">Log-ratio</tspan><tspan
+         style="font-size:12px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Log-ratio</tspan><tspan
          sodipodi:role="line"
          x="298.92642"
          y="618.52991"
-         style="font-size:12px"
+         style="font-size:12px;-inkscape-font-specification:Liberation Sans;font-family:Liberation Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
          id="tspan8967">per well</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
