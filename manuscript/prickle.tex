@@ -84,13 +84,16 @@ This process was repeated for multiple wells and sequencing was performed on all
 
 \begin{figure}[tbp]
 \begin{center}
-\includegraphics[width=\textwidth]{pics/plate_setup.pdf}
+\includegraphics[width=0.8\textwidth]{pics/plate_setup.pdf}
 \end{center}
 \caption{Schematic of the experimental design to assess the variability of spike-ins in a plate-based scRNA-seq protocol.
-The first experiment (A) involves adding an equal volume of each spike-in set into each well during the reverse transcription (RT) step.
-The second experiment (B) involves adding an equal volume of a pooled mixture of the two spike-ins into each well, again during the RT step (done twice for consistency).
-Sequencing is performed and the log-ratio of the total count between spike-in sets is computed for each well.
-Components of the spike-in variability can be separated by estimating the variance of the log-ratios across wells and comparing the estimates between experiments.
+(a) A cell is sorted into each well of a plate and lysed.
+For one set of wells, an equal volume of each spike-in set is added separately into each well during the reverse transcription (RT) step.
+For a different set of wells, an equal volume of a pooled mixture of the two spike-ins is added into each well, again during the RT step (done twice for consistency).
+PCR amplification, library generation and sequencing is then performed.
+(b) The log-ratio between the total counts of the two spike-in sets is computed for each well.
+The variance of the log-ratio is estimated from all wells with separate addition of spike-ins, and from wells with addition of the premixed pool.
+The difference between these two variance estimates represents the variance attributable to volume addition.
 }
 \label{fig:expdesign}
 \end{figure}
@@ -100,10 +103,10 @@ The total count was computed across all transcripts of each spike-in set in each
 The log-ratio of the totals between the two sets was computed for each well, and the variance of this log-ratio was computed \textit{across} wells.
 Any variability in spike-in volume addition should manifest as an increase to the variability of the log-ratio, given that the spike-in sets were added independently to each well.
 
-We also repeated the experiment by adding volumes of spike-in solution where the two spike-in sets had been pre-mixed.
-This ensures that there is no variability in the relative quantities of the two set added to each well, thus providing a baseline level of variability in the protocol (e.g., due to 
-sequencing noise).
-The variance of volume addition was then estimated as the difference in the variance estimates from the pre-mixed control wells and from the wells with separate addition of spike-ins.
+We also repeated the experiment by adding volumes of ``premixed'' spike-in solution where the two spike-in sets had been pooled at a 1:1 ratio.
+This ensures that there is no well-to-well variability in the relative quantities of RNA from the two spike-in sets.
+The variance of the log-ratio across these premixed-addition wells provides a baseline level of variability in the protocol (e.g., due to sequencing noise).
+The variance of volume addition was then estimated as the difference in the variance estimates from the premixed-addition wells and from the wells with separate addition of spike-ins.
 We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects.
 
 We used a protocol based on microtiter plates rather than microfluidics as it is easier to customise the spike-in addition step in the former.
