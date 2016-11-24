@@ -86,14 +86,14 @@ This process was repeated for multiple wells and sequencing was performed on all
 \begin{center}
 \includegraphics[width=0.8\textwidth]{pics/plate_setup.pdf}
 \end{center}
-\caption{Schematic of the experimental design to assess the variability of spike-ins in a plate-based scRNA-seq protocol.
+\caption{Schematic of the experimental design to assess the variability of spike-in addition in a plate-based scRNA-seq protocol.
 (a) A cell is sorted into each well of a plate and lysed.
-For one set of wells, an equal volume of each spike-in set is added separately into each well during the reverse transcription (RT) step.
-For a different set of wells, an equal volume of a pooled mixture of the two spike-ins is added into each well, again during the RT step (done twice for consistency).
-PCR amplification, library generation and sequencing is then performed.
-(b) The log-ratio between the total counts of the two spike-in sets is computed for each well.
-The variance of the log-ratio is estimated from all wells with separate addition of spike-ins, and from wells with addition of the premixed pool.
-The difference between these two variance estimates represents the variance attributable to volume addition.
+For one set of wells, an equal volume of each spike-in set is added separately, along with the reverse transcription (RT) reagents.
+For another set of wells, an equal volume of a pooled mixture of the two spike-ins is added into each well (done twice to keep the protocol consistent).
+Reverse transcription, PCR amplification, library generation and sequencing were then performed.
+(b) The log-ratio between the total counts of the two spike-in sets was computed for each well.
+The variance of the log-ratio was estimated from all wells with separate addition of spike-ins, and from wells with addition of the premixed pool.
+The difference between these two estimates represents the variance attributable to volume addition.
 }
 \label{fig:expdesign}
 \end{figure}
