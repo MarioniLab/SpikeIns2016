@@ -15,8 +15,12 @@
 \renewcommand{\textfraction}{0.07}  % allow minimal text w. figs
 
 \makeatletter 
-\renewcommand{\thefigure}{S\@arabic\c@figure} 
-\renewcommand{\thetable}{S\@arabic\c@table} 
+\renewcommand{\fnum@figure}{Supplementary \figurename~\thefigure}
+\renewcommand{\fnum@table}{Supplementary \tablename~\thetable}
+\makeatother
+
+%\renewcommand{\thefigure}{\@arabic\c@figure} 
+%\renewcommand{\thetable}{\@arabic\c@table} 
 
 \externalcitedocument{prickle}
 
@@ -424,6 +428,50 @@ This can be compared to $\sigma^2_{vol}$ to determine the relative importance of
 % This isn't easily resolved; L_i and R_i are normally distributed, but y_ix and company are not (e.g., the denominator of rho_i consists of sum of log-normals, at best).
 % I guess we could get independence by splitting the wells into two groups, computing L_i from one group and R_i from the other, and using that for testing. 
 % We can probably afford to do this if we have enough wells to play around with (96 per plate?).
+
+
+\begin{figure}[btp]
+    \begin{center}
+        \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/qq_separate.pdf}
+        \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/qq_premixed.pdf}
+    \end{center}
+    \caption{Quantile-quantile plots of the log-ratios after separate addition of spike-ins (left) or premixed addition (right).
+        For each plate, a linear model was fitted to the log-ratios to account for the experimental design.
+        Residuals were standardized and plotted against the theoretical quantiles of a standard normal distribution.
+        The dotted line represents equality between the sample and theoretical quantiles.
+    }
+\end{figure}
+
+\begin{figure}[btp]
+    \begin{center}
+        \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/total_ercc.pdf}
+        \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/total_sirv.pdf}
+    \end{center}
+    \caption{Distribution of the total number of reads assigned to transcripts in the ERCC (left) or SIRV spike-in set (right) across wells.
+        For each plate, separate boxplots are shown for wells in which spike-ins were added separately or premixed before addition.
+        Dots represent wells with total counts that are more than 1.5 interquartile ranges from the first or third quartile.
+    }
+\end{figure}
+
+\begin{figure}[btp]
+    \begin{center}
+        \includegraphics[width=0.7\textwidth,trim=0mm 10mm 0mm 10mm,clip]{../real/pics/variance_order.pdf}
+    \end{center}
+    \caption{Estimated variance of the log-ratio of total counts between spike-in sets, computed across wells in which the ERCC spike-in set was added before the SIRV set or vice versa.
+        This exploits the presence of a number of wells in each plate for which the order of spike-in addition was reversed.
+        Error bars represent standard errors of the variance estimates under normality.
+    }
+\end{figure}
+
+\begin{figure}[btp]
+    \begin{center}
+        \includegraphics[width=0.49\textwidth,trim=0mm 10mm 0mm 10mm,clip,page=1]{../sequence_check/biophysical/comparison.pdf}
+        \includegraphics[width=0.49\textwidth,trim=0mm 10mm 0mm 10mm,clip,page=2]{../sequence_check/biophysical/comparison.pdf}
+    \end{center}
+    \caption{Biophysical properties of transcripts in each of the two spike-in sets and for 2000 randomly selected transcripts from the mouse mm10 genome.
+    Boxplots are shown for the distribution of lengths and GC contents of transcripts (not including the poly-A tail) in each set.
+}
+\end{figure}
 
 \end{document}
 

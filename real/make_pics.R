@@ -126,8 +126,8 @@ for (index in seq_along(separate)) {
     ylim <- pmax(ylim, abs(range(out$y)))
 }
 
-plot(0,0,type="n", xlim=c(-xlim[1], xlim[2]), ylim=c(-ylim[1], ylim[2]), 
-     xlab="Theoretical quantiles", ylab="Scaled sample quantiles", cex.axis=1.2, cex.lab=1.4)
+plot(0,0,type="n", xlim=c(-xlim[1], xlim[2]), ylim=c(-ylim[1], ylim[2]), main="Separate addition", cex.main=1.4, 
+     xlab="Theoretical quantiles", ylab="Sample quantiles", cex.axis=1.2, cex.lab=1.4)
 abline(a=0, b=1, col="grey", lwd=2, lty=2)
 for (index in seq_along(collected)) {
     out <- collected[[index]]
@@ -149,8 +149,8 @@ for (index in seq_along(premixed)) {
     ylim <- pmax(ylim, abs(range(out$y)))
 }
 
-plot(0,0,type="n", xlim=c(-xlim[1], xlim[2]), ylim=c(-ylim[1], ylim[2]), 
-     xlab="Theoretical quantiles", ylab="Scaled sample quantiles", cex.axis=1.2, cex.lab=1.4)
+plot(0,0,type="n", xlim=c(-xlim[1], xlim[2]), ylim=c(-ylim[1], ylim[2]), main="Premixed addition", cex.main=1.4, 
+     xlab="Theoretical quantiles", ylab="Sample quantiles", cex.axis=1.2, cex.lab=1.4)
 abline(a=0, b=1, col="grey", lwd=2, lty=2)
 for (index in seq_along(collected)) {
     out <- collected[[index]]
@@ -195,6 +195,5 @@ my.cols <- c("grey50", "grey80")
 boxplot(erccs, at=rep(c(-0.5, 0.5), 4) + rep(1:4*3, each=2), xaxt="n", log="y", ylab="Total SIRV read count",
         col=rep(my.cols, 4), cex.axis=1.2, cex.lab=1.4)
 axis(1, at=1:4*3, names, cex.axis=1.1)
-legend("topright", fill=my.cols, legend=c("Separate", "Premixed"), cex=1.2)
 dev.off()
 
