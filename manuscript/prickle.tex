@@ -91,8 +91,8 @@ This process was repeated for multiple wells and sequencing was performed on all
 For one set of wells, an equal volume of each spike-in set is added separately, along with the reverse transcription (RT) reagents.
 For another set of wells, an equal volume of a pooled mixture of the two spike-ins is added into each well (done twice to keep the protocol consistent).
 Reverse transcription, PCR amplification, library generation and sequencing were then performed.
-(b) The log-ratio between the total counts of the two spike-in sets was computed for each well.
-The variance of the log-ratio was estimated from all wells with separate addition of spike-ins, and from wells with addition of the premixed pool.
+(b) The log$_2$-ratio between the total counts of the two spike-in sets was computed for each well.
+The variance of the log$_2$-ratio was estimated from all wells with separate addition of spike-ins, and from wells with addition of the premixed pool.
 The difference between these two estimates represents the variance attributable to volume addition.
 }
 \label{fig:expdesign}
@@ -100,12 +100,12 @@ The difference between these two estimates represents the variance attributable 
 
 For each library, reads were mapped to the genome and assigned to genes to quantify expression.
 The total count was computed across all transcripts of each spike-in set in each well.
-The log-ratio of the totals between the two sets was computed for each well, and the variance of this log-ratio was computed \textit{across} wells.
-Any variability in spike-in volume addition should manifest as an increase to the variability of the log-ratio, given that the spike-in sets were added independently to each well.
+The log$_2$-ratio of the totals between the two sets was computed for each well, and the variance of this log$_2$-ratio was computed \textit{across} wells.
+Any variability in spike-in volume addition should manifest as an increase to the variability of the log$_2$-ratio, given that the spike-in sets were added independently to each well.
 
 We also repeated the experiment by adding volumes of ``premixed'' spike-in solution where the two spike-in sets had been pooled at a 1:1 ratio.
 This ensures that there is no well-to-well variability in the relative quantities of RNA from the two spike-in sets.
-The variance of the log-ratio across these premixed-addition wells provides a baseline level of variability in the protocol (e.g., due to sequencing noise).
+The variance of the log$_2$-ratio across these premixed-addition wells provides a baseline level of variability in the protocol (e.g., due to sequencing noise).
 The variance of volume addition was then estimated as the difference in the variance estimates from the premixed-addition wells and from the wells with separate addition of spike-ins.
 We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects.
 
@@ -116,9 +116,9 @@ Plate-based protocols also tend to be cheaper and are compatible with existing l
 Thus, we focus on normalization of data from plate-based protocols, to reflect their increasing use in single-cell studies (CITE).
 
 \subsection{Estimating the variance of volume addition}
-Denote the log-transformed total count for well $i$ and spike-in set $s$ as
+Denote the log$_2$-transformed total count for well $i$ and spike-in set $s$ as
 \[
-T_{is} = \log \left[ L_i V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right] + \varepsilon_{is}
+T_{is} = \log_2 \left[ L_i V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right] + \varepsilon_{is}
 \]
 where $c_{t_s}$ is a constant specifying the concentration (in terms of transcripts per unit of volume) of each spike-in transcript $t_s$;
 $r_{t_s}$ is a constant specifying the optimal transcript molecule-to-cDNA fragment capture rate for $t_s$;
@@ -129,62 +129,62 @@ and $\varepsilon_{is}$ is the error term attributable to sequencing noise and va
 We assume that $R_{is}$, $V_{is}$ and $\varepsilon_{is}$ are mutually independent of each other, and that $V_{is}$ and $\varepsilon_{is}$ for different $s$ are independent.
 
 Let $s=1$ represent the ERCC spike-in set and $s=2$ represent the SIRV spike-in set.
-In the experiment where each spike-in set is added separately to each well, denote the log-ratio of the total counts between the two sets as $\theta_i = T_{i1} - T_{i2}$ for well $i$.
+In the experiment where each spike-in set is added separately to each well, denote the log$_2$-ratio of the total counts between the two sets as $\theta_i = T_{i1} - T_{i2}$ for well $i$.
 This can also be written as
 \[
-\theta_i = \log V_{i1} + \varepsilon_{i1} - \log V_{i2} - \varepsilon_{i2} + R_i
+\theta_i = \log_2 V_{i1} + \varepsilon_{i1} - \log_2 V_{i2} - \varepsilon_{i2} + R_i
 \]
-where $R_i = \log(R_{i1}/R_{i2})$ and represents the fold change in the average capture efficiency between the two sets (i.e., the difference in behaviour of the spike-ins).
+where $R_i = \log_2(R_{i1}/R_{i2})$ and represents the fold change in the average capture efficiency between the two sets (i.e., the difference in behaviour of the spike-ins).
 Computing the variance of $\theta_i$ yields
 \[
 \variance(\theta_i) = 2 \sigma^2_{vol} + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(R_i)
 \]
-where $\sigma^2_{vol}$ is the variance of $\log V_{i1}$ and $\log V_{i2}$.
+where $\sigma^2_{vol}$ is the variance of $\log_2 V_{i1}$ and $\log_2 V_{i2}$.
 The volume addition procedure is the same for each spike-in set, so $V_{i1}$ and $V_{i2}$ should have the same distribution.
 Also, we consider the variance of $R_i$ because $R_{i1}$ and $R_{i2}$ are not independent, e.g., due to well-specific effects on capture efficiency.
 
 In the experiment where the spike-in sets are premixed before addition, $V_{i1}=aV_{i2}$ for some constant $a$ representing the proportions in which the two sets are mixed.
 (This should be close to unity.)
 If the same premixed solution is added to each well, the relative volume of ERCC spike-ins to SIRV spike-ins must be constant for all wells.
-This means that the log-ratio for the premixed experiment becomes
+This means that the log$_2$-ratio for the premixed experiment becomes
 \[
-\theta'_i = \log a + \varepsilon_{i1} - \varepsilon_{i2} + R_i \;.
+\theta^*_i = \log_2 a + \varepsilon_{i1} - \varepsilon_{i2} + R_i \;.
 \]
-As $a$ is constant for all $i$, the variance of $\theta'_i$ is
+As $a$ is constant for all $i$, the variance of $\theta^*_i$ is
 \[
-\variance(\theta'_i) = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(R_i) \;.
+\variance(\theta^*_i) = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(R_i) \;.
 \]
 This represents the technical variance attributable to the rest of the scRNA-seq protocol.
 To obtain an estimate of the variance of the volume addition step, simple arithmatic yields
 \[
-\sigma^2_{vol} = \frac{\variance(\theta_i) - \variance(\theta'_i)}{2} \;.
+\sigma^2_{vol} = \frac{\variance(\theta_i) - \variance(\theta^*_i)}{2} \;.
 \]
 It should be stressed that this variance estimate is relevant to all experiments using the same protocol for spike-in addition, even if the identity or concentration of the spike-in set is different.
 
 Using this mathematical framework, we proceeded to estimate the variance components from the data from our mixture experiments.
-We observed that the log-ratios $\theta_i$ and $\theta'_i$ computed from each plate were roughly normally distributed (Supplementary Figure~\suppfignorm{}).
-Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our variance estimate.
+We observed that the log$_2$-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplementary Figure~\suppfignorm{}).
+Thus, we fitted a linear model to each set of log$_2$-ratios and used the residual variance of the fit as our variance estimate.
 This allows blocking on additional structure in the experimental design (Methods).
 We also noted that the distribution of $T_{is}$ was similar between separate-addition and premixed-addition wells within each plate (Supplementary Figure~\suppfigtotals{}).
-This means that we do not need to consider complex mean-variance relationships when comparing variance estimates, i.e., the contribution of $\sigma^2_{lib(s)}$ will not change between $\variance(\theta_i)$ and $\variance(\theta'_i)$ for each plate.
+This means that we do not need to consider complex mean-variance relationships when comparing variance estimates, i.e., the contribution of $\sigma^2_{lib(s)}$ will not change between $\variance(\theta_i)$ and $\variance(\theta^*_i)$ for each plate.
 Finally, we performed additional controls where we reversed the order of addition, i.e., SIRV spike-ins were added before the ERCC spike-ins.
 In general, the order did not affect the variance estimates for the separate-addition wells (Supplementary Figure~\suppfigorder{}).
 
 Our results indicate that $\sigma^2_{vol}$ is consistently smaller than the variance in the rest of the protocol (Figure~\ref{fig:varestimates}).
-Indeed, no significant difference was detected between $\variance(\theta_i)$ and $\variance(\theta'_i)$ for each plate.
+Indeed, no significant difference was detected between $\variance(\theta_i)$ and $\variance(\theta^*_i)$ for each plate.
 This indicates that variability of spike-in volume addition is a minor contributor to the technical variability of the spike-in counts.
-To further put these estimates into context, consider that $T_{is}$ represents the log-transformed ``size factor'' for the library generated from well $i$.
-In other words, all counts in this library are scaled by $\exp(-T_{is})$ to correct for well/cell-specific biases during spike-in normalization.
-The variance of the log-size factors is several orders of magnitude larger than $\sigma^2_{vol}$.
-This suggests that the latter will not have a major effect on the outcome of spike-in normalization.
+To further put these estimates into context, consider that $T_{is}$ represents the log$_2$-transformed ``size factor'' for the library generated from well $i$.
+In other words, all counts in this library are scaled by a factor of $2^{-T_{is}}$ to correct for well/cell-specific biases during spike-in normalization.
+The variance of the log$_2$-size factors is several orders of magnitude larger than $\sigma^2_{vol}$.
+This suggests that the latter will not have a major effect on the normalization result.
 
 \begin{figure}[btp]
     \begin{center}
         \includegraphics[height=2.2in,trim=0mm 10mm 0mm 10mm,clip]{../real/pics/variance_exp.pdf}
         \includegraphics[height=2.2in,trim=0mm 10mm 0mm 10mm,clip]{../real/pics/variance_sf.pdf}
     \end{center}
-    \caption{Variance estimates of the log$_2$-ratio between the ERCC and SIRV total counts (left), or the log-size factors computed from those totals (right).
-        Estimates were defined as the residual variance of a linear model fitted to the log-ratios or log-size factors across all cells (416B or trophoblasts) in each plate.
+    \caption{Variance estimates of the log$_2$-ratio between the ERCC and SIRV total counts (left), or the log$_2$-size factors computed from those totals (right).
+        Estimates were defined as the residual variance of a linear model fitted to the log$_2$-ratios or log$_2$-size factors across all cells (416B or trophoblasts) in each plate.
         Error bars represent the standard errors of the estimates, assuming normally-distributed values.
     }
     \label{fig:varestimates}
@@ -198,9 +198,9 @@ This scales up the counts for the spike-in transcripts in all libraries by the s
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
 This is because changes in the capture efficiency for the spike-in transcripts are confounded with changes in efficiency for all transcripts in the well, precluding the use of spike-ins to normalize the counts for the endogenous trancripts.
 
-In our mathematical framework, the estimated variance of $\theta'_i$ provides an upper bound for the variance of $R_i$.
+In our mathematical framework, the estimated variance of $\theta^*_i$ provides an upper bound for the variance of $R_i$.
 This quantifies the extent to which normalization is affected by differences in efficiency between two transcript sets.
-We observe that $\variance(\theta'_i)$ is an order of magnitude lower than the variance of the log-size factors in each plate (Figure~\ref{fig:varestimates}).
+We observe that $\variance(\theta^*_i)$ is an order of magnitude lower than the variance of the log$_2$-size factors in each plate (Figure~\ref{fig:varestimates}).
 This indicates that the variance in efficiency across wells, while greater than $\sigma^2_{vol}$, is still relatively small compared to the other factors driving normalization, e.g., differences in cellular RNA content, well-to-well variability in capture efficiency for all transcripts.
 Obviously, $R_i$ is computed between two spike-in sets whereas the differences between synthetic spike-in and endogenous transcripts are likely to be greater.
 Nonetheless, the SIRV and ERCC spike-ins do vary in their biophysical properties (Supplementary Figure~\suppfigbiophys{}).
@@ -227,47 +227,63 @@ This ensures that sensitivity will be assessed under realistic conditions.
 % No effect of different cell treatments.
 
 \subsection{Data analysis for the mixture experiments}
-Reads were mapped to the mm10 build of the mouse genome with additional sequences for transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
-Mapping was performed using the subread aligner v1.5.0 \cite{liao2013subread} in single-end RNA-seq mode with only unique alignments being retained.
+Reads were mapped to the mm10 build of the mouse genome, including sequences of transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
+Mapping was performed using the subread aligner v1.5.0 \cite{liao2013subread} in single-end RNA-seq mode with unique alignment.
 Reads with mapping qualities greater than or equal to 10 were counted into exonic regions of genes using the featureCounts function in the Rsubread package v1.20.1 \cite{liao2014featurecounts}.
-This was performed using the NCBI GRCm38 mouse annotation along with the annotation for the ERCC and SIRV transcripts, to obtain a count for each endogenous and spike-in gene in each well.
+Genes were defined using Ensembl v82 annotation for the GRCm38 mouse assembly and annotation for the ERCC and SIRV transcripts.
+This yielded a count for each endogenous gene and spike-in transcript in each well.
 
+Variance estimates were calculated from the libraries generated from the wells on a single plate.
 In each well, the sum of counts across all transcripts in each spike-in set was computed.
 The log$_2$-ratio between the count sums of the ERCC and SIRV sets was calculated.
-To estimate $\mbox{var}(\theta_i)$, a linear model was fitted to the log-ratios for all wells where the two spike-in sets were added separately.
-This used a one-way layout where each combination of treatment (control or oncogene-induced) and spike-in addition order (ERCC or SIRV first) was treated as a separate group.
-The variance was estimated as the mean of the squared residual effects.
-This was repeated for $\mbox{var}(\theta_i')$ using all wells where premixed spike-ins were added.
-Here, the model only contained two groups as addition order was irrelevant.
-
-Variance decomposition was performed as described in Section~1 of the Supplementary Materials using the above estimates.
-To determine the variability of $\psi_i$, each spike-in set was partitioned into two roughly similar halves.
-This was done by sorting all transcripts in each set by their average counts; assigning all odd-ranked transcripts to one half; and assigning the remaining transcripts to the other half.
-The log-ratios between the sums of the two halves were then used to estimate $\mbox{var}(\log \psi_i)$.
+To estimate $\variance(\theta_i)$, a linear model with a one-way layout was fitted to the log$_2$-ratios for all wells where the two spike-in sets were added separately.
+In the 416B data set, each combination of treatment (control or oncogene-induced) and spike-in addition order (ERCC or SIRV first) was treated as a separate group in the one-way layout.
+In the trophoblast data, only the spike-in addition order was used to define the groups.
+Linear modelling ensures that changes in the mean log$_2$-ratio across groups do not affect the variance estimate.
+After fitting the model, the mean of the squared residual effects was used as an estimate of $\variance(\theta_i)$.
+This was repeated for $\variance(\theta^*_i)$ using all wells where premixed spike-ins were added.
+Here, addition order was irrelevant so the one-way layout contained only the two treatment groups in the 416B data set.
+Similarly, only a single group was defined for the trophoblast data.
+Both values were used to calculate $\sigma^2_{vol}$ as described above.
+This process was repeated to obtain variance estimates for each plate.
 
 \subsection{Simulation design for resampling spike-in variability}
-For each data set, the sum of the spike-in counts (referred to here as the spike-in total) was computed for each cell.
-The variance of the log$_2$-transformed spike-in totals across cells includes sampling noise during library preparation or sequencing, variability in sequencing depth, and the variance of spike-in addition and capture efficiency between wells.
-The final component (denoted here as $s^2$) represents spike-in variability and must be removed prior to simulation.
-Otherwise, resampling will introduce variance for addition/efficiency on top of what is already present, leading to overrepresentation of $s^2$ in the variance of the simulated totals.
-Removal was achieved by scaling the log$_2$-totals such that the variance across wells was reduced by $s^2$ without changing the mean.
-The scaled log-values were then transformed back to ``processed'' totals that contain no variability due to addition or behaviour.
+For each data set, we computed $T_{is}$ for each cell $i$ and spike-in set $s$.
+The variance of $T_{is}$ is
+\[
+    \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(R_{is}) + \variance(\log_2 L_i)
+\]
+where the approximation assumes that $L_i$ is independent of the other random variables.
+This is generally reasonable as $L_i$ is mainly determined by factors not related to spike-in volume or behaviour, such the number of cDNA fragments derived from endogenous transcripts.
+We consider $R_{is} = R_{i0} + R_{is0}$, where $R_{i0}$ is the well-specific average capture efficiency of endogenous transcripts and $R_{is0}$ is the log$_2$-fold change in average efficiency of the transcripts in $s$ over their endogenous counterparts.
+We assume that $R_{i0}$ and $R_{is0}$ are independent for each well, and that $R_{is0}$ can be approximated with $R_i$ (i.e., the log$_2$-fold change in average efficiency between SIRV and ERCC spike-ins).
+This yields
+\[
+    \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(R_i) + \variance(R_{i0}) + \variance(\log_2 L_i) \;.
+\]
 
-Simulations were performed by sampling a new value for the combined addition/efficiency effect in each cell.
-Specifically, the effect for each cell was sampled independently from a $2^X$ distribution where $X \sim \mbox{Normal}(0, s^2)$.
-This was used to scale the processed total to obtain a simulated total for each cell.
-Counts for individual spike-in transcripts were then scaled to reflect this new total in each cell.
-In this manner, the variance due to addition or capture efficiency was re-incorporated into the variance of the simulated totals across cells.
-Note that addition and efficiency do not have to be simulated separately as they have the same effects in this framework -- a decrease in the spike-in total due to a decrease in the added spike-in volume cannot be distinguished from that due to reduced capture efficiency.
+% If library quantification has been performed, then L_i will be more likely to be correlated with volume because everything competes against each other.
+% At least it won't be correlated with global capture efficiency, as this should cancel out.
+% If it hasn't been performed, then L_i should be constant so it shouldn't matter.
 
-To scale the counts, a quantile adjustment approach was used to preserve the empirical mean-variance relationship.
-A generalized linear model (GLM) was fitted to the counts across all cells for each spike-in gene, using the mglmOneGroup function in edgeR \cite{mccarthy2012differential, robinson2010edgeR} with an all-intercept design matrix.
-An abundance-dependent trend was also fitted to the NB dispersions across all spike-in genes using the estimateDisp function.
-In both cases, the original (natural) log-totals were used as the offsets for all cells.
-The fitted GLM value and dispersion for each gene were treated as the true parameters of the NB distribution used to sample the observed count in each cell.
-The simulated mean count for each gene in each cell was computed by taking the exponential of the sum of the log-simulated total for that cell and the GLM coefficient for that gene.
-This was used as the mean of a simulated NB distribution, using the same value for the dispersion.
-The quantile of each original count in its true distribution was mapped to a quantile in the simulated distribution, using the q2qnbinom function \cite{robinson2008small}.
+Let us denote $x^2 = \sigma^2_{vol} + \variance(R_i)$, representing the total variance attributable to spike-in addition and capture efficiency.
+We also denote $\hat\sigma^2_s$ as the estimate of $\variance(T_{is})$ across wells, and $\hat\mu_s$ as the estimate of $E(T_{is})$.
+We used $\variance(\theta^*_i) \approx 0.01$ as our estimate $\hat{x}^2$ of the upper bound of $x^2$, following the reasoning described previously.
+For each well $i$, we computed a simulated log$_2$-total $T^*_{is}$ as
+\[
+    T^*_{is} = \frac{T_{is} - \hat\mu_s}{\sqrt{\hat\sigma^2_s - \hat{x}^2}} + \hat\mu_s + X_i
+\]
+where $X_i \sim \mbox{Normal}(0, \hat{x}^2)$ and is independently sampled for each well.
+This approach ensures that $\variance(T^*_{is}) = \hat\sigma^2_s$.
+In contrast, if $X_i$ were directly added to $T_{is}$, the variance of $T^*_{is}$ would be inflated as $x^2$ is already present in $\variance(T_{is})$, i.e., the contribution of spike-in variance would effectively be doubled.
+
+Counts for the library generated from each well were rescaled to reflect the new log$_2$-total in each simulation.
+A quantile adjustment approach was used to preserve the empirical mean-variance relationship.
+Briefly, a negative binomial generalized linear model (NB GLM) was fitted to the counts across all wells for each spike-in transcript, using the mglmOneGroup function in edgeR \cite{mccarthy2012differential, robinson2010edgeR} with an all-intercept design matrix and $T_{is}$ (converted to base $e$) as the offset for well $i$.
+An abundance-dependent trend was also fitted to the NB dispersions across all spike-in transcripts using the estimateDisp function.
+For each transcript $t$, we assumed that the count $y_{ti}$ for well $i$ was sampled from a NB distribution with mean equal to the corresponding fitted value of the GLM and dispersion equal to the fitted value of the mean-dispersion trend.
+We scaled the NB mean by $2^{T^*_{is} - T_{is}}$ to obtain a modified NB distribution.
+We identified the tail probabilities of $y_{ti}$ in the original distribution, and identified the corresponding quantile with the same tail probabilities in the modified distribution, using the q2qnbinom function \cite{robinson2008small}.
 This new quantile was used as the simulated count for the corresponding gene and cell.
 
 % For simplicity, we assume that sequencing is performed to saturation in each data set, e.g., like UMIs.
@@ -279,7 +295,7 @@ This new quantile was used as the simulated count for the corresponding gene and
 % For example, if it turned out that you added half the amount of spike-in to one well, it wouldn't distort the estimation of the (conditional) mean.
 % Okay, maybe the trended dispersion would be a bit weird, because technical variability should depend on the amount of RNA, but some inaccuracy there is forgivable.
 
-The value of $s^2$ was set based on the previously estimated value for $\sigma^2_{vol} + \mbox{var}(\log \psi_{i}) \approx 0.05$.
+The value of $s^2$ was set based on the previously estimated value for $\sigma^2_{vol} + \mbox{var}(\log_2 \psi_{i}) \approx 0.05$.
 This ensures that a realistic variance is used when sampling spike-in volume and efficiency in each well.
 
 \subsection{Implementation of downstream analyses}
@@ -296,16 +312,16 @@ For detecting highly variable genes (HVGs), three scRNA-seq data sets were obtai
 In each data set, HVGs were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
 The first approach is based on the method of Brennecke \textit{et al.} \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
 The top set of HVGs was identified as those genes with the smallest $p$-values.
-The second approach examines the variance of the log-counts, which provides some more robustness against outlier expression patterns.
+The second approach examines the variance of the log$_2$-counts, which provides some more robustness against outlier expression patterns.
 Here, the top set of HVGs was identified as those with the largest biological components of the variance.
 For both methods, the top set of 20-2000 genes was compared between the original and simulated analyses.
 This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
 
 For dimensionality reduction and clustering, a scRNA-seq data set was obtained from a study of mESCs cultured under different conditions \cite{kolod2015single}.
-A PCA plot was constructed from the original log-counts after spike-in normalization.
+A PCA plot was constructed from the original log$_2$-counts after spike-in normalization.
 This was repeated for each simulation iteration, and the position of each cell on the simulated plot was mapped back to the corresponding location on the original plot.
 In this manner, the sensitivity of the cell placement to spike-in variability was assessed.
-Hierarchical clustering was also performed on the normalized log-counts using Euclidean distances or rank correlations.
+Hierarchical clustering was also performed on the normalized log$_2$-counts using Euclidean distances or rank correlations.
 The stability of each cluster was assessed based on the number of occurrences of that cluster across simulation iterations.
 See Section~Y in the Supplementary Materials for further implementation details.
 
