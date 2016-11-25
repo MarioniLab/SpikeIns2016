@@ -151,13 +151,12 @@ for (datatype in c("calero", "islam")) {
             if (i) { spike.data <- resampleSpikes(spike.param, var.log=my.var) }
             else { spike.data <- spike.param$counts }
 
-            # Adjusting the library sizes to reflect the relative spike-in coverage.
+            # Computing effective library sizes that reflect the relative spike-in coverage.
             spike.totals <- colSums(spike.data)
-            spike.totals <- spike.totals/mean(spike.totals) * mean(colSums(cell.counts))
-
+            eff.lib.size <- spike.totals/mean(spike.totals) * mean(colSums(cell.counts))
+            
             # Computing log2-(CPM+1), as suggested on the page.
-            lcpms <- log2(t(t(cell.counts)/spike.totals)*1e6 + 1)
-
+            lcpms <- log2(t(t(cell.counts)/eff.lib.size)*1e6 + 1)
             suppressMessages({
                 sca <- FromMatrix(lcpms, cData=data.frame(wellKey=colnames(lcpms)), fData=data.frame(primerid=rownames(lcpms)))
                 colData(sca) <- cbind(colData(sca), expvar)
