@@ -17,6 +17,7 @@ top.hits <- c(20, 200, 2000)
 # Running across all data types (saving diagnostics along the way)
 
 for (datatype in c("wilson", "calero", "liora")) { 
+    block <- NULL
 
 	if (datatype=="wilson") { 
 		incoming <- read.table('GSE61533_HTSEQ_count_results.tsv.gz', header=TRUE, row.names=1, colClasses=c('character', rep('integer', 96)))
@@ -25,6 +26,7 @@ for (datatype in c("wilson", "calero", "liora")) {
 		# Getting metrics.
         totals <- colSums(incoming)
 		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
+
 	} else if (datatype=="calero" || datatype=="liora") { 
         if (datatype=="calero") {
             incoming.1 <- read.table("../../real/Calero/trial_20160113/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 97)))
@@ -32,12 +34,15 @@ for (datatype in c("wilson", "calero", "liora")) {
             incoming.2 <- read.table("../../real/Calero/trial_20160325/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 97)))
             incoming.2 <- incoming.2[,-1]
             incoming <- cbind(incoming.1, incoming.2)
+            block <- paste0(rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2))), ".",
+                            ifelse(grepl("S50[5-8]", colnames(incoming)), "Induced", "Control"))
         } else { 
             incoming <- read.table("../../real/Liora/test_20160906/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 98)))
             incoming <- incoming[,-1]
             metadata <- read.table("../../real/Liora/test_20160906/analysis/wellID.tsv", header=TRUE)
             incoming <- incoming[,metadata$Colnames[! metadata$Well %in% c("A01", "H12") | is.na(metadata$Well)]]
         }
+
         incoming <- incoming[!grepl("SIRV", rownames(incoming)),] # Getting rid of SIRVs at this point.
         spike.in <- grepl("^ERCC", rownames(incoming))
 
@@ -82,14 +87,17 @@ for (datatype in c("wilson", "calero", "liora")) {
                 sce <- normalize(sce)
                 
                 if (method=="VarLog"){ 
+                    if (is.null(block)) { design <- NULL }
+                    else { design <- model.matrix(~block[okay.libs]) }
+
                     # Fitting the trend to the spike-in variances.
-                    out <- trendVar(sce, trend="semiloess")
+                    out <- trendVar(sce, trend="semiloess", design=design)
 
                     # Computing the biological component.
                     out2 <- decomposeVar(sce, out)
                     out2 <- out2[!isSpike(sce),]
                     my.rank <- rank(out2$p.value)
-                    is.sig <- out2$FDR <= 0.05 & out2$bio > 0.5
+                    is.sig <- out2$FDR <= 0.05 
 
                     # Some diagnostics for this data set.
         			if (!diag.done) { 
@@ -104,8 +112,12 @@ for (datatype in c("wilson", "calero", "liora")) {
                         diag.done <- TRUE
                     }
                 } else {
-                    outt <- technicalCV2(sce, min.bio.disp=0)
-                    outt <- outt[!isSpike(sce),]
+                    sce2 <- sce
+                    if (!is.null(block)) {   
+                        counts(sce2) <- removeBatchEffect(counts(sce2), block=block[okay.libs])
+                    }
+                    outt <- technicalCV2(sce2, min.bio.disp=0)
+                    outt <- outt[!isSpike(sce2),]
                     my.rank <- rank(outt$p.value)
                     is.sig <- outt$FDR <= 0.05                    
                 }
