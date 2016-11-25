@@ -292,25 +292,35 @@ This new quantile was used as the simulated count for the corresponding gene and
 % For example, if it turned out that you added half the amount of spike-in to one well, it wouldn't distort the estimation of the (conditional) mean.
 % Okay, maybe the trended dispersion would be a bit weird, because technical variability should depend on the amount of RNA, but some inaccuracy there is forgivable.
 
-\subsection{Implementation of downstream analyses}
-For the DE analyses, two scRNA-seq data sets were obtained -- one from a study with mouse embryonic stem cells (mESCs) and fibroblasts \cite{islam2011characterization} and another from a study with root epidermal and root center \textit{Arabidopsis Thaliana} cells \cite{brennecke2013accounting}.
-In each study, DE genes were detected between cell types using edgeR \cite{robinson2010edgeR,lund2012detecting} and monocle \cite{trapnell2014dynamics}.
+\subsection{Evaluating the robustness of DEG detection}
+Two data sets were used to test the effect of spike-in variability on DEG detection.
+The first was the 416B data generated previously, where DEGs were detected between control and oncogene-induced cells in both plates.
+Here, we used an additive model with a treatment term and a blocking factor for the plate.
+The second data set was obtained from the NCBI Gene Expression Omnibus (GEO) under the accession number GSE29087, and compared mouse embryonic stem cells and fibroblasts \cite{islam2011characterization}.
+
+In both studies, DEGs were detected between conditions using edgeR \cite{robinson2010edgeR} and MAST \cite{finak2015mast}.
 The former represents methods designed for analyses of bulk RNA-seq data, while the latter represents specialized single-cell methods.
 For each method, spike-in normalization was performed by scaling the counts such that the spike-in totals were the same between cells.
 The set of DE genes in the original data was then identified at a FDR of 5\% (see Section~Y in the Supplementary Materials for implementation details of each method).
-This was repeated for the simulated data, and the proportion of genes common to both the original and simulated sets was computed.
-The proportion of common genes in the top set of 20-2000 genes with the smallest $p$-values was also computed between the original and simulated analyses.
-This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
+This was repeated for the simulated data, and the proportion of DEGs common to both the original and simulated sets was computed.
+The common proportion of the top 200 genes with the smallest $p$-values was also computed.
+This was repeated for 20 simulation iterations, and the average proportion across iterations was reported for each method.
 
-For detecting highly variable genes (HVGs), three scRNA-seq data sets were obtained -- one from a study of mouse haematopoietic stem cells \cite{wilson2015combined}, one from a study of murine immune cells \cite{brennecke2013accounting} and another from a study of mESCs \cite{islam2014quantitative}.
-In each data set, HVGs were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
+\subsection{Evaluating the robustness of HVG detection}
+Three data sets were used to test the effect of spike-in variability on HVG detection.
+This included the 416B and trophoblast data sets generated previously.
+In the former, blocking was performed to remove plate- and treatment-specific effects on mean expression, i.e., HVGs were detected within treatment conditions on each plate.
+Similarly, blocking was performed on the plate of origin for each cell in the trophoblast data set to remove plate effects.
+The final data set was obtained from NCBI GEO under the accession number GSE61533 and contained a single plate of haematopoietic stem cells \cite{wilson2016 combined}.
+
+In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
 The first approach is based on the method of Brennecke \textit{et al.} \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
-The top set of HVGs was identified as those genes with the smallest $p$-values.
-The second approach examines the variance of the log$_2$-counts, which provides some more robustness against outlier expression patterns.
-Here, the top set of HVGs was identified as those with the largest biological components of the variance.
-For both methods, the top set of 20-2000 genes was compared between the original and simulated analyses.
-This was repeated for 10 simulation iterations, and the average proportions across iterations were reported for each method.
+The second approach is based on the variance of the log-normalized expression values \cite{lun2016step}, which provides some more robustness against outlier expression patterns.
+Each method was applied on the original and simulated data, and a set of significant HVGs was detected at a FDR of 5\%.
+The proportion of HVGs common to both the original and simulated sets was computed, along with the common proportion among the top 200 genes with the lowest $p$-values.
+This was repeated for 20 simulation iterations, and the average proportion across iterations was reported for each method.
 
+\subsection{Evaluating the robustness of clustering}
 For dimensionality reduction and clustering, a scRNA-seq data set was obtained from a study of mESCs cultured under different conditions \cite{kolod2015single}.
 A PCA plot was constructed from the original log$_2$-counts after spike-in normalization.
 This was repeated for each simulation iteration, and the position of each cell on the simulated plot was mapped back to the corresponding location on the original plot.
