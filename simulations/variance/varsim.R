@@ -16,45 +16,45 @@ top.hits <- c(20, 200, 2000)
 ###########################################################################
 # Running across all data types (saving diagnostics along the way)
 
-for (datatype in c("wilson", "islam", "brennecke")) { 
-    loess.span <- 0.2
+for (datatype in c("wilson", "calero", "liora")) { 
 
 	if (datatype=="wilson") { 
 		incoming <- read.table('GSE61533_HTSEQ_count_results.tsv.gz', header=TRUE, row.names=1, colClasses=c('character', rep('integer', 96)))
 		spike.in <- grepl('^ERCC', rownames(incoming))
 
-		# Quality control on cells.
+		# Getting metrics.
+        totals <- colSums(incoming)
+		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
+	} else if (datatype=="calero" || datatype=="liora") { 
+        if (datatype=="calero") {
+            incoming.1 <- read.table("../../real/Calero/trial_20160113/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 97)))
+            incoming.1 <- incoming.1[,-1]
+            incoming.2 <- read.table("../../real/Calero/trial_20160325/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 97)))
+            incoming.2 <- incoming.2[,-1]
+            incoming <- cbind(incoming.1, incoming.2)
+        } else { 
+            incoming <- read.table("../../real/Liora/test_20160906/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 98)))
+            incoming <- incoming[,-1]
+            metadata <- read.table("../../real/Liora/test_20160906/analysis/wellID.tsv", header=TRUE)
+            incoming <- incoming[,metadata$Colnames[! metadata$Well %in% c("A01", "H12") | is.na(metadata$Well)]]
+        }
+        incoming <- incoming[!grepl("SIRV", rownames(incoming)),] # Getting rid of SIRVs at this point.
+        spike.in <- grepl("^ERCC", rownames(incoming))
+
+		# Getting metrics.
 		totals <- colSums(incoming)
-		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
-		okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
-                     !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
-                     !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
-                     !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
-		incoming <- incoming[,okay.libs]
-
-	} else if (datatype=="islam") { 
-		incoming <- read.table('GSE46980_CombinedMoleculeCounts.tab.gz', skip=7, row.names=1, sep="\t", fill=TRUE,
-		        colClasses=c(list('character', NULL, NULL, NULL, NULL, NULL, NULL), rep('integer', 96)))
-		spike.in <- grepl('SPIKE', rownames(incoming))
-
-		# Quality control on cells.
-		totals <- colSums(incoming[!spike.in,])
-		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
-		okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
-                     !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
-                     !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
-                     !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
-		incoming <- incoming[,okay.libs]
-        loess.span <- 0.3
-
-	} else if (datatype=="brennecke") {
-        # Note that cell-level quality control has already been performed.
-        incoming <- read.table('nmeth.2645-S7.csv.gz', header=TRUE, row.names=1, sep=',', colClasses=c('character', rep('integer', 92)))
-        gene.length <- as.vector(incoming[,1])
-        incoming <- incoming[,-1]
-        spike.in <- grepl('^ERCC', rownames(incoming))
-
+        library(TxDb.Mmusculus.UCSC.mm10.ensGene)
+        chr.loc <- select(TxDb.Mmusculus.UCSC.mm10.ensGene, keys=rownames(incoming), keytype="GENEID", column="CDSCHROM")
+        chr.loc <- chr.loc$CDSCHROM[match(rownames(incoming), chr.loc$GENEID)]
+		is.mito <- chr.loc=="chrM" & !is.na(chr.loc)
     }
+
+    # Quality control on cells.
+    okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
+                 !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
+                 !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
+                 !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
+	incoming <- incoming[,okay.libs]
 
     # Filtering out crappy spikes.
     high.ab <- rowMeans(incoming) >= 1
@@ -63,126 +63,71 @@ for (datatype in c("wilson", "islam", "brennecke")) {
 	diag.done <- FALSE
 
     #########################################################################
-    # Using our custom method.
+    # Running through our various methods.
 
-	for (my.var in c(0.001, 0.01, 0.1)) { 
-		set.seed(34271)
-		results <- top.res <- list()
-
-		for (i in seq(0,20)) {
-			# Running original data (once for each dataset), then resampled versions.
-			if (i) { countsSpike <- resampleSpikes(spike.param, var.log=my.var) }
-			else { countsSpike <- spike.param$counts }
-
-            sce <- newSCESet(countData=rbind(countsCell, countsSpike))
-            sce <- calculateQCMetrics(sce, feature_controls=list(Spike=rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(countsSpike)))))
-            isSpike(sce) <- "Spike"
-            sce <- computeSpikeFactors(sce)
-            sce <- normalize(sce)
-
-            # Fitting the trend to the spike-in variances.
-            out <- trendVar(sce, trend="semiloess", span=loess.span)
-			if (!diag.done) { 
-				pdf(paste0("diagnostics_", datatype, ".pdf"))
-                plot(out$mean, out$var)
-                curve(out$trend(x), col="red", lwd=2, add=TRUE)
-				dev.off()
-			}
-
-            # Computing the biological component.
-            out2 <- decomposeVar(sce, out)
-            my.rank <- rank(-out2$bio)
-            top.ranked <- lapply(top.hits, function(x) { my.rank <= x })            
-			if (i) { 
-				top.res[[i]] <- sapply(seq_along(top.hits), function(j) { sum(best[[j]] & !top.ranked[[j]]) })
-			} else {
-				best <- top.ranked
-			}
-		
-			if (!diag.done) { 
-				output <- out2
-                colnames(output) <- c("Mean", "Total", "Bio", "Tech")
-				write.table(file=paste0("out_custom_", datatype, ".tsv"), output[order(output$Bio, decreasing=TRUE),], 
-                            quote=FALSE, sep="\t", col.names=NA)
-				diag.done <- TRUE
-			}
-		}
-	
-		top.lost <- do.call(rbind, top.res)
-        colnames(top.lost) <- paste0("Top", top.hits)
-		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="VarLog", top.lost), 
-			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
-		filled <- TRUE
-	}
-
-    #########################################################################
-    # Using Brennecke's method on the original counts.
-
-    for (my.var in c(0.001, 0.01, 0.1)) { 
-		set.seed(3427)
-		results <- top.res <- list()
-
-        for (i in seq(0,20)) {
-			# Running original data (once for each dataset), then resampled versions.
-			if (i) { countsSpike <- resampleSpikes(spike.param, var.log=my.var) }
-			else { countsSpike <- spike.param$counts }
-
-            spike.sums <- colSums(countsSpike)
-            spike.sums <- spike.sums/exp(mean(log(spike.sums)))
-            sfSpike <- sfCell <- spike.sums
-
-#           # Equivalent to original normalization strategy
-#           sfCell <- estimateSizeFactorsForMatrix(countsCell)
-#           sfSpike <- estimateSizeFactorsForMatrix(countsSpike)
-
-            nCountsSpike <- t(t(countsSpike)/sfSpike)
-            nCountsCell <- t(t(countsCell)/sfCell)
-
-            # Copied straight from the supplementary materials.
-            meansSpike <- rowMeans( nCountsSpike )
-            varsSpike <- rowVars( nCountsSpike )
-            cv2Spike <- varsSpike / meansSpike^2
+    for (method in c("VarLog", "TechCV")) { 
+        for (my.var in c(0.01)) { 
+            set.seed(34271)
+            results <- top.res <- sig.res <- list()
             
-            meansCell <- rowMeans( nCountsCell )
-            varsCell <- rowVars( nCountsCell )
-            cv2Cell <- varsCell / meansCell^2
+            for (i in seq(0,20)) {
+                # Running original data (once for each dataset), then resampled versions.
+                if (i) { countsSpike <- resampleSpikes(spike.param, var.log=my.var) }
+                else { countsSpike <- spike.param$counts }
+                
+                sce <- newSCESet(countData=rbind(countsCell, countsSpike))
+                sce <- calculateQCMetrics(sce, feature_controls=list(Spike=rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(countsSpike)))))
+                isSpike(sce) <- "Spike"
+                sce <- computeSpikeFactors(sce)
+                sce <- normalize(sce)
+                
+                if (method=="VarLog"){ 
+                    # Fitting the trend to the spike-in variances.
+                    out <- trendVar(sce, trend="semiloess")
 
-            minMeanForFitA <- unname( quantile( meansSpike[ which( cv2Spike > .3 ) ], .8 ) )
-            useForFitA <- meansSpike >= minMeanForFitA
-            fitA <- glmgam.fit( cbind( a0 = 1, a1tilde = 1/meansSpike[useForFitA] ), cv2Spike[useForFitA] )
+                    # Computing the biological component.
+                    out2 <- decomposeVar(sce, out)
+                    out2 <- out2[!isSpike(sce),]
+                    my.rank <- rank(out2$p.value)
+                    is.sig <- out2$FDR <= 0.05 & out2$bio > 0.5
 
-            minBiolDisp <- .5^2
-            xi <- mean( 1 / sfSpike )
-            m <- ncol(countsCell)
-            psia1thetaA <- mean( 1 / sfSpike ) + ( coefficients(fitA)["a1tilde"] - xi ) * mean( sfSpike / sfCell )
-            cv2thA <- coefficients(fitA)["a0"] + minBiolDisp + coefficients(fitA)["a0"] * minBiolDisp
-            testDenomA <- ( meansCell * psia1thetaA + meansCell^2 * cv2thA ) / ( 1 + cv2thA/m )
-#            pA <- 1 - pchisq( varsCell * (m-1) / testDenomA, m-1 )
-#            padjA <- p.adjust( pA, "BH" )
-            lpA <- pchisq( varsCell * (m-1) / testDenomA, m-1, lower=FALSE, log=TRUE)
-   
-            # Getting the top-ranked hits.    
-            my.rank <- rank(lpA)
-            top.ranked <- lapply(top.hits, function(x) { my.rank <= x })            
-			if (i) { 
-				top.res[[i]] <- sapply(seq_along(top.hits), function(j) { sum(best[[j]] & !top.ranked[[j]]) })
-			} else {
-				best <- top.ranked
-			}
-		
-			if (!diag.done) { 
-				output <- data.frame(GeneID=rownames(countsCell), CV2=cv2Cell, logPValue=lpA)
-				write.table(file=paste0("out_brennecke_", datatype, ".tsv"), output[order(output$Bio, decreasing=TRUE),], 
-                            quote=FALSE, sep="\t", col.names=NA)
-				diag.done <- TRUE
-			}
-		}
-	
-		top.lost <- do.call(rbind, top.res)
-        colnames(top.lost) <- paste0("Top", top.hits)
-		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="CV2", top.lost), 
-			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
-		filled <- TRUE
+                    # Some diagnostics for this data set.
+        			if (!diag.done) { 
+                        pdf(paste0("diagnostics_", datatype, ".pdf"))
+                        plot(out$mean, out$var)
+                        curve(out$trend(x), col="red", lwd=2, add=TRUE)
+                        dev.off()
+
+                        output <- out2[is.sig,]
+                        write.table(file=paste0("out_", datatype, ".tsv"), output[order(output$bio, decreasing=TRUE),], 
+                                    quote=FALSE, sep="\t", col.names=NA)
+                        diag.done <- TRUE
+                    }
+                } else {
+                    outt <- technicalCV2(sce, min.bio.disp=0)
+                    outt <- outt[!isSpike(sce),]
+                    my.rank <- rank(outt$p.value)
+                    is.sig <- outt$FDR <= 0.05                    
+                }
+                    
+                top.ranked <- lapply(top.hits, function(x) { my.rank <= x })       
+                if (i) { 
+                    top.res[[i]] <- sapply(seq_along(top.hits), function(j) { sum(best[[j]] & !top.ranked[[j]])/top.hits[j] })
+                    sig.res[[i]] <- c(sum(sig & !is.sig)/sum(sig), sum(!sig & is.sig)/sum(sig))
+                } else {
+                    best <- top.ranked
+                    sig <- is.sig
+                }
+            }
+
+    		top.lost <- do.call(rbind, top.res)
+            colnames(top.lost) <- paste0("TopChange", top.hits)
+            sig.change <- do.call(rbind, sig.res)
+            colnames(sig.change) <- c("SigLost", "SigGained")
+    		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method=method, top.lost, sig.change), 
+    			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
+    		filled <- TRUE
+        }
 	}
 }
 
