@@ -77,6 +77,14 @@ spike.data <- spike.data[,keep]
 sum(keep)
 ```
 
+We check that the remaining libraries are distributed as expected along the induced/control groups for CBFB-MYH11-mcherry expression.
+
+```{r}
+oncogene.cpm <- as.integer(all.counts["CBFB-MYH11-mcherry",])/colSums(all.counts) * 1e6
+by.cherry <- split(oncogene.cpm, ifelse(is.induced, "Induced", "Control"))
+boxplot(by.cherry, log="y", ylab="Oncogene CPM")
+```
+
 Note that we'll be working with count sums, so we don't bother removing low-abundance genes.
 
 # Exploring the variability of the spike-in ratios
