@@ -19,53 +19,64 @@ filled <- FALSE
 
 #################################################################################
 
-for (datatype in c("kolod", "islam")) {
+for (datatype in c("calero", "islam")) {
 	if (datatype=="islam") {
-		counts <- read.table("GSE29087_L139_expression_tab.txt.gz", 
+		incoming <- read.table("GSE29087_L139_expression_tab.txt.gz", 
 			colClasses=c(list("character", NULL, NULL, NULL, NULL, NULL, NULL), rep("integer", 96)), skip=6, sep='\t', row.names=1)
-		is.spike <- grepl("SPIKE", rownames(counts))
-		grouping <- factor(c(rep(c("ESC", "MEF", "Neg"), c(48, 44, 4))))
+		spike.in <- grepl("SPIKE", rownames(incoming))
+		grouping <- rep(c("ESC", "MEF", "Neg"), c(48, 44, 4))
 		
 		# Quality control on individual cells.
-		totals <- colSums(counts)
-		is.mito <- grepl("^mt-", rownames(counts)) & !is.spike
-		okay.libs <- !isOutlier(totals, n=3, type="lower", log=TRUE) &
-                     !isOutlier(colSums(counts[is.mito,])/totals, n=3, type="higher") & 
-                     !isOutlier(colSums(counts[is.spike,])/totals, n=3, type="higher")
-		counts <- counts[,okay.libs]
-		grouping <- droplevels(grouping[okay.libs])
+		totals <- colSums(incoming)
+		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
+        expvar <- data.frame(Group=grouping, stringsAsFactors=FALSE)
 		
-	} else if (datatype=="kolod") {
-        all.counts <- read.table("ESpresso/counttable_es.csv", header=TRUE, row.names=1, colClasses=c("character", rep("integer", 704)))
-        serum <- sub("ola_mES_([^_]+)_.*", "\\1", colnames(all.counts))
-        batch <- sub("ola_mES_[^_]+_([^_]+)_.*", "\\1", colnames(all.counts))
-        targets <- data.frame(Serum=serum, Batch=batch)
-                                            
-        # Only using data from the batch with spike-ins.
-        keep <- targets$Batch=="3" & targets$Serum %in% c("lif", "2i")
-        counts <- all.counts[,keep]
-        is.spike <- grepl("^ERCC", rownames(counts))
-        is.mouse <- grepl("^ENSMUSG", rownames(counts))
+	} else if (datatype=="calero") {
+        incoming.1 <- read.table("../../real/Calero/trial_20160113/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 97)))
+        incoming.1 <- incoming.1[,-1]
+        incoming.2 <- read.table("../../real/Calero/trial_20160325/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 97)))
+        incoming.2 <- incoming.2[,-1]
+        incoming <- cbind(incoming.1, incoming.2)
 
-        # Getting rid of mapping statistics stored in the same file.
-        counts <- counts[is.spike|is.mouse,] 
-        is.spike <- is.spike[is.spike|is.mouse]
-        grouping <- factor(targets$Serum[keep])
-	}
+        incoming <- incoming[!grepl("SIRV", rownames(incoming)),] # Getting rid of SIRVs at this point.
+        spike.in <- grepl("^ERCC", rownames(incoming))
+        
+        # Getting metrics.
+        totals <- colSums(incoming)
+        library(TxDb.Mmusculus.UCSC.mm10.ensGene)
+        chr.loc <- select(TxDb.Mmusculus.UCSC.mm10.ensGene, keys=rownames(incoming), keytype="GENEID", column="CDSCHROM")
+        chr.loc <- chr.loc$CDSCHROM[match(rownames(incoming), chr.loc$GENEID)]
+        is.mito <- chr.loc=="chrM" & !is.na(chr.loc)
 
-	design <- model.matrix(~grouping)
-	filter.keep <- rowMeans(counts) >= 1
-    spike.param <- spikeParam(counts[is.spike & filter.keep,])
-    cell.counts <- counts[!is.spike & filter.keep,]
+        # Constructing the experimental design.        
+        expvar <- data.frame(Batch=rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2))),
+                             Group=ifelse(grepl("S50[5-8]", colnames(incoming)), "Induced", "Control"), stringsAsFactors=FALSE)
+    }
+    
+    # Quality control on cells.
+    okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
+        !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
+        !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
+        !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
+    incoming <- incoming[,okay.libs]
+    expvar <- expvar[okay.libs,,drop=FALSE]
+
+	filter.keep <- rowMeans(incoming) >= 1
+    spike.param <- spikeParam(incoming[spike.in & filter.keep,])
+    cell.counts <- incoming[!spike.in & filter.keep,]
 
 	#################################################################################
 	# Running edgeR first.
 
-	# Filtering out crappy genes.
 	y.ref <- DGEList(cell.counts)
 	diag.done <- FALSE
+    if (datatype=="calero") {
+        design <- model.matrix(~Batch + Group, expvar)
+    } else if (datatype=="islam") {
+        design <- model.matrix(~Group, expvar)
+    }
 
-    for (my.var in c(0.001, 0.01, 0.1)) {
+    for (my.var in c(0.01)) {
 		set.seed(231234)
 		results <- top.set <- list()
 		
@@ -87,7 +98,8 @@ for (datatype in c("kolod", "islam")) {
 			if (!diag.done) {
 				pdf(paste0("diagnostics_", datatype, ".pdf"))
 				plotBCV(y) # Nice downward trend
-				limma::plotMDS(edgeR::cpm(y, log=TRUE), col=c("red", "blue")[(as.integer(grouping)==1)+1L]) # Mostly separated
+				limma::plotMDS(edgeR::cpm(y, log=TRUE), pch=16,
+                               col=c("red", "blue")[(as.integer(factor(expvar$Group))==1)+1L]) # Mostly separated
 				dev.off()
 			}
 
@@ -121,56 +133,16 @@ for (datatype in c("kolod", "islam")) {
 		filled <- TRUE
 	}
 
-	#################################################################################
-	# Next, monocle.
+    #################################################################################
+    # Also, MAST.
 
-	for (my.var in c(0.001, 0.01, 0.1)) {
-		set.seed(3742)
-		results <- top.set <- list()
-		
-		for (i in seq(0,20)) {
-			# Running original data, then resampled versions.
-			if (i) { spike.data <- resampleSpikes(spike.param, var.log=my.var) }
-			else { spike.data <- spike.param$counts }
-
-			# Normalizing by spike-in total counts (scaled to the total library size).
-			spike.totals <- colSums(spike.data)
-            spike.totals <- spike.totals/mean(spike.totals) * mean(colSums(cell.counts))
-			normalized <- edgeR::cpm(cell.counts, lib.size=spike.totals)
-
-			pdat <- AnnotatedDataFrame(data=data.frame(grouping=grouping))
-			sampleNames(pdat) <- colnames(normalized)
-			HSMM <- newCellDataSet(cellData=normalized, phenoData=pdat)
-
-            HSMM <- HSMM[1:2000,] # for convenience, otherwise we'll be here for days. 
-			out <- differentialGeneTest(HSMM, fullModelFormulaStr="expression~grouping", cores=10) 
-
-			# Choosing stuff. 
-			chosen <- p.adjust(out$pval, method="BH") <= fdr.threshold
-		    top.ranked <- rank(out$pval) <= top.hits
-			if (i) { 
-				results[[i]] <- sum(original!=chosen)/sum(original)
-				top.set[[i]] <- sum(best!=top.ranked)/top.hits
-			} else {
-				original <- chosen
-				best <- top.ranked
-			}
-		}
-
-		final <- do.call(rbind, results)
-        colnames(final) <- "AllDE"
-		top.lost <- do.call(rbind, top.set)
-        colnames(top.lost) <- paste0("Top", top.hits)
-
-        write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method="monocle", Total=length(original), Detected=sum(original),
-            final, top.lost), row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
-		filled <- TRUE
+    if (datatype=="calero") {
+        form <- ~cngeneson + Batch + Group
+    } else if (datatype=="islam") {
+        form <- ~cngeneson + Group
     }
 
-    #################################################################################
-    # Finally, MAST.
-
-    for (my.var in c(0.001, 0.01, 0.1)) {
+    for (my.var in c(0.01)) {
         set.seed(3742)
         results <- top.set <- list()
     
@@ -179,21 +151,23 @@ for (datatype in c("kolod", "islam")) {
             if (i) { spike.data <- resampleSpikes(spike.param, var.log=my.var) }
             else { spike.data <- spike.param$counts }
 
-            # Normalizing by spike-in total counts (again, scaled to the total library size).
+            # Adjusting the library sizes to reflect the relative spike-in coverage.
             spike.totals <- colSums(spike.data)
             spike.totals <- spike.totals/mean(spike.totals) * mean(colSums(cell.counts))
-            lcpms <- log2(t(cell.counts+1)/spike.totals*1e6)
+
+            # Computing log2-(CPM+1), as suggested on the page.
+            lcpms <- log2(t(t(cell.counts)/spike.totals)*1e6 + 1)
 
             suppressMessages({
-                sca <- FromMatrix('SingleCellAssay', lcpms, data.frame(wellKey=rownames(lcpms)), data.frame(primerid=colnames(lcpms)))
-                cData(sca) <- cbind(cData(sca), grouping)
-                cData(sca)$cngeneson <- colMeans(cell.counts>0)
-                                                          
-                mfit <- zlm.SingleCellAssay(~ grouping + cngeneson, sca, method="bayesglm", ebayes=TRUE, ebayesControl=list(method="MLE", model="H1"))
-                mlrt <- lrTest(mfit, Hypothesis(colnames(design)[ncol(design)], colnames(coef(mfit, "D")))) # cngeneson is added at the end, so it shouldn't affect terms before it.
+                sca <- FromMatrix(lcpms, cData=data.frame(wellKey=colnames(lcpms)), fData=data.frame(primerid=rownames(lcpms)))
+                colData(sca) <- cbind(colData(sca), expvar)
+                colData(sca)$cngeneson <- scale(colMeans(cell.counts>0))
+                
+                mfit <- zlm.SingleCellAssay(form, sca)
+                mlrt <- lrTest(mfit, "Group")
                 MAST.p <- mlrt[, "hurdle", "Pr(>Chisq)"]
-            })                                                                            
-        
+            })
+
             # Choosing stuff. 
 			chosen <- p.adjust(MAST.p, method="BH") <= fdr.threshold
 		    top.ranked <- rank(MAST.p) <= top.hits
