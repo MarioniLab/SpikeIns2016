@@ -31,13 +31,15 @@ We define the well identities for each sample, using information in the metadata
 Hence the need for the contortions below.)
 
 ```{r}
-manifest <- read.csv("manifest.csv", header=TRUE)
-metadata <- read.csv("metadata.csv", header=TRUE)
+manifest <- read.csv("manifest.csv", header=TRUE, stringsAsFactors=FALSE)
+metadata <- read.csv("metadata.csv", header=TRUE, stringsAsFactors=FALSE)
 num.ids <- sub("[^\\.]+\\.", "", colnames(all.counts))
 ref.ids <- sub(".*#", "", metadata[,4])
 metadata <-  metadata[match(num.ids, ref.ids),]
 manifest <- manifest[match(metadata$Sanger.sample.ID, manifest$SANGER.SAMPLE.ID),]
 well.ids <- sub(".*_", "", manifest$SUPPLIER.SAMPLE.NAME)
+write.table(file="wellID.tsv", data.frame(Colnames=colnames(all.counts), Sample=num.ids, Well=well.ids), 
+    sep="\t", row.names=FALSE, quote=FALSE)
 colnames(all.counts) <- well.ids
 ```
 
