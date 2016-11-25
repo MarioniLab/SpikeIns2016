@@ -113,7 +113,7 @@ for (datatype in c("wilson", "calero", "liora")) {
                 top.ranked <- lapply(top.hits, function(x) { my.rank <= x })       
                 if (i) { 
                     top.res[[i]] <- sapply(seq_along(top.hits), function(j) { sum(best[[j]] & !top.ranked[[j]])/top.hits[j] })
-                    sig.res[[i]] <- c(sum(sig & !is.sig)/sum(sig), sum(!sig & is.sig)/sum(sig))
+                    sig.res[[i]] <- sum(sig!=is.sig)/sum(sig)
                 } else {
                     best <- top.ranked
                     sig <- is.sig
@@ -121,10 +121,8 @@ for (datatype in c("wilson", "calero", "liora")) {
             }
 
     		top.lost <- do.call(rbind, top.res)
-            colnames(top.lost) <- paste0("TopChange", top.hits)
-            sig.change <- do.call(rbind, sig.res)
-            colnames(sig.change) <- c("SigLost", "SigGained")
-    		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method=method, top.lost, sig.change), 
+            colnames(top.lost) <- paste0("Top", top.hits)
+    		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method=method, top.lost, Sig=unlist(sig.res)),
     			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
     		filled <- TRUE
         }
