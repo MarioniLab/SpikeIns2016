@@ -241,9 +241,9 @@ Finally, the Benjamini-Hochberg correction was applied to control the FDR.
 
 For MAST v1.0.5, an effective library size was defined by multiplying the total spike-in count by a constant value $C$ for each library.
 We set $C$ to the total read count for the endogenous genes, averaged across all libraries.
-This adjusts the library size for each cell to reflect the differences in coverage of the spike-in transcripts.
-Counts were then converted to count-per-million (CPM) values using the effective library sizes.
-This ensures that the coverage of the spike-in transcripts is identical across libraries.
+This procedure adjusts the library size for each cell to reflect the difference in the spike-in totals.
+Counts were converted to count-per-million (CPM) values using the effective library sizes.
+This is the same as spike-in normalization, as the sum of CPMs across spike-in transcripts is equal across libraries.
 CPMs were log-transformed after adding a pseudo-count of 1.
 For each gene, a hurdle model was fitted to the log-CPMs across all cells using the zlm.SingleCellAssay function with default parameters.
 Along with the experimental factors, the proportion of genes with non-zero counts in each library was included as a covariate \cite{finak2015mast} in the model.
