@@ -30,8 +30,7 @@ resampleSpikes <- function(param, var.log)
 	log.lib <- log2(param$lib.size)
 	cur.var <- var(log.lib)
 	if (cur.var < var.log) { warning("variance in original library sizes is lower than specified") }
-	new.log.lib <- log.lib * sqrt(max(0, 1 - var.log/cur.var))
-	new.log.lib <- new.log.lib - mean(new.log.lib) + mean(log.lib)
+    new.log.lib <- (log.lib - mean(log.lib)) * sqrt(max(0, 1 - var.log/cur.var)) + mean(log.lib)
 	new.lib.size <- 2^new.log.lib
 
 	# Adding spike-in variability back in, randomly.
