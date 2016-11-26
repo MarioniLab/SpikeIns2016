@@ -325,13 +325,21 @@ The proportion of HVGs common to both the original and simulated sets was comput
 This was repeated for 20 simulation iterations, and the average proportion across iterations was reported for each method.
 
 \subsection{Evaluating the robustness of clustering}
-For dimensionality reduction and clustering, a scRNA-seq data set was obtained from a study of mESCs cultured under different conditions \cite{kolod2015single}.
-A PCA plot was constructed from the original log$_2$-counts after spike-in normalization.
-This was repeated for each simulation iteration, and the position of each cell on the simulated plot was mapped back to the corresponding location on the original plot.
-In this manner, the sensitivity of the cell placement to spike-in variability was assessed.
-Hierarchical clustering was also performed on the normalized log$_2$-counts using Euclidean distances or rank correlations.
-The stability of each cluster was assessed based on the number of occurrences of that cluster across simulation iterations.
-See Section~Y in the Supplementary Materials for further implementation details.
+Count data from a study of pancreatic islet cells \cite{someone} was obtained from ArrayExpress under the acession E-MTAB-5061.
+Spike-in normalization was performed and a set of HVGs was defined using the variance-of-log-expression method.
+PCA plots of the first three components were constructed from the matrix of log-expression values for the HVGs.
+This process -- including HVG detection -- was repeated with the simulated data after introducing spike-in variability.
+To compare each simulated PCA plot to the original plot, the coordinates of each cell in the former were mapped onto the latter by rescaling and rotation.
+Robustness was assessed based on the spread of remapped coordinates from all simulation iterations for each cell.
+See Section~Y in the Supplementary Materials for details.
+
+To test the robustness of clustering, the matrix of Euclidean distances between cells was computed from the HVG log-expression values. 
+Hierarchical clustering was performed using the Ward criterion and the resulting dendrogram was cut into 2, 5 or 10 clusters.
+(This was done using the hclust and cutree commands, respectively, from the stats package.)
+This process was repeated with the simulated data, and the Jaccard index between every pair of simulated and original clusters was computed.
+For each original cluster, the maximum Jaccard index across all simulated clusters was recorded at each simulation iteration.
+This value represents the extent to which the membership of the original cluster was preserved in the most similar simulated cluster.
+We also compared the original clusters to those generated from complete-linkage clustering of the original HVG log-expression values.
 
 {\small
 \bibliography{refnorm}

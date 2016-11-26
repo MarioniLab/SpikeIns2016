@@ -250,44 +250,42 @@ Along with the experimental factors, the proportion of genes with non-zero count
 Putative DE genes between the relevant conditions were identified using the lrTest function.
 
 \subsection{Methods for detecting highly variable genes}
-The first approach to detect HVGs is based on the method described by Brennecke \textit{et al.} \cite{brennecke2013accounting}.
-The only modification involves defining the spike-in total (rescaled to have a mean of unity) as the size factor for each library, for both the endogenous and spike-in counts.
-This represents spike-in normalization as it scales the counts in each library so that the spike-in totals are the same. 
+The first HVG detection method was based on the approach described by Brennecke \textit{et al.} \cite{brennecke2013accounting}.
+Only the size factors were modified in order to perform spike-in normalization.
+Specifically, the spike-in totals were rescaled to have a mean of unity across all libraries, and the size factor for each library was defined as its rescaled spike-in total.
+This represents spike-in normalization as each ``spike-in size factor'' scales the counts in each library so that the spike-in totals are the same. 
 We do \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
-The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package.
-If blocking factors were present in the data set, they were regressed out by applying the removeBatchEffect function from the limma package to the counts, prior to using technicalCV2.
+The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package with min.bio.disp set to zero.
+If blocking factors were present, they were regressed out by applying the removeBatchEffect function from the limma package to the counts, prior to using technicalCV2.
 
-The second approach to detect HVGs is based on computing the variance of log-expression values \cite{lun2016step}.
-A normalized log-expression value was defined as the log-ratio of each count with the spike-in-based size factor for the corresponding library
-    (a pseudo-count of 1 was added prior to log-transformation to avoid undefined values).
-The variance of the log-expression was computed across all cells for each spike-in transcript.
-A loess curve was then fitted to the log-variance against the mean for all spike-in transcripts using the trendVar function in scran.
+The second approach to detect HVGs was based on computing the variance of log-expression values \cite{lun2016step}.
+For each count in each library, a normalized log-expression value was defined as the log-ratio of the count with the spike-in size factor for that library.
+(A pseudo-count of 1 was added prior to log-transformation to avoid undefined values).
+The variance of log-expression was computed across all cells for each spike-in transcript.
+A loess curve was fitted to the log-variance against the mean for all spike-in transcripts using the trendVar function in scran.
 This represents the mean-variance relationship due to technical noise.
 The biological component of the variance and a $p$-value was computed for each gene using the decomposeVar function.
 If blocking factors were present, they were used to construct a design matrix for modelling in trendVar.
 
 \subsection{Methods for dimensionality reduction and clustering}
-For the mESC culture study, data was obtained from \url{http://www.ebi.ac.uk/teichmann-srv/espresso} \cite{kolod2015single}.
-Counts were only used from the third batch of samples in which ERCC spike-ins were added.
-Low-abundance genes were filtered out as previously described.
-Cell-level quality control was already done and not required.
+Spike-in size factors were defined from the spike-in totals as previously described. 
+HVG detection was performed using the variance-of-log-expression method, where HVGs were defined as genes detected at a FDR of 5\% and with biological components above 0.5.
+PCA was performed on the normalized log-expression values of the HVGs, using the prcomp function from the stats package with scaling and centring.
+The first two PCs were used as the coordinates for each cell in one PCA plot, while the first and third PCs were used as the coordinates in another plot.
+Each point was coloured according to its annotated cell type \cite{someone}.
 
-For construction of the PCA plot, normalized log-expression values were defined as previously described.
-These values were supplied to the prcomp function with scaling and centering, and the first two principal components were used as the coordinates for each cell.
-This was repeated for each simulation iteration after re-normalizing with the modified spike-in totals.
-Coordinates of all cells in each simulated PCA plot were then mapped to the space of the original plot.
-This was done by rotating and scaling the former to minimize the sum of squared Euclidean distances between the rotated and original coordinates.
-After several simulation iterations, each cell has one original location and several remapped locations (one from each iteration). 
+The procedure above was repeated at each simulation iteration with new spike-in counts.
+Coordinates of all cells in each simulated PCA plot were mapped onto the original plot.
+This was done after scaling and rotating the simulated coordinates around the origin, to eliminate differences between plots that were not relevant to interpretation.
+Specifically, a 2-by-2 transformation matrix was applied to the simulated coordinates;
+    the squared Euclidean distance from the (scaled and rotated) simulated coordinates to the original coordinates was computed for each cell;
+    and the scaling and rotation parameters of the matrix were identified that minimized the sum of squared distances across all cells.
+We do not project the simulated log-expression data onto the space of the original plot, as this does not capture the variability in the identification of the PCs across iterations.
+Upon completion of the simulation, each cell will have one original location and several remapped locations (one per iteration). 
 For each cell, the smallest circle centered at its original location was drawn that contained the corresponding remapped locations for 95\% of the iterations.
-This circle acts like an ``error bar'' for the coordinates.
 
-For clustering, a matrix of Euclidean distances was computed between pairs of cells using their normalized log-expression values.
-Complete-linkage hierarchical clustering was then performed using the hclust function.
-From the resulting dendrogram, the children of each node were defined as a possible cluster, referred to here as an original cluster.
-Dendrogram construction was repeated after re-normalization in each simulation iteration.
-The stability of each original cluster in response to spike-in variability was assessed as the proportion of iterations in which that cluster was present in the simulated dendrogram (i.e., all and only the cells in the cluster were the children of one node in that dendrogram).
-This was repeated with a more relaxed criterion, where an original cluster was considered to be present in a simulated dendrogram if the lowest (i.e., furthest from the root) node containing all cells in the original cluster contained no more than 5\% of other cells.
-This entire process was also repeated using 1 minus the rank correlations between cells as the distance.
+Note that, for the data set used in this simulation, we removed cells that were annotated as low quality in the associated metadata.
+As such, we did not perform any outlier-based quality control on the cells.
 
 \newpage
 \section{Dealing with variable spike-in behaviour}
