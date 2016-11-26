@@ -107,7 +107,11 @@ We also repeated the experiment by adding volumes of ``premixed'' spike-in solut
 This ensures that there is no well-to-well variability in the relative quantities of RNA from the two spike-in sets.
 The variance of the log-ratio across these premixed-addition wells provides a baseline level of variability in the protocol (e.g., due to sequencing noise).
 The variance of volume addition was then estimated as the difference in the variance estimates from the premixed-addition wells and from the wells with separate addition of spike-ins.
-We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects.
+
+We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects \cite{hicks2015widespread,tung2016}.
+For the separate-addition experiment, we also reversed the order of addition of the two spike-in sets to determine if this affected the variance estimate.
+Finally, we generated data from replicate plates to ensure our results were reproducible.
+This was done in a range of conditions, i.e., using different cells, by different operators and with sequencing by different machines and centres.
 
 We used a protocol based on microtiter plates rather than microfluidics as it is easier to customise the spike-in addition step in the former.
 Our experimental design requires two separate additions of spike-in RNA to each reaction (see Methods).
