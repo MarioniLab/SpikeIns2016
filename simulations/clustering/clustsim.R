@@ -33,7 +33,7 @@ compute.max.jaccard <- function(ref.clust, incoming.clust) {
 
 headers <- read.table("pancreas_refseq_rpkms_counts_3514sc.txt.gz", nrow=1, comment="", stringsAsFactors=FALSE, sep="\t", fill=TRUE)
 metadata <- read.table("E-MTAB-5061.sdrf.txt", sep="\t", header=TRUE, stringsAsFactors=FALSE, check.names=FALSE)
-chosen <- metadata[,"Characteristics[individual]"]=="HP1502401"
+chosen <- metadata[,"Characteristics[individual]"]=="HP1502401" & metadata[,"Characteristics[single cell well quality]"]!="low quality cell"
 cell.type <- metadata[chosen,"Characteristics[cell type]"]
 source.name <- metadata[chosen,"Source Name"]
 
@@ -52,12 +52,12 @@ incoming <- incoming[,-(1:2)]
 spike.in <- grepl("ERCC", rownames(incoming))
 totals <- colSums(incoming)
 
-# Quality control on cells (couldn't find mitochondrial genes).
-okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
-             !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
-             !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
-incoming <- incoming[,okay.libs]
-my.cells <- my.cells[okay.libs]
+# Quality control already performed on cells.
+#okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
+#             !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
+#             !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
+#incoming <- incoming[,okay.libs]
+#my.cells <- my.cells[okay.libs]
 
 # Filtering out crappy spikes.
 high.ab <- rowMeans(incoming) >= 1
