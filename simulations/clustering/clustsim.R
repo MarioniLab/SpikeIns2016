@@ -188,7 +188,8 @@ all.means <- unlist(all.means)
 all.stder <- unlist(all.stder)
 colors <- c("black", "red", "orange") 
 
-pdf("clusters.pdf")
+pdf("clusters.pdf", width=12, height=6)
+par(mfrow=c(1,2))
 all.colors <- colors[as.integer(origin)]
 plot(all.sizes, all.means, pch=16, col=all.colors, ylim=c(0, 1), ylab="Maximum Jaccard index", 
      xlab="Cluster size", cex.axis=1.2, cex.lab=1.4, cex=1.4, main="Effect of spike-in variability", cex.main=1.4)
