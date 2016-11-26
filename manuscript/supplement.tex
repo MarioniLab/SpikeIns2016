@@ -67,44 +67,33 @@ $^2$EMBL European Bioinformatics Institute, Wellcome Genome Campus, Hinxton, Cam
 \end{center}
 \end{titlepage}
 
-\section{Decomposing the variance for log-ratios of spike-ins}
+\newcommand\variance{\mbox{var}}
 
-\subsection{Overview of basic definitions}
-The first step of the experiment involves adding spike-in sets to each well of a microtiter plate.
-(We will use ``well'' and ``cell'' interchangeably here, as each well contains one cell.)
-Consider these definitions:
-\begin{center}
-    \begin{tabular}{l p{0.9\textwidth}}
-$C_{t_s}$  & The concentration in molecules per unit of volume for transcript $t_s$ in spike-in set $s$. \\
-$\eta_{is}$   & The volume of spike-in set $s$ added to well $i$. \\
-$\zeta_{it_s}$ & The number of molecules for transcript $t_s$ of set $s$ added to $i$ during spike-in addition.
-\end{tabular}
-\end{center}
-$\eta_{is}$ is a random variable that depends on the experimental precision of volume addition.
-In contrast, $C_{t_s}$ is a constant that depends on the composition of the spike-in set $s$.
-We also define $\zeta_{it_s} = C_{t_s}\eta_{is}$.
+\section{Further interpretation of the mathematical terms}
+$R_{is}$ was introduced as the average capture efficiency in well $i$ for all transcripts in set $s$.
+It ranges from 0 to 1 and scales $r_{t_s}$ to determine the actual capture rate for each $t_s$.
+The most obvious interpretation of $R_{is}$ (and $r_{t_s}$) is that of the efficiency of reverse transcription, but it also describes the efficiency of PCR amplification and tagmentation in Smart-seq2.
+Thus, no additional variables are necessary for the latter steps.
 
-After the spike-in volumes are added together, library preparation is performed to convert RNA to cDNA prior to high-throughput sequencing.
-Consider the following definitions:
-\begin{center}
-\begin{tabular}{l p{0.9\textwidth}}
-$R_{t_s}$ & The ``baseline'' number of cDNA fragments generated from each molecule of $t_s$. \\
-$\phi_{is}$ & The efficiency of cDNA generation in well $i$ for all transcripts of set $s$. \\
-$\delta_{it_s}$ & The cDNA fragment-per-transcript molecule conversion rate for transcript $t_s$ in well $i$.
-\end{tabular}
-\end{center}
-$R_{t_s}$ is a constant as it depends on the inherent properties of each transcript.
-$\phi_{is}$ is a random variable that represents well-specific biases for each spike-in set.
-These parameters are related by $\delta_{it_s} = R_{t_s} \phi_{is}$.
+The term $l_s L_i$ describes the rate at which reads are obtained from cDNA fragments during high-throughput sequencing.
+The $l_s$ constant represents the average sequencing efficiency for transcripts in $s$, as well as factors such as mappability that affect the final counts.
+The interpretation of $L_i$ depends on whether library quantification was performed to equalize the amount of cDNA from each well prior to sequencing.
+If not, $L_i$ will be constant across wells, with its exact value depending on the sequencing depth.
+However, if quantification was performed, $L_i$ will depend on the other variables that contribute to $T_{is}$.
+Specifically,
+\[
+    L_i = D \left[ \sum_{s} \left( l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right) \right]^{-1}
+\]
+where $D$ is the total sequencing depth (in reads) and the outer sum is taken over the spike-in sets $s\in \{1, 2\}$ as well as the set of endogenous transcripts $s=g$.
+In typical experiments, $L_i$ is effectively independent of $V_{is}$ and $R_{is}$ for any particular spike-in set $s$.
+This is because the denominator of the above expression is dominated by the vastly larger number of cDNA fragments from the set of endogenous transcripts.
 
-Finally, define $\nu_{ig}$ as the number of transcript molecules for gene $g$ in the cellular RNA for the cell in well $i$.
-This is a random variable that includes the biological variability in gene expression.
-Let $\delta_{ig}$ represent the cDNA fragment-per-transcript conversion rate for $g$ in $i$, which is also a random variable across wells.
-
-All random variables are assumed to be independent unless they have been explicitly related by equalities, e.g., $\zeta_{it_s}$ and $\eta_{is}$.
-This is justified by the fact that they describe separate processes in the protocol.
-The other exception is that $\phi_{is}$ may not be independent between $s$, as capture efficiencies of different sets may be affected by the same factors in each well.
-However, they are still independent of the other variables.
+The error term $\varepsilon_{is}$ describes variance due to sequencing noise and variability during library preparation.
+Its variance is set to $\sigma^2_{lib(s)}$, which implicitly assumes that there is no dependence on the mean of $T_{is}$.
+This assumption is unlikely to be true because strong mean-variance relationships are often observed in count data from sequencing experiments \cite{law2014voom}.
+However, the distribution of $T_{is}$ is similar between separate-addition and premixed-addition wells within each plate (Supplementary Figure~\ref{fig:totals}).
+If the mean of $T_{is}$ does not change, neither will the value of $\sigma^2_{lib(s)}$, regardless of the nature of the mean-variance relationship. 
+This suggests that $\sigma^2_{lib(s)}$ will not change between $\variance(\theta_i)$ and $\variance(\theta^*_i)$, allowing calculation of $\sigma^2_{vol}$ from their difference.
 
 \subsection{Constructing the distribution of the total counts}
 For spike-in sets $s=1, 2, \ldots$, the cDNA fragment-to-read conversion factor for each well is
@@ -435,6 +424,7 @@ This can be compared to $\sigma^2_{vol}$ to determine the relative importance of
         For each plate, separate boxplots are shown for wells in which spike-ins were added separately or premixed before addition.
         Dots represent wells with total counts that are more than 1.5 interquartile ranges from the first or third quartile.
     }
+    \label{fig:totals}
 \end{figure}
 
 \begin{figure}[btp]
