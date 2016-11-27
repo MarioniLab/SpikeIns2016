@@ -174,22 +174,21 @@ Linear models are particularly useful as they allow blocking on additional struc
 In addition, the size of $T_{is}$ was similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplementary Figure~\suppfigtotals{}, Section~XX of the Supplementary Materials for more details).
 Finally, the order of spike-in addition did not affect the variance estimates for the separate-addition wells on most plates (Supplementary Figure~\suppfigorder{}).
 
-Our results indicate that $\sigma^2_{vol}$ is consistently smaller than the variance in the rest of the protocol (Figure~\ref{fig:varestimates}).
+Our results indicate that $\sigma^2_{vol}$ is consistently smaller than the variance in the rest of the protocol (Figure~\ref{fig:varestimates}a).
 Indeed, no significant difference was detected between $\variance(\theta_i)$ and $\variance(\theta^*_i)$ for each plate.
 This indicates that variability of spike-in volume addition is a minor contributor to the technical variability of the spike-in counts.
 To further put these estimates into context, consider that $T_{is}$ represents the log$_2$-transformed ``size factor'' for the library generated from well $i$.
 In other words, all counts in this library are scaled by a factor of $2^{-T_{is}}$ to correct for well/cell-specific biases during spike-in normalization.
-The variance of the log-size factors is several orders of magnitude larger than $\sigma^2_{vol}$.
-This suggests that the latter will not have a major effect on the normalization result.
+The variance of the log-size factors is several orders of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b), which suggests that the latter will not have a major effect on normalization.
 
 \begin{figure}[btp]
     \begin{center}
-        \includegraphics[height=2.2in,trim=0mm 10mm 0mm 10mm,clip]{../real/pics/variance_exp.pdf}
-        \includegraphics[height=2.2in,trim=0mm 10mm 0mm 10mm,clip]{../real/pics/variance_sf.pdf}
+        \includegraphics[width=\textwidth,trim=0mm 15mm 0mm 0mm,clip]{../real/pics/variance_exp.pdf}
     \end{center}
-    \caption{Variance estimates of the log$_2$-ratio between the ERCC and SIRV total counts (left), or the log$_2$-size factors computed from those totals (right).
-        Each estimate is the residual variance of a linear model fitted to the log-ratios or log-size factors across all cells (416B or trophoblasts) in each plate.
-        Error bars represent the standard errors of the estimates, assuming normally-distributed values.
+    \caption{Variance estimates of (a) the log$_2$-ratio between the ERCC and SIRV total counts across wells, or (b) the log$_2$-size factors computed from those totals.
+        Each estimate is the residual variance of a linear model fitted to the log-ratios or log-size factors across all wells on each plate.
+        Results are shown for experiments with 416B cells or trophoblasts, each containing two replicate plates.
+        Error bars represent the standard errors of the estimates, assuming the log-values are normally-distributed.
     }
     \label{fig:varestimates}
 \end{figure}
@@ -235,15 +234,14 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
 
 \begin{figure}[bt]
     \begin{center}
-        \includegraphics[height=2.5in,trim=0mm 5mm 0mm 10mm,clip]{../simulations/pics/de_plot.pdf}
-        \includegraphics[height=2.5in,trim=0mm 5mm 0mm 10mm,clip]{../simulations/pics/hvg_plot.pdf}
+        \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../simulations/pics/setplot.pdf}
     \end{center}
     \caption{Effect of spike-in variability on DEG or HVG detection in simulated data.
-        Left: The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
+        (a) The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
         This was also calculated for the top set of 200 DEGs with the smallest $p$-values.
         Simulations were designed to test for differential expression between mouse embryonic stem cells (mESCs) and fibroblasts (MEFs) \cite{islam2011characterisation},
         or before and after induction of the CBFB-MYH11 oncogene in our 416B data set.
-        Right: The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
+        (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
         by the Brennecke \textit{et al.} method using the squared coefficient of variation (CV$^2$) or by the variance of log-expression.
         This was also calculated for the top set of 200 HVGs with the smallest $p$-values.
         Simulations were designed to detect HVGs in our 416B and trophoblast data, and in haematopoietic stem cells (HSCs) \cite{wilson2015combined}.
@@ -261,8 +259,7 @@ Thus, spike-in variability does not appear to affect the visual interpretation o
 
 \begin{figure}[btp]
     \begin{center}
-        \includegraphics[width=\textwidth]{../simulations/clustering/pca_effect.pdf}
-        \includegraphics[width=\textwidth]{../simulations/clustering/clusters.pdf}
+        \includegraphics[width=\textwidth]{../simulations/clustering/clust_effect.pdf}
     \end{center}
     \caption{Effect of spike-in variability on dimensionality reduction and clustering in simulated data.
         (a) PCA plots of the first three principal components, where each cell is coloured according to the annotated cell type in the original study \cite{someone}.
@@ -323,8 +320,8 @@ The variance of $T_{is}$ is
 \[
     \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(R_{is}) + \variance(\log_2 L_i)
 \]
-where the approximation assumes that $L_i$ is independent of the other random variables.
-This is generally reasonable as $L_i$ is mainly determined by factors not related to spike-in volume or behaviour, such the number of cDNA fragments derived from endogenous transcripts.
+where the approximation assumes that $L_i$ is independent of the other random variables that contribute to $T_{is}$.
+(This is discussed in more detail in Section~XX of the Supplementary Materials.)
 Let $R_{is} = R_{i0}P_{is}$, where $R_{i0}$ is the well-specific average capture efficiency of endogenous transcripts and $P_{is}$ is the fold change in average efficiency of the transcripts in $s$ over their endogenous counterparts.
 We assume that $R_{i0}$ and $P_{is}$ are independent for each well, and that $\log_2(P_{is})$ can be approximated with $F_i$ (i.e., the log-fold change in average efficiency between SIRV and ERCC spike-ins).
 This yields
