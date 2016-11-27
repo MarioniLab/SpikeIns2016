@@ -40,8 +40,8 @@ for (operator in c("Calero", "Liora")) {
     }
 }
 
-pdf("pics/variance_exp.pdf", width=9, height=7)
-par(mar=c(5.1, 5.1, 2.1, 2.1))
+pdf("pics/variance_exp.pdf", width=14, height=7)
+par(mar=c(5.1, 5.1, 2.1, 2.1), mfrow=c(1,2))
 final <- cbind(Separate=unlist(total), Premixed=unlist(premixed), Volume=unlist(volume))
 final.err <- cbind(Separate=unlist(total.err), Premixed=unlist(premixed.err), Volume=unlist(volume.err))
 upper.limit <- final  + final.err
@@ -50,10 +50,9 @@ out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/S
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
 legend("topright", fill=cols, names, cex=1.2)
-dev.off()
+curcoords <- par()$usr
+mtext("a", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1]), font=2)
 
-pdf("pics/variance_sf.pdf", width=7, height=7)
-par(mar=c(5.1, 5.1, 2.1, 2.1))
 final <- cbind(ERCC=unlist(ERCC.sf), SIRV=unlist(SIRV.sf))
 final.err <- cbind(ERCC=unlist(ERCC.sf.err), SIRV=unlist(SIRV.sf.err))
 upper.limit <- final  + final.err
@@ -61,6 +60,8 @@ out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"size fa
         cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, max(upper.limit)))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
+curcoords <- par()$usr
+mtext("b", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1]), font=2)
 dev.off()
 
 pdf("pics/variance_order.pdf", width=9, height=7)

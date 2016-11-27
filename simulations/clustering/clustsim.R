@@ -161,14 +161,20 @@ visualize <- function(ref, incoming, col, mult=5, ...) {
 	invisible(NULL)
 }
 
-pdf(sprintf("pca_effect.pdf"), width=11, height=5)
-layout(cbind(1,2,3), widths=c(2, 2, 1))
+pdf("clust_effect.pdf", width=11, height=10)
+layout(rbind(rep(1:3, c(4,4,2)), rep(4:5, c(5,5))))
+opar <- par()$mar
+par(mar=c(5.1, 4.1, 2.1, 1.1))
 visualize(ref[[1]], pca.collected[[1]], col=colors, xlab="PC1", ylab="PC2", cex.axis=1.2, cex.lab=1.4)
+curcoords <- par()$usr
+mtext("a", line=0, cex=1.5, at=curcoords[1] - 0.12*(curcoords[2] - curcoords[1]), font=2)
+
 visualize(ref[[2]], pca.collected[[2]], col=colors, xlab="PC1", ylab="PC3", cex.axis=1.2, cex.lab=1.4)
+
 par(mar=c(5.1, 0.5, 4.1, 1.1))
 plot(0,0,type="n", axes=FALSE, xlab="", ylab="")
 legend("topleft", col=all.colors, pch=16, legend=levels(all.cells), cex=1.2)
-dev.off()
+par(mar=opar)
 
 #################################################################################
 # Euclidean clustering (identify bootstrap intervals, basically).
@@ -188,8 +194,8 @@ all.means <- unlist(all.means)
 all.stder <- unlist(all.stder)
 colors <- c("black", "red", "orange") 
 
-pdf("clusters.pdf", width=12, height=6)
-par(mfrow=c(1,2))
+par(mar=c(5.1, 4.1, 4.1, 3.1))
+
 all.colors <- colors[as.integer(origin)]
 plot(all.sizes, all.means, pch=16, col=all.colors, ylim=c(0, 1), ylab="Maximum Jaccard index", 
      xlab="Cluster size", cex.axis=1.2, cex.lab=1.4, cex=1.4, main="Effect of spike-in variability", cex.main=1.4)
@@ -198,10 +204,16 @@ segments(all.sizes, all.means, all.sizes, upper, col=all.colors)
 segments(all.sizes-2, upper, all.sizes+2, upper, col=all.colors)
 legend(max(all.sizes), 0, xjust=1, yjust=0, col=colors, legend=sprintf("k = %s", levels(origin)), pch=16, cex=1.4)
 
+curcoords <- par()$usr
+mtext("b", line=1, cex=1.5, at=curcoords[1] - 0.1*(curcoords[2] - curcoords[1]), font=2)
+
 # Comparing to an alternative clustering method.
 alt.jaccard <- compute.max.jaccard(ref.clust, alt.clust)
 plot(all.sizes, unlist(alt.jaccard), col=all.colors, ylim=c(0, 1), ylab="Maximum Jaccard index", 
      xlab="Cluster size", cex.axis=1.2, cex.lab=1.4, cex=1.4, pch=16, main="Effect of clustering algorithm", cex.main=1.4)
+
+curcoords <- par()$usr
+mtext("c", line=1, cex=1.5, at=curcoords[1] - 0.1*(curcoords[2] - curcoords[1]), font=2)
 dev.off()
 
 #################################################################################
