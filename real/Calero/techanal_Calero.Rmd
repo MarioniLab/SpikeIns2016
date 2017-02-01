@@ -8,7 +8,8 @@ output:
 ---
 
 ```{r, echo=FALSE, results='hide'}
-knitr::opts_chunk$set(fig.path="figure-tech/", error=FALSE)
+knitr::opts_chunk$set(fig.path="figure-tech/", error=FALSE, message=FALSE, warning=FALSE)
+options(width=100)
 ```
 
 # Introduction
@@ -40,8 +41,19 @@ premixed <- grepl("N7(09|10|11|12)", colnames(all.counts))
 spike.data <- setupSpikes(all.counts, spike1=is.ercc, spike2=is.sirv, 
     separate=ercc.first|sirv.first, premixed=premixed,
     ercc.first=ercc.first, sirv.first=sirv.first, induced=is.induced)
-spike.data$genes$mouse <- is.mouse
 colSums(data.frame(Induced=is.induced, ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
+```
+
+We also add some annotation describing which genes are endogenous, and whether they are mitochondrial.
+This may be useful in downstream analyses.
+
+```{r}
+spike.data$genes$mouse <- is.mouse
+library(TxDb.Mmusculus.UCSC.mm10.ensGene)
+chr.loc <- select(TxDb.Mmusculus.UCSC.mm10.ensGene, keys=rownames(spike.data), 
+    keytype="GENEID", column="CDSCHROM")
+chr.loc <- chr.loc$CDSCHROM[match(rownames(spike.data), chr.loc$GENEID)]
+spike.data$genes$is.mito <- chr.loc=="chrM" & !is.na(chr.loc)
 ```
 
 # Quality control
@@ -73,6 +85,7 @@ library(scran)
 keep <- !(isOutlier(mouse.sums, nmad=3, log=TRUE, type="lower") | 
           isOutlier(ercc.sums, nmad=3, log=TRUE, type="lower") | 
           isOutlier(sirv.sums, nmad=3, log=TRUE, type="lower"))
+all.data <- spike.data
 spike.data <- spike.data[,keep]
 sum(keep)
 ```
@@ -257,6 +270,7 @@ saveRDS(list(sfERCC.var=ercc.var, sfSIRV.var=sirv.var,
 We also save the object to file for downstream uses (e.g., plotting).
 
 ```{r}
-saveRDS(spike.data, file="techsaved.rds")
+saveRDS(spike.data, file="object.rds")
+saveRDS(all.data, file="full.rds")
 ```
 

@@ -27,33 +27,31 @@ for (datatype in c("calero", "islam")) {
 		grouping <- rep(c("ESC", "MEF", "Neg"), c(48, 44, 4))
 		
 		# Quality control on individual cells.
-		totals <- colSums(incoming)
 		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
         expvar <- data.frame(Group=grouping, stringsAsFactors=FALSE)
 		
 	} else if (datatype=="calero") {
-        incoming.1 <- read.table("../../real/Calero/trial_20160113/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 97)))
-        incoming.1 <- incoming.1[,-1]
-        incoming.2 <- read.table("../../real/Calero/trial_20160325/analysis/genic_counts.tsv", header=TRUE, row.names=1, colClasses=c('character', rep('integer', 97)))
-        incoming.2 <- incoming.2[,-1]
-        incoming <- cbind(incoming.1, incoming.2)
+        incoming.1 <- readRDS("../../real/Calero/trial_20160113/analysis/full.rds")
+        incoming.2 <- readRDS("../../real/Calero/trial_20160325/analysis/full.rds")
+        stopifnot(identical(rownames(incoming.1), rownames(incoming.2)))
+        incoming <- cbind(incoming.1$counts, incoming.2$counts)
+        gdata <- incoming.1$genes
 
-        incoming <- incoming[!grepl("SIRV", rownames(incoming)),] # Getting rid of SIRVs at this point.
-        spike.in <- grepl("^ERCC", rownames(incoming))
-        
-        # Getting metrics.
-        totals <- colSums(incoming)
-        library(TxDb.Mmusculus.UCSC.mm10.ensGene)
-        chr.loc <- select(TxDb.Mmusculus.UCSC.mm10.ensGene, keys=rownames(incoming), keytype="GENEID", column="CDSCHROM")
-        chr.loc <- chr.loc$CDSCHROM[match(rownames(incoming), chr.loc$GENEID)]
-        is.mito <- chr.loc=="chrM" & !is.na(chr.loc)
+        keep <- !gdata$spike2 # Using only the ERCCs as the spike-ins.
+        incoming <- incoming[keep,]
+        gdata <- gdata[keep,]
+        spike.in <- gdata$spike1 
+        is.mito <- gdata$is.mito       
 
         # Constructing the experimental design.        
         expvar <- data.frame(Batch=rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2))),
-                             Group=ifelse(grepl("S50[5-8]", colnames(incoming)), "Induced", "Control"), stringsAsFactors=FALSE)
+                             Group=ifelse(c(incoming.1$samples$induced, incoming.2$samples$induced), 
+                                          "Induced", "Control"), 
+                             stringsAsFactors=FALSE)
     }
     
     # Quality control on cells.
+    totals <- colSums(incoming)
     okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
         !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
         !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
