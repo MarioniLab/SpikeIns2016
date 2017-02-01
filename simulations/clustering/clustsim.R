@@ -141,8 +141,14 @@ for (i in seq(0,20)) {
 #################################################################################
 # Generating pretty plots.
 
-all.cells <- factor(my.cells)
-all.colors <- rainbow(nlevels(all.cells))
+ncell.types <- table(my.cells)
+all.cells <- my.cells
+all.cells[all.cells %in% names(ncell.types)[ncell.types < 10]] <- "other" # don't colour minor cell types.
+all.cells[grep("unclassified", all.cells)] <- "other" # or unknown cells, either.
+
+all.cells <- factor(all.cells)
+all.colors <- c(rainbow(nlevels(all.cells)-1), "grey30")
+all.colors[2] <- "orange"
 colors <- all.colors[as.integer(all.cells)]
 
 # Visualization command.
@@ -192,28 +198,33 @@ origin <- factor(rep(lengths(all.sizes), lengths(all.sizes)))
 all.sizes <- unlist(all.sizes)
 all.means <- unlist(all.means)
 all.stder <- unlist(all.stder)
-colors <- c("black", "red", "orange") 
+colors <- c("black", "grey30", "grey60")
+pch <- c(16, 17, 18)
 
 par(mar=c(5.1, 4.1, 4.1, 3.1))
 
 all.colors <- colors[as.integer(origin)]
-plot(all.sizes, all.means, pch=16, col=all.colors, ylim=c(0, 1), ylab="Maximum Jaccard index", 
-     xlab="Cluster size", cex.axis=1.2, cex.lab=1.4, cex=1.4, main="Effect of spike-in variability", cex.main=1.4)
+all.points <- pch[as.integer(origin)]
+plot(all.sizes, all.means, col=all.colors, ylim=c(0, 1), ylab="Maximum Jaccard index", 
+     xlab="Cluster size", cex.axis=1.3, cex.lab=1.5, cex=2, main="Effect of spike-in variability", 
+     cex.main=1.5, log="x", pch=all.points)
 upper <- all.means + all.stder 
 segments(all.sizes, all.means, all.sizes, upper, col=all.colors)
-segments(all.sizes-2, upper, all.sizes+2, upper, col=all.colors)
-legend(max(all.sizes), 0, xjust=1, yjust=0, col=colors, legend=sprintf("k = %s", levels(origin)), pch=16, cex=1.4)
+segments(all.sizes/1.1, upper, all.sizes*1.1, upper, col=all.colors)
 
+legend(max(all.sizes), 0, xjust=1, yjust=0, col=colors, legend=sprintf("k = %s", levels(origin)), 
+       pch=pch, pt.cex=2, cex=1.5)
 curcoords <- par()$usr
-mtext("b", line=1, cex=1.5, at=curcoords[1] - 0.1*(curcoords[2] - curcoords[1]), font=2)
+mtext("b", line=1, cex=1.5, at=10^(curcoords[1] - 0.1*(curcoords[2] - curcoords[1])), font=2)
 
 # Comparing to an alternative clustering method.
 alt.jaccard <- compute.max.jaccard(ref.clust, alt.clust)
 plot(all.sizes, unlist(alt.jaccard), col=all.colors, ylim=c(0, 1), ylab="Maximum Jaccard index", 
-     xlab="Cluster size", cex.axis=1.2, cex.lab=1.4, cex=1.4, pch=16, main="Effect of clustering algorithm", cex.main=1.4)
+     xlab="Cluster size", cex.axis=1.3, cex.lab=1.5, cex=2, main="Effect of clustering algorithm", 
+     cex.main=1.5, log="x", pch=all.points)
 
 curcoords <- par()$usr
-mtext("c", line=1, cex=1.5, at=curcoords[1] - 0.1*(curcoords[2] - curcoords[1]), font=2)
+mtext("c", line=1, cex=1.5, at=10^(curcoords[1] - 0.1*(curcoords[2] - curcoords[1])), font=2)
 dev.off()
 
 #################################################################################

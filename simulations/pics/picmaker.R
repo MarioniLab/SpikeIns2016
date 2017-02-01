@@ -27,7 +27,7 @@ spacing <- matrix(rep(c(0.2, 0), length(means)/2), ncol=2)
 spacing[1,1] <- 0
 spacing[1,2] <- 2
 
-all.cols <- c("blue4", "blue1", "brown4", "brown1")
+all.cols <- c("blue", "lightblue", "forestgreen", "lightgreen")
 out <- barplot(means, beside=TRUE, col=all.cols, ylab='Change in the DEG set (%)', 
                ylim=c(0, 8), cex.lab=1.4, cex.axis=1.2, cex.names=1.4, space=spacing)
 
@@ -76,7 +76,7 @@ spacing <- matrix(rep(c(0.2, 0), length(means)/2), ncol=2)
 spacing[1,1] <- 0
 spacing[1,2] <- 2
 
-all.cols <- c("blue4", "blue1", "darkgoldenrod4", "darkgoldenrod1", "cornsilk4", "cornsilk1")
+all.cols <- c("blue", "lightblue", "red", "pink", "darkgoldenrod1", "darkgoldenrod4")
 out <- barplot(means, beside=TRUE, col=all.cols, space=spacing,
     names.arg=c(expression("Brennecke et al. (CV"^2*")"), "Variance of log-expression"),
     ylab='Change in the HVG set (%)', ylim=c(0, 15), cex.lab=1.4, cex.axis=1.2, cex.names=1.4)

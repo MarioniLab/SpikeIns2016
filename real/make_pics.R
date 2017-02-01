@@ -1,8 +1,7 @@
 ###############################################################
 
 dir.create("pics")
-library(viridis)
-cols <- plasma(4)
+cols <- c("blue", "lightblue", "red", "pink")
 names <- c("416B (I)", "416B (II)", "Trophoblast (I)", "Trophoblast (II)")
 
 ###############################################################
@@ -42,10 +41,16 @@ for (operator in c("Calero", "Liora")) {
 
 pdf("pics/variance_exp.pdf", width=14, height=7)
 par(mar=c(5.1, 5.1, 2.1, 2.1), mfrow=c(1,2))
+
 final <- cbind(Separate=unlist(total), Premixed=unlist(premixed), Volume=unlist(volume))
 final.err <- cbind(Separate=unlist(total.err), Premixed=unlist(premixed.err), Volume=unlist(volume.err))
 upper.limit <- final  + final.err
-out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"), 
+spacing <- matrix(rep(c(0.2, 0), length(final)/2), ncol=3)
+spacing[1,1] <- 0
+spacing[1,2] <- 2
+spacing[1,3] <- 2
+
+out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"), space=spacing,
                cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, max(upper.limit)))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
@@ -56,8 +61,12 @@ mtext("a", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1])
 final <- cbind(ERCC=unlist(ERCC.sf), SIRV=unlist(SIRV.sf))
 final.err <- cbind(ERCC=unlist(ERCC.sf.err), SIRV=unlist(SIRV.sf.err))
 upper.limit <- final  + final.err
+spacing <- matrix(rep(c(0.2, 0), length(final)/2), ncol=2)
+spacing[1,1] <- 0
+spacing[1,2] <- 2
+
 out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"size factors"), 
-        cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, max(upper.limit)))
+        cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, max(upper.limit)), space=spacing)
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
 curcoords <- par()$usr
