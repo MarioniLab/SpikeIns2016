@@ -36,6 +36,7 @@ for (datatype in c("wilson", "calero", "liora")) {
                             ifelse(c(incoming.1$samples$induced, incoming.2$samples$induced), "Induced", "Control"))
         } else { 
             incoming.1 <- readRDS("../../real/Liora/test_20160906/analysis/full.rds")
+            incoming.1 <- incoming.1[,is.na(incoming.1$samples$control.well)]
             incoming <- cbind(incoming.1$counts)
             gdata <- incoming.1$genes
             block <- NULL

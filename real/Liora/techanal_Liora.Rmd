@@ -18,7 +18,7 @@ Here, we examine the variability of spike-in addition using the mixture experime
 First, we load the counts for all genes and define their categories, i.e., mouse cellular, ERCC or SIRV spike-ins.
 
 ```{r}
-all.counts <- read.table("genic_counts.tsv", header=TRUE, row.names=1)
+all.counts <- read.table("genic_counts.tsv", header=TRUE, row.names=1, comment="", check.names=FALSE)
 gene.lengths <- all.counts[,1]
 all.counts <- all.counts[,-1]
 is.ercc <- grepl("ERCC", rownames(all.counts))
@@ -34,9 +34,7 @@ Hence the need for the contortions below.)
 ```{r}
 manifest <- read.csv("manifest.csv", header=TRUE, stringsAsFactors=FALSE)
 metadata <- read.csv("metadata.csv", header=TRUE, stringsAsFactors=FALSE)
-num.ids <- sub("[^\\.]+\\.", "", colnames(all.counts))
-ref.ids <- sub(".*#", "", metadata[,4])
-metadata <-  metadata[match(num.ids, ref.ids),]
+metadata <-  metadata[match(colnames(all.counts), metadata[,4]),]
 manifest <- manifest[match(metadata$Sanger.sample.ID, manifest$SANGER.SAMPLE.ID),]
 well.ids <- sub(".*_", "", manifest$SUPPLIER.SAMPLE.NAME)
 stopifnot(all(!is.na(well.ids)))
