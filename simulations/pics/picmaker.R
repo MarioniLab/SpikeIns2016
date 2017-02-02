@@ -36,7 +36,7 @@ segments(out, means, out, means+stderrs)
 segments(out-0.2, means+stderrs, out+0.2, means+stderrs)
 
 legend(0, 8, fill=all.cols, cex=1.4, 
-        legend=c("416B (all DEGs)", "416B (top 200)", "mESC/MEF (all DE)", "mESC/MEF (top 200)")) 
+        legend=c("416B (all DEGs)", "416B (top 200)", "mESC (all DE)", "mESC (top 200)")) 
 
 curcoords <- par()$usr
 mtext("a", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1]), font=2)
@@ -76,7 +76,7 @@ spacing <- matrix(rep(c(0.2, 0), length(means)/2), ncol=2)
 spacing[1,1] <- 0
 spacing[1,2] <- 2
 
-all.cols <- c("blue", "lightblue", "red", "pink", "darkgoldenrod1", "darkgoldenrod4")
+all.cols <- c("blue", "lightblue", "red", "pink", "wheat4", "wheat")
 out <- barplot(means, beside=TRUE, col=all.cols, space=spacing,
     names.arg=c(expression("Brennecke et al. (CV"^2*")"), "Variance of log-expression"),
     ylab='Change in the HVG set (%)', ylim=c(0, 15), cex.lab=1.4, cex.axis=1.2, cex.names=1.4)
@@ -86,7 +86,7 @@ segments(out, means, out, means+stderrs)
 segments(out-0.2, means+stderrs, out+0.2, means+stderrs)
 
 legend("topright", fill=all.cols, legend=c("416B (all HVGs)", "416B (top 200)", 
-                                          "Trophoblast (all HVGs)", "Trophoblast (top 200)", 
+                                          "Tropho (all HVGs)", "Tropho (top 200)", 
                                           "HSC (all HVGs)", "HSC (top 200"), cex=1.4)
 
 curcoords <- par()$usr
