@@ -38,10 +38,15 @@ is.induced <- grepl("S50[5-8]", colnames(all.counts))
 ercc.first <- grepl("N70[1-4]", colnames(all.counts))
 sirv.first <- grepl("N70[5-8]", colnames(all.counts))
 premixed <- grepl("N7(09|10|11|12)", colnames(all.counts))
+colSums(data.frame(Induced=is.induced, ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
+```
+
+We proceed to make an object containing all of this information.
+
+```{r}
 spike.data <- setupSpikes(all.counts, spike1=is.ercc, spike2=is.sirv, 
     separate=ercc.first|sirv.first, premixed=premixed,
     ercc.first=ercc.first, sirv.first=sirv.first, induced=is.induced)
-colSums(data.frame(Induced=is.induced, ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
 ```
 
 We also add some annotation describing which genes are endogenous, and whether they are mitochondrial.
@@ -62,7 +67,7 @@ We examine the distribution of the sum of counts across all samples, in order to
 First, we compute the count sums for each category of genes.
 
 ```{r}
-mouse.sums <- colSums(all.counts[spike.data$genes$mouse,])
+mouse.sums <- colSums(spike.data$counts[spike.data$genes$mouse,])
 spike.data$samples$mouse <- mouse.sums
 ercc.sums <- spike.data$samples$sum1
 sirv.sums <- spike.data$samples$sum2
@@ -93,8 +98,8 @@ sum(keep)
 We check that the remaining libraries are distributed as expected along the induced/control groups for CBFB-MYH11-mcherry expression.
 
 ```{r}
-oncogene.cpm <- as.integer(all.counts["CBFB-MYH11-mcherry",])/colSums(all.counts) * 1e6
-by.cherry <- split(oncogene.cpm, ifelse(is.induced, "Induced", "Control"))
+oncogene.cpm <- edgeR::cpm(spike.data)["CBFB-MYH11-mcherry",]
+by.cherry <- split(oncogene.cpm, ifelse(spike.data$samples$induced, "Induced", "Control"))
 boxplot(by.cherry, log="y", ylab="Oncogene CPM")
 ```
 
@@ -208,10 +213,10 @@ Otherwise, the technical component of the variance will be different between the
 Fortunately, this seems to be the case here, so we can proceed safely.
 
 ```{r}
-summary(sirv.sums[premixed])
-summary(sirv.sums[!premixed])
-summary(ercc.sums[premixed])
-summary(ercc.sums[!premixed])
+summary(spike.data$samples$sum1[spike.data$samples$premixed]) # ERCC, premixed
+summary(spike.data$samples$sum1[!spike.data$samples$premixed]) # ERCC, separate
+summary(spike.data$samples$sum2[spike.data$samples$premixed]) # SIRV, premixed
+summary(spike.data$samples$sum2[!spike.data$samples$premixed]) # SIRV, separate
 ```
 
 <!--

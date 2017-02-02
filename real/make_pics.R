@@ -1,8 +1,8 @@
 ###############################################################
 
 dir.create("pics")
-cols <- c("blue", "lightblue", "red", "pink")
-names <- c("416B (I)", "416B (II)", "Trophoblast (I)", "Trophoblast (II)")
+cols <- c("orange", "purple", "grey80")
+names <- c("416B (I)", "416B (II)", "Tropho (I)", "Tropho (II)")
 
 ###############################################################
 # Making a barplot of the variance estimates.
@@ -42,47 +42,45 @@ for (operator in c("Calero", "Liora")) {
 pdf("pics/variance_exp.pdf", width=14, height=7)
 par(mar=c(5.1, 5.1, 2.1, 2.1), mfrow=c(1,2))
 
-final <- cbind(Separate=unlist(total), Premixed=unlist(premixed), Volume=unlist(volume))
-final.err <- cbind(Separate=unlist(total.err), Premixed=unlist(premixed.err), Volume=unlist(volume.err))
+final <- rbind(Separate=unlist(total), Premixed=unlist(premixed), Volume=unlist(volume))
+colnames(final) <- names
+final.err <- rbind(Separate=unlist(total.err), Premixed=unlist(premixed.err), Volume=unlist(volume.err))
 upper.limit <- final  + final.err
-spacing <- matrix(rep(c(0.2, 0), length(final)/2), ncol=3)
-spacing[1,1] <- 0
-spacing[1,2] <- 2
-spacing[1,3] <- 2
 
-out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"), space=spacing,
+out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"), 
                cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, max(upper.limit)))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
-legend("topright", fill=cols, names, cex=1.2)
+legend("topright", fill=cols, rownames(final), cex=1.2)
 curcoords <- par()$usr
 mtext("a", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1]), font=2)
 
-final <- cbind(ERCC=unlist(ERCC.sf), SIRV=unlist(SIRV.sf))
-final.err <- cbind(ERCC=unlist(ERCC.sf.err), SIRV=unlist(SIRV.sf.err))
+final <- rbind(ERCC=unlist(ERCC.sf), SIRV=unlist(SIRV.sf))
+colnames(final) <- names
+final.err <- rbind(ERCC=unlist(ERCC.sf.err), SIRV=unlist(SIRV.sf.err))
 upper.limit <- final  + final.err
-spacing <- matrix(rep(c(0.2, 0), length(final)/2), ncol=2)
-spacing[1,1] <- 0
-spacing[1,2] <- 2
 
+my.cols <- c("grey30", "grey70")
 out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"size factors"), 
-        cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, max(upper.limit)), space=spacing)
+        cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=my.cols, ylim=c(0, max(upper.limit)))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
+legend("topright", fill=my.cols, rownames(final), cex=1.2)
 curcoords <- par()$usr
 mtext("b", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1]), font=2)
 dev.off()
 
 pdf("pics/variance_order.pdf", width=9, height=7)
 par(mar=c(5.1, 5.1, 2.1, 10.1), xpd=TRUE)
-final <- cbind("ERCC+SIRV"=unlist(ERCC.first), "SIRV+ERCC"=unlist(SIRV.first))
-final.err <- cbind("ERCC+SIRV"=unlist(ERCC.first.err), "SIRV+ERCC"=unlist(SIRV.first.err))
+final <- rbind("ERCC+SIRV"=unlist(ERCC.first), "SIRV+ERCC"=unlist(SIRV.first))
+colnames(final) <- names
+final.err <- rbind("ERCC+SIRV"=unlist(ERCC.first.err), "SIRV+ERCC"=unlist(SIRV.first.err))
 upper.limit <- final  + final.err
 out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"), 
-               cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, max(upper.limit)))
+               cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=my.cols, ylim=c(0, max(upper.limit)))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
-legend(max(out)+0.5, max(final), fill=cols, names, cex=1.2)
+legend(max(out)+0.5, max(final), fill=my.cols, rownames(final), cex=1.2)
 dev.off()
 
 ###############################################################
@@ -136,15 +134,16 @@ for (index in seq_along(separate)) {
     ylim <- pmax(ylim, abs(range(out$y)))
 }
 
+qq.cols <- c("blue", "lightblue", "red", "pink")
 plot(0,0,type="n", xlim=c(-xlim[1], xlim[2]), ylim=c(-ylim[1], ylim[2]), main="Separate addition", cex.main=1.4, 
      xlab="Theoretical quantiles", ylab="Sample quantiles", cex.axis=1.2, cex.lab=1.4)
 abline(a=0, b=1, col="grey", lwd=2, lty=2)
 for (index in seq_along(collected)) {
     out <- collected[[index]]
-    points(out$x, out$y, col=cols[index], pch=16)
-    lines(out$x, out$y, col=cols[index], lwd=2)
+    points(out$x, out$y, col=qq.cols[index], pch=16)
+    lines(out$x, out$y, col=qq.cols[index], lwd=2)
 }
-legend("bottomright", col=cols, lwd=2, pch=16, legend=names, cex=1.2)
+legend("bottomright", col=qq.cols, lwd=2, pch=16, legend=names, cex=1.2)
 dev.off()
 
 pdf("pics/qq_premixed.pdf")
@@ -164,8 +163,8 @@ plot(0,0,type="n", xlim=c(-xlim[1], xlim[2]), ylim=c(-ylim[1], ylim[2]), main="P
 abline(a=0, b=1, col="grey", lwd=2, lty=2)
 for (index in seq_along(collected)) {
     out <- collected[[index]]
-    points(out$x, out$y, col=cols[index], pch=16)
-    lines(out$x, out$y, col=cols[index], lwd=2)
+    points(out$x, out$y, col=qq.cols[index], pch=16)
+    lines(out$x, out$y, col=qq.cols[index], lwd=2)
 }
 dev.off()
 
@@ -193,7 +192,7 @@ for (operator in c("Calero", "Liora")) {
 }
 
 pdf("pics/total_ercc.pdf")
-my.cols <- c("grey50", "grey80")
+my.cols <- cols[1:2]
 boxplot(erccs, at=rep(c(-0.5, 0.5), 4) + rep(1:4*3, each=2), xaxt="n", log="y", ylab="Total ERCC read count",
         col=rep(my.cols, 4), cex.axis=1.2, cex.lab=1.4)
 axis(1, at=1:4*3, names, cex.axis=1.1)
@@ -201,7 +200,6 @@ legend("topright", fill=my.cols, legend=c("Separate", "Premixed"), cex=1.2)
 dev.off()
 
 pdf("pics/total_sirv.pdf")
-my.cols <- c("grey50", "grey80")
 boxplot(erccs, at=rep(c(-0.5, 0.5), 4) + rep(1:4*3, each=2), xaxt="n", log="y", ylab="Total SIRV read count",
         col=rep(my.cols, 4), cex.axis=1.2, cex.lab=1.4)
 axis(1, at=1:4*3, names, cex.axis=1.1)
