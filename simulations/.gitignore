@@ -1,0 +1,11 @@
+*.Rout
+*.Rout.save
+*.err
+*.out
+*.tsv
+*.txt
+*.pdf
+
+clustering/pancreas_refseq_rpkms_counts_3514sc.txt.gz
+diffexp/GSE29087_L139_expression_tab.txt.gz
+variance/GSE61533_HTSEQ_count_results.tsv.gz

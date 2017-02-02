@@ -1,0 +1,9 @@
+*.html
+*.md
+*.Rout
+*.tsv
+*.err
+*.out
+*.rds
+figure-*/
+ArrayExpress/*.sh
