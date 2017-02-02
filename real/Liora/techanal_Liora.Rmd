@@ -39,23 +39,15 @@ ref.ids <- sub(".*#", "", metadata[,4])
 metadata <-  metadata[match(num.ids, ref.ids),]
 manifest <- manifest[match(metadata$Sanger.sample.ID, manifest$SANGER.SAMPLE.ID),]
 well.ids <- sub(".*_", "", manifest$SUPPLIER.SAMPLE.NAME)
-write.table(file="wellID.tsv", data.frame(Colnames=colnames(all.counts), Sample=num.ids, Well=well.ids), 
-    sep="\t", row.names=FALSE, quote=FALSE)
-colnames(all.counts) <- well.ids
+stopifnot(all(!is.na(well.ids)))
 ```
 
-We check the positive and negative controls.
-The positive control at A01 uses 50 cells which should suppress the coverage of the spike-in transcripts (assuming that library quantification was performed).
-In contrast, the negative control at H12 uses no cells, which means that the spike-ins will dominate the sequencing output for that library.
-We remove these prior to further analyses.
+The positive control is at A1 (50 cells), while the negative control is at H12 (no cells).
 
 ```{r}
-data.frame(Mouse=sum(all.counts[is.mouse,"A01"]), 
-    ERCC=sum(all.counts[is.ercc,"A01"]), SIRV=sum(all.counts[is.sirv,"A01"]))
-data.frame(Mouse=sum(all.counts[is.mouse,"H12"]), 
-    ERCC=sum(all.counts[is.ercc,"H12"]), SIRV=sum(all.counts[is.sirv,"H12"]))
-discard <- is.na(well.ids) | well.ids %in% c("A01", "H12") 
-all.counts <- all.counts[,!discard]
+control.type <- rep(NA, length(well.ids))
+control.type[well.ids=="A01"] <- "+"
+control.type[well.ids=="H12"] <- "-"
 ```
 
 We also define the grouping for each sample. 
@@ -65,13 +57,19 @@ The second factor is how the spike-ins have been added -- ERCCs followed by SIRV
 
 ```{r, message=FALSE}
 library(simpaler)
-ercc.first <- grepl("[A-Z]0[1234]", colnames(all.counts))
-sirv.first <- grepl("[A-Z]0[5678]", colnames(all.counts))
-premixed <- grepl("[A-Z](09|10|11|12)", colnames(all.counts))
+ercc.first <- grepl("[A-Z]0[1234]", well.ids) 
+sirv.first <- grepl("[A-Z]0[5678]", well.ids)
+premixed <- grepl("[A-Z](09|10|11|12)", well.ids) 
+colSums(data.frame(ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
+```
+
+Now we add all this information together.
+
+```{r}
 spike.data <- setupSpikes(all.counts, spike1=is.ercc, spike2=is.sirv, 
     separate=ercc.first|sirv.first, premixed=premixed,
-    ercc.first=ercc.first, sirv.first=sirv.first)
-colSums(data.frame(ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
+    ercc.first=ercc.first, sirv.first=sirv.first, 
+    well.ids=well.ids, control.well=control.type)
 ```
 
 We also add some annotation describing which genes are endogenous, and whether they are mitochondrial.
@@ -88,11 +86,33 @@ spike.data$genes$is.mito <- chr.loc=="chrM" & !is.na(chr.loc)
 
 # Quality control
 
+First we save the full data set for future use.
+
+```{r}
+all.data <- spike.data
+```
+
+We check the positive and negative controls.
+The positive control should be sequenced at the least, and the abundance of endogenous RNA should suppress spike-in coverage (assuming that library quantification was performed).
+In contrast, the negative control at H12 uses no cells, which means that the spike-ins will dominate the sequencing output for that library.
+
+```{r}
+poscon <- which(spike.data$samples$control.well=="+")
+data.frame(Mouse=sum(spike.data$counts[is.mouse,poscon]), 
+    ERCC=sum(spike.data$counts[is.ercc,poscon]), 
+    SIRV=sum(spike.data$counts[is.sirv,poscon]))
+negcon <- which(spike.data$samples$control.well=="-")
+data.frame(Mouse=sum(spike.data$counts[is.mouse,negcon]), 
+    ERCC=sum(spike.data$counts[is.ercc,negcon]), 
+    SIRV=sum(spike.data$counts[is.sirv,negcon]))
+spike.data <- spike.data[,-c(poscon, negcon)]
+```
+
 We examine the distribution of the sum of counts across all samples, in order to identify samples for which cell capture or library preparation have failed.
 First, we compute the count sums for each category of genes.
 
 ```{r}
-mouse.sums <- colSums(all.counts[spike.data$genes$mouse,])
+mouse.sums <- colSums(spike.data$counts[spike.data$genes$mouse,])
 spike.data$samples$mouse <- mouse.sums
 ercc.sums <- spike.data$samples$sum1
 sirv.sums <- spike.data$samples$sum2
@@ -114,9 +134,8 @@ We remove libraries with outliers in any of the count sums.
 library(scran)
 keep <- !(isOutlier(mouse.sums, nmad=3, log=TRUE, type="lower") | 
           isOutlier(ercc.sums, nmad=3, log=TRUE, type="lower") | 
-          isOutlier(sirv.sums, nmad=3, log=TRUE, type="lower"))
-all.data <- spike.data
-spike.data <- spike.data[,keep]
+          isOutlier(sirv.sums, nmad=3, log=TRUE, type="lower")) 
+spike.data <- spike.data[,keep ]
 sum(keep)
 ```
 
@@ -216,10 +235,10 @@ Otherwise, the technical component of the variance will be different between the
 Fortunately, this seems to be the case here, so we can proceed safely.
 
 ```{r}
-summary(sirv.sums[premixed])
-summary(sirv.sums[!premixed])
-summary(ercc.sums[premixed])
-summary(ercc.sums[!premixed])
+summary(spike.data$samples$sum1[spike.data$samples$premixed]) # ERCC, premixed
+summary(spike.data$samples$sum1[!spike.data$samples$premixed]) # ERCC, separate
+summary(spike.data$samples$sum2[spike.data$samples$premixed]) # SIRV, premixed
+summary(spike.data$samples$sum2[!spike.data$samples$premixed]) # SIRV, separate
 ```
 
 <!--
