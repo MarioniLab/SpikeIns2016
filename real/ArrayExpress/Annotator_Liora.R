@@ -1,19 +1,19 @@
 ########################################################################################
-# Print out important bits from the metadata for Fernando's lot.
+# Print out important bits from the metadata for Liora's lot.
 
 collected <- list()
-fpath <- "/run/user/1753941046/gvfs/smb-share:server=jmlab-data,share=jmlab/group_folders/lun01/Internal/SpikeIns"
+fpath <- "../Liora"
 relink <- "make_links_Liora.sh"
 write(file=relink, c("set -e", "set -u", "mkdir fastq_Liora"), ncol=1)
 
-for (sample in c("Liora/test_20160906")) {# "Liora/test_20170201")) {
-    cpath <- file.path("..", sample, "analysis", "genic_counts.tsv")
+for (sample in c("test_20160906")) {# "test_20170201")) {
+    cpath <- file.path(fpath, sample, "analysis", "genic_counts.tsv")
     all.files <- read.table(cpath, nrows=1, stringsAsFactor=FALSE, comment="")
     prefixes <- as.character(all.files[-c(1:2)])
     batch <- sub(".*_", "", basename(sample))
 
     # Loading in the corresponding object.
-    full.obj <- readRDS(file.path("..", sample, "analysis", "full.rds"))
+    full.obj <- readRDS(file.path(fpath, sample, "analysis", "full.rds"))
     m <- match(prefixes, colnames(full.obj))
     full.obj <- full.obj[,m]
 
@@ -28,26 +28,25 @@ for (sample in c("Liora/test_20160906")) {# "Liora/test_20170201")) {
     well.type[full.obj$samples$control=="-"] <- "empty"
 
     # Adding in the MD5 sums.
-    fnames <- paste0(prefixes, ".fq.gz")
-#    md5.sums <- read.table(file.path(fpath, sample, "fastq", "md5.all"),
-#                           header=FALSE, stringsAsFactor=FALSE)
-#    m <- match(fnames, md5.sums[,2])
-#    md5.sums <- md5.sums[m,1]
-    md5.sums <- rep("XXXXXXX", length(fnames))
+    md5.sums <- read.table(file.path(fpath, sample, "fastq", "md5.all"),
+                           header=FALSE, stringsAsFactor=FALSE, comment="")
+    m <- match(sub("_[12].fq.gz$", "", md5.sums[,2]), prefixes)
 
     # Creating links to files.
-#    curpath <- file.path(fpath, sample, "fastq")
-#    chosen <- list.files(curpath, pattern="fq.gz$")
-#    write(file=relink, paste0("ln -s ", file.path(curpath, chosen), " ", file.path("fastq", chosen)), append=TRUE, ncol=1)
+    curpath <- file.path(fpath, sample, "fastq")
+    chosen <- list.files(curpath, pattern="fq.gz$")
+    write(file=relink, paste0("ln -s ", file.path(curpath, chosen), " ", file.path("fastq", chosen)), append=TRUE, ncol=1)
     new.count.file <- paste0("counts_Liora_", batch, ".tsv")
-#    write(file=relink, paste0("ln -s ", normalizePath(cpath), " ", file.path("fastq", new.count.file)), append=TRUE, ncol=1)
+    write(file=relink, paste0("ln -s ", normalizePath(cpath), " ", file.path("fastq", new.count.file)), append=TRUE, ncol=1)
 
-    collected[[sample]] <- data.frame(Sample=prefixes, Batch=batch, Addition=addition.mode, Treatment=treatment, 
-                                      Well=well.type, File=fnames, MD5=md5.sums, Counts=new.count.file)
+    out <- data.frame(Sample=prefixes, Batch=batch, Addition=addition.mode, Treatment=treatment, 
+                      Well=well.type, Counts=new.count.file)[m,]
+    out$File <- md5.sums[,2]
+    out$MD5 <- md5.sums[,1]
+    collected[[sample]] <- out 
 }
 
 collected <- do.call(rbind, collected)
-
 
 output <- list()
 output[["Source Name"]] <- collected$Sample
@@ -86,5 +85,4 @@ output[["Factor Value[treatment]"]] <- collected$Treatment
 output$check.names <- FALSE
 sdrf <- do.call(data.frame, output)
 write.table(file="sdrf_Liora.tsv", sdrf, row.names=FALSE, sep="\t", quote=FALSE)
-
 
