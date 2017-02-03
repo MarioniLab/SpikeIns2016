@@ -4,7 +4,7 @@
 collected <- list()
 fpath <- "/run/user/1753941046/gvfs/smb-share:server=jmlab-data,share=jmlab/group_folders/lun01/Internal/SpikeIns"
 relink <- "make_links_Calero.sh"
-write(file=relink, c("set -e", "set -u", "mkdir fastq"), ncol=1)
+write(file=relink, c("set -e", "set -u", "mkdir fastq_Calero"), ncol=1)
 
 
 for (sample in c("Calero/trial_20160113", "Calero/trial_20160325")) {
@@ -36,7 +36,7 @@ for (sample in c("Calero/trial_20160113", "Calero/trial_20160325")) {
     curpath <- file.path(fpath, sample, "fastq")
     chosen <- list.files(curpath, pattern="fq.gz$")
     write(file=relink, paste0("ln -s ", file.path(curpath, chosen), " ", file.path("fastq", chosen)), append=TRUE, ncol=1)
-    new.count.file <- paste0("genic_counts_", batch, ".tsv")
+    new.count.file <- paste0("counts_Calero_", batch, ".tsv")
     write(file=relink, paste0("ln -s ", normalizePath(cpath), " ", file.path("fastq", new.count.file)), append=TRUE, ncol=1)
 
     collected[[sample]] <- data.frame(Sample=prefixes, Batch=batch, Addition=addition.mode, Treatment=treatment,
@@ -74,6 +74,7 @@ output[["Array Data File"]] <- collected$File
 output[["Protocol REF"]] <- "Assigning reads to genes"
 output[["Derived Array Data File"]] <- collected$Counts
 output[["Comment[MD5]"]] <- collected$MD5
+output[["Characteristics[single cell well quality]"]] <- "single cell"
 output[["Factor Value[spike-in addition]"]] <- collected$Addition
 output[["Factor Value[treatment]"]] <- collected$Treatment
 
