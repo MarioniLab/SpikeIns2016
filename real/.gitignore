@@ -7,3 +7,9 @@
 *.rds
 figure-*/
 ArrayExpress/*.sh
+
+bam/
+fastq/
+logs/
+cram/
+qual/
