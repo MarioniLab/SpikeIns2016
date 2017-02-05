@@ -89,9 +89,8 @@ In typical experiments, $L_i$ is effectively independent of $V_{is}$ and $R_{is}
 This is because the denominator of the above expression is dominated by the vastly larger number of cDNA fragments from the set of endogenous transcripts.
 
 The error term $\varepsilon_{is}$ describes variance due to sequencing noise and variability during library preparation.
-Its variance is set to $\sigma^2_{lib(s)}$, which implicitly assumes that there is no dependence on the mean of $T_{is}$.
-This assumption is unlikely to be true because strong mean-variance relationships are often observed in count data from sequencing experiments \cite{law2014voom}.
-However, the distribution of $T_{is}$ is similar between separate-addition and premixed-addition wells within each plate (Supplementary Figure~\ref{fig:totals}).
+Its variance is set to $\sigma^2_{lib(s)}$, which implicitly assumes that there is no relationship between the variance and the mean of $T_{is}$.
+However, we note that the distribution of $T_{is}$ is similar between separate-addition and premixed-addition wells within each plate (Supplementary Figure~\ref{fig:totals}).
 If the mean of $T_{is}$ does not change, neither will the value of $\sigma^2_{lib(s)}$, regardless of the nature of the mean-variance relationship. 
 This suggests that $\sigma^2_{lib(s)}$ will not change between $\variance(\theta_i)$ and $\variance(\theta^*_i)$, allowing calculation of $\sigma^2_{vol}$ from their difference.
 
@@ -211,7 +210,7 @@ The value of $\mbox{var}(\theta_i')$ can also be treated as an upper bound for $
 \section{Implementation details for the downstream analyses}
 
 \subsection{Data pre-processing}
-Quality control was performed by removing libraries with outlier values for various quality metrics \cite{lun2016step}, including 
+Quality control was performed by removing libraries with outlier values for various quality metrics \cite{lun2016stepbystep}, including 
 the log-transformed total read count across all genes and the log-transformed total number of expressed genes, where small outliers were removed; 
 and the proportion of reads mapped to spike-in transcripts or mitochondrial genes, where large outliers were removed.
 Outlier values were defined as those that were more than three median absolute deviations away from the median value in the specified direction.
@@ -247,7 +246,7 @@ We do \textit{not} compute separate size factors for the endogenous genes and sp
 The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package with min.bio.disp set to zero.
 If blocking factors were present, they were regressed out by applying the removeBatchEffect function from the limma package to the counts, prior to using technicalCV2.
 
-The second approach to detect HVGs was based on computing the variance of log-expression values \cite{lun2016step}.
+The second approach to detect HVGs was based on computing the variance of log-expression values \cite{lun2016stepbystep}.
 For each count in each library, a normalized log-expression value was defined as the log-ratio of the count with the spike-in size factor for that library.
 (A pseudo-count of 1 was added prior to log-transformation to avoid undefined values).
 The variance of log-expression was computed across all cells for each spike-in transcript.
@@ -261,7 +260,7 @@ Spike-in size factors were defined from the spike-in totals as previously descri
 HVG detection was performed using the variance-of-log-expression method, where HVGs were defined as genes detected at a FDR of 5\% and with biological components above 0.5.
 PCA was performed on the normalized log-expression values of the HVGs, using the prcomp function from the stats package with scaling and centring.
 The first two PCs were used as the coordinates for each cell in one PCA plot, while the first and third PCs were used as the coordinates in another plot.
-Each point was coloured according to its annotated cell type \cite{someone}.
+Each point was coloured according to its annotated cell type \cite{segerstople2016single}.
 
 The procedure above was repeated at each simulation iteration with new spike-in counts.
 Coordinates of all cells in each simulated PCA plot were mapped onto the original plot.

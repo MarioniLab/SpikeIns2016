@@ -213,7 +213,7 @@ This suggests that $F_i$ will include some of the differences in behaviour betwe
 \subsection{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
-This included public data sets \cite{someone,islam2011characterization,wilson2015combined} as well as our 416B and trophoblast data.
+This included public data sets \cite{segerstople2016single,islam2011characterization,wilson2015combined} as well as our 416B and trophoblast data.
 We then performed analyses such as detection of differentially expressed genes (DEGs) and highly variable genes (HVGs), as well as dimensionality reduction and clustering of cells.
 This was done without any modification of the data, yielding a set of original results.
 
@@ -262,7 +262,7 @@ Thus, spike-in variability does not appear to affect the visual interpretation o
         \includegraphics[width=\textwidth]{../simulations/clustering/clust_effect.pdf}
     \end{center}
     \caption{Effect of spike-in variability on dimensionality reduction and clustering in simulated data.
-        (a) PCA plots of the first three principal components, where each cell is coloured according to the annotated cell type in the original study \cite{someone}.
+        (a) PCA plots of the first three principal components, where each cell is coloured according to the annotated cell type in the original study \cite{segerstople2016single}.
         The circle around each cell contains 95\% of remapped locations across the simulation iterations, and represents the deviation due to spike-in variability.
         (b) Clusters were identified from the original data by hierarchical clustering with Ward's criterion, followed by a tree cut with $k$ of 2, 5 or 10.
         This was repeated at each simulation iteration, and the maximum Jaccard index of each original cluster to any of the simulated clusters at the same $k$ was computed.
@@ -388,7 +388,7 @@ The proportion of HVGs common to both the original and simulated sets was comput
 This was repeated for 20 simulation iterations, and the average proportion across iterations was reported for each method.
 
 \subsection{Evaluating dimensionality reduction and clustering}
-Count data from a study of pancreatic islet cells \cite{someone} was obtained from ArrayExpress under the acession E-MTAB-5061.
+Count data from a study of pancreatic islet cells \cite{segerstople2016single} was obtained from ArrayExpress under the acession E-MTAB-5061.
 Spike-in normalization was performed and a set of HVGs was defined using the variance-of-log-expression method.
 PCA plots of the first three components were constructed from the matrix of log-expression values for the HVGs.
 This process -- including HVG detection -- was repeated with the simulated data after introducing spike-in variability.
