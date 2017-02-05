@@ -108,7 +108,7 @@ This ensures that there is no well-to-well variability in the relative quantitie
 The variance of the log-ratio across these premixed-addition wells provides a baseline level of variability in the protocol (e.g., due to sequencing noise).
 The variance of volume addition was then estimated as the difference in the variance estimates from the premixed-addition wells and from the wells with separate addition of spike-ins.
 
-We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects \cite{hicks2015widespread,tung2016}.
+We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects \cite{hicks2015widespread,tung2016batch}.
 For the separate-addition experiment, we also reversed the order of addition of the two spike-in sets to determine if this affected the variance estimate.
 Finally, we generated data from replicate plates to ensure our results were reproducible.
 This was done in a range of conditions, i.e., using different cells, by different operators and with sequencing by different machines and centres.
@@ -213,7 +213,7 @@ This suggests that $F_i$ will include some of the differences in behaviour betwe
 \subsection{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
-This included public data sets \cite{someone,islam2011characterisation,wilson2015combined} as well as our 416B and trophoblast data.
+This included public data sets \cite{someone,islam2011characterization,wilson2015combined} as well as our 416B and trophoblast data.
 We then performed analyses such as detection of differentially expressed genes (DEGs) and highly variable genes (HVGs), as well as dimensionality reduction and clustering of cells.
 This was done without any modification of the data, yielding a set of original results.
 
@@ -225,10 +225,10 @@ Any changes indicate that the analysis is sensitive to spike-in variability in r
 The advantage of this approach is that only the spike-in counts are modified.
 Counts for endogenous genes were used directly without modification, ensuring that the simulations are realistic.
 
-For DEG detection, we applied edgeR \cite{robinson2010edgeR} and MAST \cite{finak2014mast} to the original and simulated data after spike-in normalization.
+For DEG detection, we applied edgeR \cite{robinson2010edgeR} and MAST \cite{finak2015mast} to the original and simulated data after spike-in normalization.
 We observed only minor (below 5\%) changes to the set of significant DEGs from either method upon introducing spike-in variability in each data set (Figure~\ref{fig:setchange}a). 
 Small changes were also observed in the top 200 DEGs with the smallest $p$-values.
-For HVG detection, we applied methods based on the coefficient of variation \cite{brennecke2014technical} or on the variance of log-expression values \cite{lun2016step}.
+For HVG detection, we applied methods based on the coefficient of variation \cite{brennecke2013accounting} or on the variance of log-expression values \cite{lun2016stepbystep}.
 Again, only minor changes were observed in most data sets (Figure~\ref{fig:setchange}b), for both the set of significant HVGs and for the top 200 HVGs with the smallest $p$-values.
 These results suggest that the detection and ranking of DEGs and HVGs are largely robust to variability in spike-in volume or behaviour.
 
@@ -239,7 +239,7 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
     \caption{Effect of spike-in variability on DEG or HVG detection in simulated data.
         (a) The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
         This was also calculated for the top set of 200 DEGs with the smallest $p$-values.
-        Simulations were designed to test for differential expression between mouse embryonic stem cells (mESCs) and fibroblasts (MEFs) \cite{islam2011characterisation},
+        Simulations were designed to test for differential expression between mouse embryonic stem cells (mESCs) and fibroblasts (MEFs) \cite{islam2011characterization},
         or before and after induction of the CBFB-MYH11 oncogene in our 416B data set.
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
         by the Brennecke \textit{et al.} method using the squared coefficient of variation (CV$^2$) or by the variance of log-expression.
@@ -251,7 +251,7 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
 \end{figure}
 
 For dimensionality reduction, we restricted ourselves to principal components analysis (PCA) on the normalized expression profiles of all cells. 
-While $t$-distributed stochastic neighbour embedding \cite{vanhinton2008tsne} is commonly used, its robustness is difficult to evaluate due to its randomness.
+While $t$-distributed stochastic neighbour embedding \cite{van2008visualizing} is commonly used, its robustness is difficult to evaluate due to its randomness.
 We generated PCA plots of the first three principal components using both the original and simulated data.
 At each simulation iteration, coordinates of all cells in the simulated plots were mapped onto the corresponding original plots to determine the sensitivity of the original locations to spike-in variability.
 Figure~\ref{fig:dimclust}a indicates that changes in the location of each cell across simulation iterations were generally minor.
@@ -378,11 +378,11 @@ Three data sets were used to test the effect of spike-in variability on HVG dete
 This included the 416B and trophoblast data sets generated previously.
 In the former, blocking was performed to remove plate- and treatment-specific effects on mean expression, i.e., HVGs were detected within treatment conditions on each plate.
 Similarly, blocking was performed on the plate of origin for each cell in the trophoblast data set to remove plate effects.
-The final data set was obtained from NCBI GEO under the accession number GSE61533 and contained a single plate of haematopoietic stem cells \cite{wilson2016 combined}.
+The final data set was obtained from NCBI GEO under the accession number GSE61533 and contained a single plate of haematopoietic stem cells \cite{wilson2015combined}.
 
 In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-ins (see Section~Y in the Supplementary Materials for implementation details of each method).
 The first approach is based on the method of Brennecke \textit{et al.} \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
-The second approach is based on the variance of the log-normalized expression values \cite{lun2016step}, which provides some more robustness against outlier expression patterns.
+The second approach is based on the variance of the log-normalized expression values \cite{lun2016stepbystep}, which provides some more robustness against outlier expression patterns.
 Each method was applied on the original and simulated data, and a set of significant HVGs was detected at a FDR of 5\%.
 The proportion of HVGs common to both the original and simulated sets was computed, along with the common proportion among the top 200 genes with the lowest $p$-values.
 This was repeated for 20 simulation iterations, and the average proportion across iterations was reported for each method.
