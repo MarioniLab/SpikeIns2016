@@ -130,19 +130,25 @@ We used a protocol based on microtiter plates rather than microfluidics as it is
 Our experimental design requires two separate additions of spike-in RNA to each reaction (see Methods).
 This is not straightforward to achieve on, say, the Fluidigm C1 chip where the added volume for each reagent depends on the design on the reaction chamber.
 Plate-based protocols also tend to be cheaper and are compatible with existing laboratory techniques such as indexed fluorescently-activated cell sorting (FACS).
-Thus, we focus on normalization of data from plate-based protocols, to reflect their increasing use in single-cell studies (CITE).
+Thus, we focus on normalization of data from plate-based protocols, reflecting their widespread use in single-cell studies \cite{segerstople2016single,islam2011characterization,wilson2015combined}.
 
 \subsection{Estimating the variance of volume addition}
-Denote the log$_2$-transformed total count for well $i$ and spike-in set $s$ as
+Denote the log$_2$-transformed total read count for well $i$ and spike-in set $s$ as
 \[
 T_{is} = \log_2 \left[ L_i l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right] + \varepsilon_{is}
 \]
-where $c_{t_s}$ is a constant specifying the concentration (in terms of transcripts per unit of volume) of each spike-in transcript $t_s$;
-$r_{t_s}$ is a constant specifying the optimal transcript molecule-to-cDNA fragment capture rate for $t_s$;
-$R_{is}$ is a random variable representing the average capture efficiency in well $i$ for all transcripts in set $s$;
-$V_{is}$ is a random variable representing the volume of solution of $s$ added to $i$;
-$L_i$ is a random variable representing the cDNA fragment-to-read conversion rate for $i$, scaled by a constant $l_s$ representing the ``sequenceability'' of transcripts in $s$;
-and $\varepsilon_{is}$ is the error term attributable to sequencing noise and variability in library preparation, where $E(\varepsilon_{is})=0$ and $\variance(\varepsilon_{is})= \sigma^2_{lib(s)}$.
+where the sum is taken over all unique transcripts $t_s$ in $s$.
+The other terms are defined as follows:
+\begin{itemize}
+    \item $c_{t_s}$, a constant specifying the concentration (in terms of transcripts per unit of volume) of $t_s$.
+    \item $r_{t_s}$, a constant specifying the optimal transcript molecule-to-cDNA fragment capture rate for $t_s$.
+    \item $R_{is}$, a random variable representing the average capture efficiency in $i$ for all transcripts in $s$.
+    \item $V_{is}$, a random variable representing the volume of solution of $s$ added to $i$.
+    \item $L_i$, a random variable representing the cDNA fragment-to-read conversion rate for $i$.
+    \item $l_s$, a constant representing the ``sequenceability'' of transcripts in $s$.
+\end{itemize}
+The product of all of these terms defines the expected number of reads for $t_s$ in $i$, and the sum of the products across all $t_s$ determines the expected total count of set $s$ in well $i$.
+In addition, $\varepsilon_{is}$ represents the effect of sequencing noise on the log-total count, where $E(\varepsilon_{is})=0$ and $\variance(\varepsilon_{is})= \sigma^2_{lib(s)}$.
 We assume that $R_{is}$, $V_{is}$ and $\varepsilon_{is}$ are mutually independent of each other, as they relate to separate steps in the protocol.
 We also assume that $V_{is}$ and $\varepsilon_{is}$ are independent between different $s$ (but not $R_{is}$, due to well-specific factors affecting capture efficiency for all transcripts).
 Further details on the interpretation of these variables are provided in Section~BBB of the Supplementary Materials.
@@ -151,14 +157,14 @@ Let $s=1$ represent the ERCC spike-in set and $s=2$ represent the SIRV spike-in 
 In the experiment where each spike-in set is added separately to each well, denote the log$_2$-ratio of the total counts between the two sets as $\theta_i = T_{i1} - T_{i2}$ for well $i$.
 This can also be written as
 \[
-\theta_i = \log_2(V_{i1}) + \varepsilon_{i1} - \log_2(V_{i2}) - \varepsilon_{i2} + F_i
+    \theta_i = \log_2(V_{i1}) + \varepsilon_{i1} - \log_2(V_{i2}) - \varepsilon_{i2} + F_i + \log_2\left[ \frac{l_1 \sum_{t_1} r_{t_1} c_{t_1}}{l_2\sum_{t_2} r_{t_2} c_{t_2}} \right]
 \]
 where $F_i = \log_2(R_{i1}/R_{i2})$ and represents the log-fold change in the average capture efficiency between the two sets (i.e., the difference in behaviour of the transcripts).
 Computing the variance of $\theta_i$ yields
 \[
 \variance(\theta_i) = 2 \sigma^2_{vol} + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(F_i)
 \]
-where $\sigma^2_{vol}$ is the variance of $\log_2 V_{i1}$ and $\log_2 V_{i2}$.
+where $\sigma^2_{vol}$ is the variance of $\log_2(V_{i1})$ \textit{and} $\log_2(V_{i2})$.
 The volume addition procedure is the same for each spike-in set, so $V_{i1}$ and $V_{i2}$ should have the same distribution.
 Also, we consider the variance of $F_i$ because $R_{i1}$ and $R_{i2}$ are not independent, e.g., due to well-specific effects on capture efficiency.
 
@@ -331,12 +337,13 @@ To assess the effect of the order of spike-in addition, a linear model was fitte
 For each data set, we compute $T_{is}$ for each cell $i$ and spike-in set $s$.
 The variance of $T_{is}$ is
 \[
-    \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(R_{is}) + \variance(\log_2 L_i)
+    \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(\log_2 R_{is}) + \variance(\log_2 L_i)
 \]
 where the approximation assumes that $L_i$ is independent of the other random variables that contribute to $T_{is}$.
 (This is discussed in more detail in Section~XX of the Supplementary Materials.)
 Let $R_{is} = R_{i0}P_{is}$, where $R_{i0}$ is the well-specific average capture efficiency of endogenous transcripts and $P_{is}$ is the fold change in average efficiency of the transcripts in $s$ over their endogenous counterparts.
-We assume that $R_{i0}$ and $P_{is}$ are independent for each well, and that $\log_2(P_{is})$ can be approximated with $F_i$ (i.e., the log-fold change in average efficiency between SIRV and ERCC spike-ins).
+We assume that $R_{i0}$ and $P_{is}$ are independent for each well, and that $\variance(\log_2 P_{is})$ can be approximated with $\variance(F_i)$,
+i.e., the well-to-well variability in relative capture efficiency between the two spike-in sets is similar to that between spike-ins and endogenous transcripts.
 This yields
 \[
     \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(F_i) + \variance(R_{i0}) + \variance(\log_2 L_i) \;.
@@ -350,7 +357,8 @@ This yields
 
 Let us denote $x^2 = \sigma^2_{vol} + \variance(F_i)$, representing the total variance attributable to spike-in addition and capture efficiency.
 We also denote $\hat\sigma^2_s$ as the estimate of $\variance(T_{is})$ across wells, and $\hat\mu_s$ as the estimate of $E(T_{is})$.
-We use $\variance(\theta^*_i) \approx 0.01$ as our estimate $\hat{x}^2$ of the upper bound of $x^2$, following the reasoning described previously.
+We use $\variance(\theta^*_i) \approx 0.01$ as our estimate $\hat{x}^2$ of the upper bound of $x^2$.
+This is based on the fact that the estimated $\variance(\theta^*_i)\approx 0.01$ provides an upper bound on $\variance(F_i)$, while $\sigma^2_{vol}$ is near-zero in Figure~\ref{fig:varestimates}a.
 For each well $i$, we compute a simulated log$_2$-total $T^*_{is}$ as
 \[
     T^*_{is} = (T_{is} - \hat\mu_s)\sqrt{1-\frac{ \hat{x}^2}{\hat\sigma^2_s}} + \hat\mu_s + X_i
