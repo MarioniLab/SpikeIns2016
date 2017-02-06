@@ -5,6 +5,7 @@
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage[hidelinks]{hyperref}
+\usepackage{color}
 \urlstyle{same}
 
 \newcommand{\suppfignorm}{1}
@@ -73,9 +74,10 @@ Thus, it is of particular interest whether or not the aforementioned criticisms 
 To our knowledge, this has yet to be rigorously studied.
 
 In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
-We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells.
-We also estimate the variability in differential behaviour between the sets, to determine how cell-specific biases change between different RNA populations.
-Both factors are quantitatively negligible and have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
+We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells, 
+and show that it is quantitatively negligible in real experiments across a range of conditions. 
+We also obtain a rough estimate of the variance in differential behaviour between the sets, to determine how cell-specific biases change between different RNA populations.
+Simulations indicate that both factors have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
 These results suggest that spike-ins can be safely used for routine normalization of scRNA-seq data.
 
 % The advantage of spike-ins is that it can capture cell size and doesn't require a non-DE majority.
@@ -435,6 +437,16 @@ This process was repeated with the simulated data, and the Jaccard index between
 For each original cluster, the maximum Jaccard index across all simulated clusters was recorded at each simulation iteration.
 This value represents the extent to which the membership of the original cluster was preserved in the most similar simulated cluster.
 We also compared the original clusters to those generated from complete-linkage clustering of the original HVG log-expression values.
+
+\section{Acknowledgements}
+We thank Victoria Moignard and Wajid Jawaid for discussions about the experimental design.
+We also thank Liliana Antunes for supplying the trophoblast cells.
+
+\section{Funding}
+This work was supported by core funding from the CRUK (award no. A17197) to JCM;
+core funding from EMBL to JCM;
+an EMBL Interdisciplinary Postdocs fellowship to LHV;
+\textcolor{red}{need Bertie + Fernando statement.}
 
 {\small
 \bibliography{refnorm}
