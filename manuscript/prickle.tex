@@ -13,6 +13,9 @@
 \newcommand{\suppfigorder}{3}
 \newcommand{\suppfigbiophys}{4}
 
+\newcommand{\suppsecmath}{1}
+\newcommand{\suppsecsim}{2}
+
 \title{Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data}
 \author{Aaron T. L. Lun$^1$, Fernando J. Calero-Nieto$^2$, Liora Haim-Vilmovsky$^{3,4}$, \\ Bertie G\"ottgens$^2$, John C. Marioni$^{1,3,4}$}
 \date{
@@ -163,7 +166,7 @@ We assume that $R_{is}$, $V_{is}$ and $\varepsilon_{is}$ are mutually independen
 We also assume that $V_{is_1}$ and $V_{is_2}$ are independent for sets $s_1$ and $s_2$, as each spike-in set is added separately to each well.
 Similarly, $\varepsilon_{is_1}$ and $\varepsilon_{is_2}$ are assumed to be independent as sequencing noise for each transcript should be unaffected by that of other transcripts.
 (However, $R_{is_1}$ and $R_{is_2}$ are not independent due to well-specific factors affecting capture efficiency for all transcripts).
-Further details on these variables are provided in Section~BBB of the Supplementary Materials.
+Further details on these variables are provided in Section~\suppsecmath{} of the Supplementary Materials.
 
 Let $s=1$ represent the ERCC spike-in set and $s=2$ represent the SIRV spike-in set.
 In the experiment where each spike-in set is added separately to each well, denote the log$_2$-ratio of the total counts between the two sets as $\theta_i = T_{i1} - T_{i2}$ for well $i$.
@@ -202,7 +205,7 @@ With this mathematical framework, we estimated the variance components using the
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplementary Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
 Linear models are particularly useful as they allow blocking on additional structure in the experimental design (Methods).
-In addition, the size of $T_{is}$ was similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplementary Figure~\suppfigtotals{}, Section~XX of the Supplementary Materials for more details).
+In addition, the size of $T_{is}$ was similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplementary Figure~\suppfigtotals{}, Section~\suppsecmath{} of the Supplementary Materials for more details).
 Finally, the order of spike-in addition did not affect the variance estimates for the separate-addition wells on most plates (Supplementary Figure~\suppfigorder{}).
 
 Our results indicate that $\sigma^2_{vol}$ is consistently smaller than the variance in the rest of the protocol (Figure~\ref{fig:varestimates}a).
@@ -359,7 +362,7 @@ The variance of $T_{is}$ is
     \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(\log_2 R_{is}) + \variance(\log_2 L_i)
 \]
 where the approximation assumes that $L_i$ is independent of the other random variables that contribute to $T_{is}$.
-(This is discussed in more detail in Section~XX of the Supplementary Materials.)
+(This is discussed in more detail in Section~\suppsecmath{} of the Supplementary Materials.)
 Let $R_{is} = R_{i0}P_{is}$, where $R_{i0}$ is the well-specific average capture efficiency of endogenous transcripts and $P_{is}$ is the fold change in average efficiency of the transcripts in $s$ over their endogenous counterparts.
 We assume that $R_{i0}$ and $P_{is}$ are independent for each well, and that $\variance(\log_2 P_{is})$ can be approximated with $\variance(F_i)$,
 i.e., the well-to-well variability in relative capture efficiency between the two spike-in sets is similar to that between spike-ins and endogenous transcripts.
@@ -406,7 +409,7 @@ Here, we used an additive model with a treatment term and a blocking factor for 
 The second data set was obtained from the NCBI Gene Expression Omnibus (GEO) with the accession number GSE29087, and compared mouse embryonic stem cells and fibroblasts \cite{islam2011characterization}.
 
 In both studies, DEGs were detected between conditions using edgeR and MAST.
-Implementation details of each method are provided in Section~Y in the Supplementary Materials. 
+Implementation details of each method are provided in Section~\suppsecsim{} in the Supplementary Materials. 
 Briefly, normalization was performed by scaling the counts (explicitly or via offsets) such that the spike-in totals were the same between cells.
 The set of DEGs in the original data was then identified at a FDR of 5\%.
 This procedure was repeated for the simulated data, and the number of genes that were detected in the original results and not in the simulated results (or vice versa) was recorded as a proportion of the total number of original DEGs.
@@ -421,7 +424,7 @@ Similarly, blocking was performed on the plate of origin for each cell in the tr
 The final data set was obtained from NCBI GEO with the accession number GSE61533 and contained a single plate of haematopoietic stem cells \cite{wilson2015combined}.
 
 In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-in counts 
-(See Section~Y in the Supplementary Materials for implementation details of each method.)
+(See Section~\suppsecsim{} in the Supplementary Materials for implementation details of each method.)
 The first approach is based on the method of Brennecke \textit{et al.} \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
 The second approach is based on the variance of the log-normalized expression values \cite{lun2016stepbystep}, which provides some more robustness against outlier expression patterns.
 Each method was applied on the original and simulated data, and a set of significant HVGs was detected at a FDR of 5\%.
@@ -435,7 +438,7 @@ PCA plots of the first three components were constructed from the matrix of log-
 This process -- including HVG detection -- was repeated with the simulated data after introducing spike-in variability.
 To compare each simulated PCA plot to the original plot, the coordinates of each cell in the former were mapped onto the latter by rescaling and rotation.
 Robustness was assessed based on the spread of remapped coordinates across all simulation iterations for each cell.
-See Section~Y in the Supplementary Materials for details.
+See Section~\suppsecsim{} in the Supplementary Materials for details.
 
 To test the robustness of clustering, the matrix of Euclidean distances between cells was computed from the HVG log-expression values. 
 Hierarchical clustering was performed using the Ward criterion and the resulting dendrogram was cut into 2, 5 or 10 clusters.
@@ -456,7 +459,7 @@ an EMBL Interdisciplinary Postdocs fellowship to LHV;
 \textcolor{red}{need Bertie + Fernando statement.}
 
 \section{Supplementary materials}
-The Supplementary Materials is a single PDF file that consists of Sections~1-2 and contains Supplementary Figures~1-4 and Supplementary Table~1.
+The Supplementary Materials is a single PDF file that consists of Sections~1-\suppsecsim{} and contains Supplementary Figures~1-\suppfigbiophys{} and Supplementary Table~1.
 It includes the additional references \cite{law2014voom,ritchie2015limma}.
 
 {\small
