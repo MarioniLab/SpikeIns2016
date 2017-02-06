@@ -317,6 +317,30 @@ To put this into context, we repeated the clustering on the original data but us
 This yielded smaller indices for all clusters (Figure~\ref{fig:dimclust}c), indicating that spike-in variability has less effect on the results than the choice of clustering method.
 
 \section{Discussion}
+In this article, we performed mixture experiments to quantify the variability of spike-in addition across wells in a plate-based scRNA-seq protocol.
+We also obtained a rough estimate of the well-to-well variability in the differences in behaviour between two different sets of transcripts.
+Both values were at least an order of magnitude smaller than the variability in the actual spike-in coverage across cells, suggesting that they were negligible in the context of spike-in normalization.
+This was supported by simulations where the experimentally observed levels of spike-in variance yielded only minor changes in the results of DEG and HVG analyses as well as PCA and clustering.
+Our results indicate that spike-in normalization is reliable and can be used routinely in scRNA-seq data analyses.
+
+Our conclusions differ from those of Risso \textit{et al.} \cite{risso2014normalization}, where spike-in normalization is not considered reliable enough for routine analyses of bulk RNA-seq data.
+We speculate that this difference may be due to the difficulty of adding an appropriate amount of spike-in RNA at the population level.
+For example, should spike-in RNA be added at a constant ratio with respect to the concentration of endogenous RNA, or to the number of cells in the sample?
+If the endogenous RNA concentration or the number of cells determines the amount of spike-in RNA to be added, these will need to be experimentally quantified for each sample.
+In that case, how accurate is the quantification, and what effect do errors have on the downstream analysis?
+These questions are not relevant to single-cell experiments where the obvious approach is to add the same amount of spike-in RNA to each individual cell.
+
+We have used the Smart-seq2 protocol in our study to reflect its widespread use in the scRNA-seq literature.
+However, our estimate of $\sigma^2_{vol}$ is agnostic to how reverse transcription, amplification and sequencing were performed, as these steps are represented by other mathematical terms.
+Thus, our conclusions are likely to be applicable to any scRNA-seq protocol where spike-in RNA is added in a similar manner (using electronic pipettes, see Methods).
+Our experimental framework may also be useful for evaluating the precision of spike-in addition when developing new protocols or setting up existing protocols in new laboratories, to ensure that spike-in RNA is added correctly to each cell.
+
+We stress that our study only examines the reliability of spike-ins for ``relative'' normalization, i.e., to make counts comparable across cells.
+We do not consider the reliability of spike-ins for absolute quantification, i.e., to determine the number of molecules of each transcript or gene in each cell.
+This is more difficult to evaluate as accuracy is affected by the magnitude of the differences in the behaviour of spike-in and endogenous transcripts.
+In contrast, relative normalization is only affected by variability in the differences in behaviour, as discussed above.
+Nonetheless, our conclusions are still relevant as absolute quantification depends on the same amount of spike-in RNA being added to each cell.
+
 
 \section{Methods}
 
@@ -449,8 +473,8 @@ This value represents the extent to which the membership of the original cluster
 We also compared the original clusters to those generated from complete-linkage clustering of the original HVG log-expression values.
 
 \section{Acknowledgements}
-We thank Victoria Moignard and Wajid Jawaid for discussions about the experimental design.
-We also thank Liliana Antunes for supplying the trophoblast cells.
+We thank Liliana Antunes for supplying the trophoblast cells.
+We also thank Victoria Moignard and Wajid Jawaid for helpful discussions about the experimental design.
 
 \section{Funding}
 This work was supported by core funding from the CRUK (award no. A17197) to JCM;
