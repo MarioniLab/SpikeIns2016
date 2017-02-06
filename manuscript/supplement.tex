@@ -82,138 +82,27 @@ The term $l_s L_i$ describes the rate at which reads are obtained from cDNA frag
 The $l_s$ constant represents the average sequencing efficiency for transcripts in $s$, as well as factors such as mappability that affect the final counts.
 The interpretation of $L_i$ depends on whether library quantification was performed to equalize the amount of cDNA from each well prior to sequencing.
 If not, $L_i$ will be constant across wells, with its exact value depending on the sequencing depth.
-However, if quantification was performed, $L_i$ will depend on the other variables that contribute to $T_{is}$.
+However, if quantification was performed, $L_i$ will theoretically depend on the other variables that contribute to $T_{is}$.
 Specifically,
 \[
-    L_i = D \left[ \sum_{s} \left( l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right) \right]^{-1}
+    L_i = D_i \left[ \sum_{s} \left( l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right) \right]^{-1}
 \]
-where $D$ is the total sequencing depth (in reads) and the outer sum is taken over the spike-in sets $s\in \{1, 2\}$ as well as the set of endogenous transcripts $s=g$.
-In typical experiments, $L_i$ is effectively independent of $V_{is}$ and $R_{is}$ for any particular spike-in set $s$.
+where $D_i$ is the total sequencing depth for well $i$ (in reads) and the outer sum is taken over the spike-in sets $s\in \{1, 2\}$ as well as the set of endogenous transcripts $s=g$.
+In practice, $L_i$ is effectively independent of $V_{is}$ and $R_{is}$ for any particular spike-in set $s$.
 This is because the denominator of the above expression is dominated by the vastly larger number of cDNA fragments from the set of endogenous transcripts.
+Any correlation between $L_i$ and the other terms would be negligible compared to the biological variance of expression.
 
-The error term $\varepsilon_{is}$ describes variance due to sequencing noise and variability during library preparation.
-Its variance is set to $\sigma^2_{lib(s)}$, which implicitly assumes that there is no relationship between the variance and the mean of $T_{is}$.
+The error term $\varepsilon_{is}$ describes the variability due to sequencing noise in the spike-in counts for set $s$.
+We defined its variance as $\sigma^2_{lib(s)}$, which implicitly assumes that there is no relationship between the variance and the mean of $T_{is}$.
+This is a strong assumption given that mean-variance relationships are often observed in RNA-seq data \cite{mccarthy2012differential,law2014voom}.
 However, we note that the distribution of $T_{is}$ is similar between separate-addition and premixed-addition wells within each plate (Supplementary Figure~\ref{fig:totals}).
 If the mean of $T_{is}$ does not change, neither will the value of $\sigma^2_{lib(s)}$, regardless of the nature of the mean-variance relationship. 
 This suggests that $\sigma^2_{lib(s)}$ will not change between $\variance(\theta_i)$ and $\variance(\theta^*_i)$, allowing calculation of $\sigma^2_{vol}$ from their difference.
 
-\subsection{Constructing the distribution of the total counts}
-For spike-in sets $s=1, 2, \ldots$, the cDNA fragment-to-read conversion factor for each well is
-\[
-    \rho_i = \frac{N_i}{\sum_g \delta_{ig}\nu_{ig} + \sum_{t_1} \delta_{it_1} S_{it_1}  + \sum_{t_2} \delta_{it_2} S_{it_2} + \ldots} 
-\]
-where $N_i$ is the size of the library for well $i$.
-This accounts for composition biases, e.g., when overexpression of one gene can take up more sequencing resources and suppress the coverage of other genes.
-In contrast, for UMI data, the fragment-to-UMI conversion factor is simply $\rho_i = 1$ when sequencing is saturated.
-
-The conditional expectation of the total read count across all transcripts in set $s$ for well $i$ is
-\[
-    \mu_{is} = \rho_i  \textstyle\sum_{t_s} \delta_{it_s} \zeta_{it_s} = \rho_i  \eta_{is} \phi_{is} \sum_{t_s} R_{t_s} C_{t_s} \;.
-\]
-The observed total $y_{is}$ is assumed to be log-normally distributed, conditional on the other parameters, i.e., 
-\[
-    \log y_{is} | \{ \eta_{is}, \phi_{is} \forall s \}, \{ \delta_{ig}, \nu_{ig} \forall g \} \sim \mathcal{N}(\log \mu_{is}, \sigma^2_{lib(s)})
-\]
-where $\sigma^2_{lib(s)}$ represents the variability due to sequencing of set $s$.
-We consider that $\sigma^2_{lib(s)} = f(A_s)$ for some monotonic decreasing function $f$ of the abundance $A_s$ for $s$.
-This models the decrease in variability with increasing abundance, a trend that is typically observed in analyses of sequencing count data.
-
-For simplicity, we define $A_s = E(\log \mu_{is})$ rather than $A_s = \log \mu_{is}$.
-This is an approximation as the variability should depend on the size of the total count within each well, rather than on its expectation across all wells.
-Nonetheless, this approximation is useful as it simplifies the following derivations, by ensuring that we do not have to consider the effect of variability in $\eta_{is}$, $\phi_{is}$, etc. on the value of $\sigma^2_{lib(s)}$.
-We also assume that the totals are conditionally independent between different spike-in sets.
-We have already conditioned on well-specific biases, so any remaining variation due to random technical noise should be independent.
-
-\subsection{Deriving the variance of the log-ratios upon separate addition}
-Denote the log-ratio of the total counts between two spike-in sets $s=1, 2$ as $\theta_i = \log(y_{i1}/y_{i2})$ for well $i$.
-Based on the distribution of the total counts, $\theta_i$ is conditionally distributed as
-\[
-    \theta_i |  \{ \eta_{is}, \phi_{is} \forall s \} \sim \mathcal{N}( \log \mu_{i1} - \log \mu_{i2}, \sigma^2_{lib(1)} + \sigma^2_{lib(2)} ) \;. 
-\]
-There is no dependence on $\delta_{ig}$ or $\nu_{ig}$ as these terms cancel out during calculation of $\theta_i$ for each well.
-This can be illustrated by examining the conditional expectation for $\theta_i$, i.e.,
-\begin{align*}
-    E(\theta_i |  \{ \eta_{is}, \phi_{is} \forall s \})
-    &= \log \mu_{ix} - \log \mu_{iy} \\
-    &= \log \left( \frac{\rho_i \eta_{i1} \phi_{i1} \sum_{t_1} R_{t_1} C_{t_1}}{\rho_i \eta_{i2} \phi_{i2} \sum_{t_2} R_{t_2} C_{t_2}} \right) \\
-    &= \log \eta_{i1} - \log \eta_{i2} +  \log (\phi_{i1} / \phi_{i2})  + Z \quad\mbox{for some constant } Z \;.
-\end{align*}
-
-Assume that both $\log \eta_{i1}$ and $\log \eta_{i2}$ are distributed with the same variance $\sigma^2_{vol}$.
-The use of the same variance is justified by the fact that the same spike-in volume is added for both $s=1$ and $2$, such that the variability should be the same for both volumes.
-This means that the variance of $\theta_i$ can be written as
-\[
-\mbox{var}(\theta_i) = 2\sigma_{vol}^2 + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)
-% Easily derived using the law of total variances.
-% Normal distribution for R_i is obvious, based on product of PDFs (int[ P(X=x|u)*P(u) du ] gives a exp(x^2), eventually, and you can work this out to validate the variance).
-% Both claims tested in simulations (sample variances of normal distribution with normal mean match up with expected truth, no rejections on a Shapiro-Wilk test).
-\]
-where $\psi_i = \phi_{i1}/\phi_{i2}$.
-This can be estimated as the sample variance of the log-ratios across all wells in the first experiment. 
-For convenience in downstream statistical tests, it is helpful to assume that $\log \eta_{is}$ for each $s$ and $\log \psi_i$ are normally distributed.
-This ensures that $\theta_i$ will also follow a normal distribution.
-
-\subsection{Deriving the variance of the log-ratios with premixing}
-In the second experiment, mixing of spike-in sets occurs beforehand such that addition is not variable.
-More specifically, $\eta_{i1}=\eta_{i2}$ in each well such that they cancel out in calculating $\theta_i$ and do not contribute to the variance.
-This means that the variance of the log-ratio (denoted here as $\theta_i'$) can be written as
-\[
-    \mbox{var}(\theta_i') = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)
-\]
-and can be estimated as the sample variance of the log-ratios in this experiment.
-Subtraction of the estimated variance of $\theta_i'$ from that of $\theta_i$ from the first experiment can be used to obtain an estimate of $\sigma^2_{vol}$.
-Note that this assumes that $E(\log \mu_{is})$ is the same for each spike-in set between the first and second experiments, i.e., the average count size for each set is the same between experiments.
-This ensures that there are no abundance-related changes in the technical variability of each set, i.e., $ \sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
-In general, this assumption is reasonable if premixing of the two sets is done in a 1:1 ratio (volume-by-volume) and the total added volume of premixed spike-in is equal to the total volume for separate additions in the first experiment.
-
-% It's possible to do something more complicated with a Poisson sampling distribution that's conditional on the mean.
-% You could use the general variance decomposition formula to get the variance of the total count (see Bowsher and Swain, 2012).
-% This would account for the mean-variance relationship at low counts.
-% However, it becomes intractable to solve for the variance of the log-ratio of counts.
-% There is no apparent benefit to this complexity, given that the log-normal approximation is more than sufficient at large counts.
-
-\subsection{Estimating the variance of the set-specific capture efficiency}
-Some work is required to decompose the components of $\mbox{var}(\theta_i')$, in order to separate technical variability from the variability of the $\phi_{is}$ terms.
-This can be done by splitting one of the spike-in sets into two halves.
-Divide transcripts in $s=1$ into two halves $1_a$ and $1_b$.
-Each transcript is assigned to one half such that the total count for each half is equal to the sum of counts for all assigned transcripts.
-We assume that the average capture efficiency is the same for each half as all transcripts are taken from the same spike-in set.
-This means that $\phi_{i1} = \phi_{i1_a} = \phi_{i1_b}$, such that the capture efficiency term cancels out in the calculation of the log-ratio $\theta_{i(1_{ab})}'$ between the total counts of the two halves.
-Thus, the variance of the log-ratio will simplify to 
-\[
-    \mbox{var}(\theta_{i(1_{ab})}') = \sigma^2_{lib(1_a)} + \sigma^2_{lib(1_b)} \;.
-\]
-This is true for both premixed and separate-addition experiments, as there is no variability in the added volume between two halves of the same spike-in set, i.e.,  $\eta_{i1} = \eta_{i1_a} = \eta_{i1_b}$.
-Now, consider the variance of the log-ratio of the total count for each half $s=1_a, 1_b$ to the second spike-in set $s=2$.
-This is written as
-\begin{align*}
-    \mbox{var}(\theta_{i(1_a)}') &= \sigma^2_{lib(1_a)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \\
-    \mbox{var}(\theta_{i(1_b)}') &= \sigma^2_{lib(1_b)} + \sigma^2_{lib(2)} + \mbox{var}(\log \psi_i) \;,
-\end{align*}
-using only the samples in the second premixed experiment where variability in volume addition need not be considered.
-We now perform some basic arithmetic on the variances of the log-ratios:
-\begin{align*}
-    &\mbox{var}(\theta_{i(1_a)}') +  \mbox{var}(\theta_{i(1_b)}') - \mbox{var}(\theta_{i(1_{ab})}') = 2 [\sigma^2_{lib(2)} + \mbox{var}(\log \psi_i)] \\
-    &\mbox{var}(\theta_i') - \textstyle\frac{1}{2}[\mbox{var}(\theta_{i(1_a)}') + \mbox{var}(\theta_{i(1_b)}') - \mbox{var}(\theta_{i(1_{ab})}') ] = \sigma^2_{lib(1)}
-\end{align*}
-We repeat this after splitting $s=2$ into halves to obtain an estimate of $\sigma^2_{lib(2)}$.
-These values can be subtracted from $\mbox{var}(\theta_i')$ to estimate the variance in the fold-differences in spike-in-specific efficiency, i.e., $\mbox{var}(\log \psi_i)$.
-
-Note that our calculations assume that there is no variability in capture efficiency between the two halves of each spike-in set.
-This may not be true of synthetic sets with few transcripts (e.g., 92 in ERCC, 7 in SIRV) where transcript-specific efficiencies may not average out within each half.
-If variability in efficiency exists between halves, it will not cancel out when calculating $\theta_{i(1_{ab})}'$.
-This is likely to result in overestimation of $\sigma^2_{lib(s)}$ and underestimation of the variance in spike-in-specific efficiency.
-To mitigate this effect, we split the transcripts so that the distribution of transcript abundances is similar between halves.
-This increases the chance that each half will have similar average efficiencies.
-The value of $\mbox{var}(\theta_i')$ can also be treated as an upper bound for $\mbox{var}(\log \psi_i)$, reached when technical variability is absent, i.e., $\sigma^2_{lib(s)}=0$ for both $s=1,2$.
-
-% Imagine that var(theta_i(ab)') is increased by x; this means that the true value of the estimated sigma^2_lib1 is actually sigma^2_lib1 + x.
-% Hence, overestimation; assuming that the variability in behaviour relative to the second spike-in set doesn't change (which is why we have 'likely' not 'certainly').
-
 \section{Implementation details for the downstream analyses}
 
 \subsection{Data pre-processing}
-Quality control was performed by removing libraries with outlier values for various quality metrics \cite{lun2016stepbystep}, including 
+Quality control was performed by removing libraries with outlier values for various metrics \cite{lun2016stepbystep}, including 
 the log-transformed total read count across all genes and the log-transformed total number of expressed genes, where small outliers were removed; 
 and the proportion of reads mapped to spike-in transcripts or mitochondrial genes, where large outliers were removed.
 Outlier values were defined as those that were more than three median absolute deviations away from the median value in the specified direction.
@@ -231,8 +120,8 @@ The likelihood ratio test was applied to test for significant differences in exp
 Finally, the Benjamini-Hochberg correction was applied to control the FDR.
 
 For MAST v1.0.5, an effective library size was defined by multiplying the total spike-in count by a constant value $C$ for each library.
-We set $C$ to the total read count for the endogenous genes, averaged across all libraries.
-This procedure adjusts the library size for each cell to reflect the difference in the spike-in totals.
+We set $C$ to the ratio of the average total count for the endogenous genes to the average total count for the spike-in transcripts, where each average was computed across all libraries.
+This procedure simply adjusts the library size for each cell to reflect the difference in the spike-in totals across cells.
 Counts were converted to count-per-million (CPM) values using the effective library sizes.
 This is the same as spike-in normalization, as the sum of CPMs across spike-in transcripts is equal across libraries.
 CPMs were log-transformed after adding a pseudo-count of 1.
@@ -241,20 +130,18 @@ Along with the experimental factors, the proportion of genes with non-zero count
 Putative DE genes between the relevant conditions were identified using the lrTest function.
 
 \subsection{Methods for detecting highly variable genes}
-The first HVG detection method was based on the approach described by Brennecke \textit{et al.} \cite{brennecke2013accounting}.
-Only the size factors were modified in order to perform spike-in normalization.
+The first HVG detection method was based on the approach described by Brennecke \textit{et al.} \cite{brennecke2013accounting}, with some modifications to the size factors in order to perform spike-in normalization.
 Specifically, the spike-in totals were rescaled to have a mean of unity across all libraries, and the size factor for each library was defined as its rescaled spike-in total.
 This represents spike-in normalization as each ``spike-in size factor'' scales the counts in each library so that the spike-in totals are the same. 
-We do \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
+We did \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
 The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package with min.bio.disp set to zero.
-If blocking factors were present, they were regressed out by applying the removeBatchEffect function from the limma package to the counts, prior to using technicalCV2.
+If blocking factors were present, they were regressed out by applying the removeBatchEffect function from the limma package \cite{ritchie2015limma} to the counts prior to using technicalCV2.
 
 The second approach to detect HVGs was based on computing the variance of log-expression values \cite{lun2016stepbystep}.
 For each count in each library, a normalized log-expression value was defined as the log-ratio of the count with the spike-in size factor for that library.
-(A pseudo-count of 1 was added prior to log-transformation to avoid undefined values).
+(A pseudo-count of 1 was added prior to log-transformation to avoid undefined values.)
 The variance of log-expression was computed across all cells for each spike-in transcript.
-A loess curve was fitted to the log-variance against the mean for all spike-in transcripts using the trendVar function in scran.
-This represents the mean-variance relationship due to technical noise.
+A loess curve was fitted to the log-variance against the mean for all spike-in transcripts using the trendVar function in scran, representing the mean-variance relationship due to technical noise.
 The biological component of the variance and a $p$-value was computed for each gene using the decomposeVar function.
 If blocking factors were present, they were used to construct a design matrix for modelling in trendVar.
 
@@ -266,144 +153,29 @@ The first two PCs were used as the coordinates for each cell in one PCA plot, wh
 Each point was coloured according to its annotated cell type \cite{segerstople2016single}.
 
 The procedure above was repeated at each simulation iteration with new spike-in counts.
-Coordinates of all cells in each simulated PCA plot were mapped onto the original plot.
-This was done after scaling and rotating the simulated coordinates around the origin, to eliminate differences between plots that were not relevant to interpretation.
-Specifically, a 2-by-2 transformation matrix was applied to the simulated coordinates;
-    the squared Euclidean distance from the (scaled and rotated) simulated coordinates to the original coordinates was computed for each cell;
-    and the scaling and rotation parameters of the matrix were identified that minimized the sum of squared distances across all cells.
-We do not project the simulated log-expression data onto the space of the original plot, as this does not capture the variability in the identification of the PCs across iterations.
-Upon completion of the simulation, each cell will have one original location and several remapped locations (one per iteration). 
-For each cell, the smallest circle centered at its original location was drawn that contained the corresponding remapped locations for 95\% of the iterations.
+Coordinates of all cells in each simulated PCA plot were mapped onto the original plot, after scaling and rotating the coordaintes to eliminate differences between plots that were not relevant to interpretation.
+Specifically:
+\begin{itemize}
+    \item For each cell, the simulated coordinates was right-multiplied by a 2-by-2 transformation matrix
+        \[
+            \left[\begin{array}{cc}
+                    b_x \cos(\psi) & - b_y \sin(\psi) \\
+                    b_x \sin(\psi) & b_y \cos(\psi) 
+                \end{array}
+            \right]
+        \]
+        where $\psi$ is the angle around the origin and $b_x$ and $b_y$ scale the $x$- and $y$-coordinates respectively.
+    \item The squared Euclidean distance from the (scaled and rotated) simulated coordinates to the original coordinates was computed for each cell, and summed across all cells.
+    \item The scaling and rotation parameters of the matrix were identified that minimized the sum of squared distances across all cells, using the optim function from the stats package.
+\end{itemize}
+The more obvious approach to remapping is to directly project the simulated log-expression data onto the space of the original plot.
+However, we do not do this as it does not capture the variability in the identification of the PCs across iterations.
+Upon completion of the simulation, each cell will have one original location and one remapped location per iteration. 
+For each cell, the smallest circle centered at its original location was drawn that contained the 95\% of the remapped locations.
+(This avoids inflated circles due to outliers.)
 
-Note that, for the data set used in this simulation, we removed cells that were annotated as low quality in the associated metadata.
-As such, we did not perform any outlier-based quality control on the cells.
-
-\newpage
-\section{Dealing with variable spike-in behaviour}
-Another implicit assumption is that the spike-in populations exhibit equivalent behaviour with respect to cDNA generation efficiency.
-This allows $\psi_i$ to cancel out during calculation of $R_i$, such that any variability in efficiency across wells can be ignored.
-However, this may not be true for populations like the set of ERCC spike-ins with, e.g., differing GC composition, shorter poly-A tails.
-Differences in well-specific efficiency can be modelled by introducing a $\psi_{is}$ term to replace $\psi_i$ in the above calculations.
-This means that the conditional expectation of $R_i$ with respect to the random variables $V_{i}$ and $\psi_{is}$ becomes
-\[
-E(R_i | V_{ix}, V_{iy},  \psi_{ix}, \psi_{iy} ) = \log \frac{ S_{ix} \sum_t \psi_{ix}\delta_{t} \pi_{tx} } { S_{iy}\sum_t \psi_{iy}\delta_{t} \pi_{ty} } \;. \\
-\]
-The effect on the variance of $R_i$ depends on whether the ratio $\psi_{ix}/\psi_{iy}$ is constant or variable.
-If it is constant, it will be absorbed into the constant term $Z$ and will not contribute to the variance across wells.
-Otherwise, we can model $\log(\psi_{ix}/\psi_{iy})$ with a normal distribution that is independent of $V_{is}$.
-The variance of this distribution will contribute directly to both $\mbox{var}(R_i)$ and $\mbox{var}(R_i')$, and will be effectively calculated as part of $\sigma^2_{lib}$.
-Subtraction of sample variances will subsequently yield an estimate of $\sigma^2_{vol}$, as before.
-
-Disentangling the variability of $\log(\psi_{ix}/\psi_{iy})$ from the other components of $\sigma^2_{lib}$ is more difficult.
-It requires careful control over the properties of the spike-in populations -- namely, by using two populations that are effectively identical for the purposes of reverse transcription, yet sufficiently different for read alignment to the correct genome.
-Some study of the relative contribution of this variance term can be performed by using several different spike-ins, and observing differences in the estimated $\sigma^2_{lib}$ (assuming that variance in the other steps of the protocol are constant across runs).
-If the variance is negligible, then the exact value of $\psi_{ix}/\psi_{iy}$ is irrelevant in most applications as it will have no effect on the normalization factors between cells.
-
-Another approach is to shuffle the spike-in sets \textit{in silico} for the second experiment.
-Half the species in one set are summed with half the species in the other set, and this is repeated with the remaining species in both sets.
-The variance of the log-ratios between these two sums is computed across wells, using the same partitioning of species for all wells.
-To ensure robustness, a different partition can be chosen and the variance calculation repeated; the average variance can be computed across partitions.
-The idea is that, on average, the shuffled populations do not exhibit any systematic difference in their capture efficiency.
-Any variability in the log-ratio is attributable to the protocol alone, rather than changes to efficiency.
-Subtracting from the original variance of the control experiment will identify the variability due to spike-in behaviour.
-
-\newpage
-\section{Statistical analyses of the results}
-Denote the sample variance of $R$ as $s^2_1$, and that of $R'$ as $s^2_2$.
-These are estimated from the set of observed ratios in each experiment, using the corrected Pearson estimator.
-We could then intuitively define
-\begin{align*}
-\widehat{\sigma^2_{lib}} &= s^2_2 \quad\mbox{and} \\
-\widehat{\sigma^2_{vol}} &= \frac{s^2_1 - s^2_2}{2} \;.
-\end{align*}
-However, this is not sensible if $s^2_1 < s^2_2$ as the estimate for $\sigma^2_{vol}$ will be negative.
-In such cases, 
-\begin{align*}
-\widehat{\sigma^2_{vol}} &= 0 \quad\mbox{and} \\
-\widehat{\sigma^2_{lib}} &= \frac{s^2_1(n_1 - 1) + s^2_2(n_2-1)}{n_1 + n_2 - 2} 
-\end{align*}
-where $n_1$ and $n_2$ are the number of repeated wells in the first and second experiments, respectively.
-This uses all of the data from the first and second experiments to estimate $\sigma^2_{lib}$, while the estimate of $\sigma^2_{vol}$ is fixed at the lower bound of zero.
-These definitions are based on the principle of restricted maximum likelihood when the parameter space is constrained to non-negative values (see Thompson, 1962).
-
-% See "The Problem of Negative Estimates of Variance Components". Thompson (1962), Ann. Math. Statist., Volume 33, Number 1 (1962), 273-289.
-% More specifically, the log-REML is equal to:
-%\[
-%L(\mathbf{y_1}, \mathbf{y_2} | \sigma^2_{lib}, \sigma^2_{vol}) = - n_1 \log(\sigma^2_{lib}) - \frac{1}{\sigma^2_{lib}} \sum y_{1i} - n_2 \log(\sigma^2_{lib} + \sigma^2_{vol}) - \frac{1}{\sigma^2_{lib} + \sigma^2_{vol}} \sum y_{2i} 
-%\]
-% where y_1 and y_2 are vectors of residual effects from the two experiments.
-% If you take the partial derivatives with respect to each sigma^2, you get two equations that can be solved simultaneously.
-% This yields a single maximum for the REML at the standard expressions for the experimental sample variances (and after subtraction, for the volume variance).
-% However, the story's different when the volume variance estimate is forced to zero.
-% Under normal conditions, there's only one maxima (see above) - but in this case, the maxima lies outside the constrained space.
-% This means that the maxima in the constrained space must lie on the boundary, as the REML must increase as it gets closer to the maxima.
-% We can then plug in a zero value for the volume variance and solve for the library variance, which gives us the value above. 
-
-It is also possible to determine the significance of non-zero estimates for $\sigma^2_{vol}$.
-This aims to determine whether there is a significant increase in variability from volume addition, over the variability introduced during general library preparation.
-Specifically, the null hypothesis states that $\sigma^2_{vol} = 0$.
-This means that
-\begin{align*}
-s^2_1 &\sim \frac{\sigma^2_{lib} \chi^2_{n_1 - 1}}{n_1 - 1} \quad\mbox{and} \\
-s^2_2 &\sim \frac{\sigma^2_{lib} \chi^2_{n_2 - 1}}{n_2 - 1} 
-\end{align*}
-As the sample variances are estimated independently, the ratio $s^2_1/s^2_2$ follows a F-distribution on $n_1-1$ and $n_2-1$ degrees of freedom under the null.
-The observed value of this ratio can be used to compute a $p$-value based on the upper tail of this distribution.
-A similar test can be used to determine whether alterations in the protocol result in significant decreases in the variance, i.e., improvements in spike-in reliability.
-
-Of course, these analyses hinge on the assumption of normality for the log-ratios. 
-This can be evaluated empirically using established statistical methods such as the Shapiro-Wilk test.
-Simulations indicate that the log-ratios of overdispersed count data can be accurately modelled with the normal distribution.
-
-An alternative approach to variance estimation is to take the median absolute deviation (MAD) for each set of ratios and multiply it by 1.4826.
-This will yield a robust, unbiased estimate of the standard deviation under normality.
-While this protects against outliers, it will likely invalidate the tests described above -- the variance of this estimator will be different from the Pearson estimator.
-Rather, it may be possible to use simulations to obtain a null distribution for the variance ratios.
-For example, you could simulate the ratios of MAD-based variance estimates for the standard normal distribution.
-The final distribution of these ratios should be the same even if you change the location or scale of the original normal distribution.
-
-\newpage
-\section{Estimating the variability of total cellular RNA}
-Our aim is to estimate the variance of total cellular RNA, and to compare it to the variance of the spike-ins.
-If the former is negligible compared to the latter, we can claim that any imprecision in spike-in addition will have little impact on the biological conclusions.
-This suggests that spike-ins can be safely used.
-
-To test this, we would ideally estimate $\mbox{var}(\sum_t \nu_{it})$, i.e., the variance in the number of cellular transcript molecules between wells/cells.
-However, this not possible as we are confounded by the unknown efficiencies $\delta_{it}$. 
-Thus, we instead consider the log-library size $L_i$ for well $i$, which has the conditional distribution
-\[
-L_i | V_{ix}, V_{iy}, \psi_i, \nu_{i1}, \ldots, \nu_{in} \sim \mathcal{N}(\log ( \rho_i \textstyle\sum_t \delta_{it} \nu_{it}), \sigma^2_{lib}) \;.
-\]
-Again, $\sigma^2_{lib}$ represents variability due to sequencing.
-We assume that the conditional distribution of $L_i$ is independent of the conditional distributions for $y_{ix}$ and $y_{iy}$, i.e., sampling during sequencing is independent.
-We define the normalized log-library size by subtracting the log-total of the spike-in counts, i.e., $\tilde{L_i} = L_i - \log y_{ix}$.
-Here, we have chosen population $x$, though $y$ can also be used.
-$\tilde{L_i}$ has the conditional distribution
-\[
-\tilde{L_i} | V_{ix}, V_{iy}, \psi_i, \nu_{i1}, \ldots, \nu_{in} \sim \mathcal{N}( \log S_{ix} + \log(\textstyle\sum_t \delta_t \pi_{tx}) - \log(\textstyle\sum_t \delta_t \nu_{it}), 2\sigma^2_{lib})
-\]
-which no longer depends on $V_{iy}$ or $\psi_i$.
-Now, recall that $\log V_{ix}$ is normally distributed, such that 
-\[
-\tilde{L_i} | \nu_{i1}, \ldots, \nu_{in} \sim \mathcal{N}( E(\log V_{ix}) + \log C_{x} + \log(\textstyle\sum_t \delta_t \pi_{tx}) - \log(\textstyle\sum_t \delta_t \nu_{it}), 2\sigma^2_{lib} + \sigma^2_{vol}) \;.
-\]
-We further assume that $\log(\textstyle\sum_t \delta_t \nu_{it})$ is normally distributed with variance $\sigma^2_{bio}$.
-This variance represents the biological variability in the expected number of reads, which can be used as a proxy for the variability in the number of transcript molecules.
-Indeed, one could argue that the former is more relevant than the latter --  sequencing returns results in terms of reads, not transcripts, and even UMI-based methods fail to capture all transcript molecules.
-With the above assumption, $\tilde{L_i}$ becomes normally distributed with variance
-\[
-\mbox{var}(\tilde{L_i}) = 2\sigma^2_{lib} + \sigma^2_{vol} + \sigma^2_{bio} \;.
-\]
-Statistical methods can then be applied to estimate the value of $\sigma^2_{bio}$ from the sample variance of $\tilde{L_i}$ across cells/wells.
-This can be compared to $\sigma^2_{vol}$ to determine the relative importance of spike-in variability.
-
-% Note that under the null, i.e., vol=bio, the variance of L_i should be equal to that of R_i.
-% However, testing is complicated by the fact that we're using population 'x' twice in each well, to compute L_i and R_i.
-% We'd end up with some correlation in the variance estimates, which would be pretty annoying.
-% This isn't easily resolved; L_i and R_i are normally distributed, but y_ix and company are not (e.g., the denominator of rho_i consists of sum of log-normals, at best).
-% I guess we could get independence by splitting the wells into two groups, computing L_i from one group and R_i from the other, and using that for testing. 
-% We can probably afford to do this if we have enough wells to play around with (96 per plate?).
-
+Note that, for the data set used in this simulation, we removed cells that were already annotated as low quality in the associated metadata.
+No additional outlier-based quality control was performed.
 
 \begin{figure}[btp]
     \begin{center}
