@@ -130,13 +130,14 @@ The variance of volume addition was then estimated as the difference in the vari
 We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects \cite{hicks2015widespread,tung2016batch}.
 For the separate-addition experiment, we also reversed the order of addition of the two spike-in sets to determine if this affected the variance estimate.
 Finally, we generated data from replicate plates to ensure our results were reproducible.
-This was done in a range of conditions, i.e., using different cells, by different operators and with sequencing by different machines and centres.
+This was done in a range of conditions, i.e., using different cell types, by different operators and with sequencing at different locations.
 
 We used a protocol based on microtiter plates rather than microfluidics as it is easier to customise the spike-in addition step in the former.
 Our experimental design requires two separate additions of spike-in RNA to each reaction (see Methods).
 This is not straightforward to achieve on, say, the Fluidigm C1 chip where the added volume for each reagent depends on the design on the reaction chamber.
-Plate-based protocols also tend to be cheaper and are compatible with existing laboratory techniques such as indexed fluorescently-activated cell sorting (FACS).
-Thus, we focus on normalization of data from plate-based protocols, reflecting their widespread use in single-cell studies \cite{segerstople2016single,islam2011characterization,wilson2015combined}.
+%Plate-based protocols also tend to be cheaper and are compatible with existing laboratory techniques such as indexed fluorescently-activated cell sorting (FACS).
+Our focus on data from plate-based protocols reflects their widespread use in single-cell studies \cite{segerstople2016single,islam2011characterization,wilson2015combined}.
+Obviously, the procedure we describe here can be adapted to any protocol where the spike-in addition can be easily modified, e.g., plate-based CEL-seq \cite{hashimshony2016celseq2} or STRT-seq \cite{islam2011characterization}.
 
 \subsection{Estimating the variance of volume addition}
 Denote the log$_2$-transformed total read count for well $i$ and spike-in set $s$ as
@@ -153,11 +154,14 @@ The other terms are defined as follows:
     \item $L_i$, a random variable representing the cDNA fragment-to-read conversion rate for $i$.
     \item $l_s$, a constant representing the ``sequenceability'' of transcripts in $s$.
 \end{itemize}
-The product of all of these terms defines the expected number of reads for $t_s$ in $i$, and the sum of the products across all $t_s$ determines the expected total count of set $s$ in well $i$.
+The product of all of these terms defines the expected number of reads for each $t_s$ in well $i$, and the sum of the products across all $t_s$ is the expected total count of set $s$ in $i$.
 In addition, $\varepsilon_{is}$ represents the effect of sequencing noise on the log-total count, where $E(\varepsilon_{is})=0$ and $\variance(\varepsilon_{is})= \sigma^2_{lib(s)}$.
-We assume that $R_{is}$, $V_{is}$ and $\varepsilon_{is}$ are mutually independent of each other, as they relate to separate steps in the protocol.
-We also assume that $V_{is}$ and $\varepsilon_{is}$ are independent between different $s$ (but not $R_{is}$, due to well-specific factors affecting capture efficiency for all transcripts).
-Further details on the interpretation of these variables are provided in Section~BBB of the Supplementary Materials.
+
+We assume that $R_{is}$, $V_{is}$ and $\varepsilon_{is}$ are mutually independent of each other, as they describe separate steps in the protocol.
+We also assume that $V_{is_1}$ and $V_{is_2}$ are independent for sets $s_1$ and $s_2$, as each spike-in set is added separately to each well.
+Similarly, $\varepsilon_{is_1}$ and $\varepsilon_{is_2}$ are assumed to be independent as sequencing noise for each transcript should be unaffected by that of other transcripts.
+(However, $R_{is_1}$ and $R_{is_2}$ are not independent due to well-specific factors affecting capture efficiency for all transcripts).
+Further details on these variables are provided in Section~BBB of the Supplementary Materials.
 
 Let $s=1$ represent the ERCC spike-in set and $s=2$ represent the SIRV spike-in set.
 In the experiment where each spike-in set is added separately to each well, denote the log$_2$-ratio of the total counts between the two sets as $\theta_i = T_{i1} - T_{i2}$ for well $i$.
@@ -170,29 +174,29 @@ Computing the variance of $\theta_i$ yields
 \[
 \variance(\theta_i) = 2 \sigma^2_{vol} + \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(F_i)
 \]
-where $\sigma^2_{vol}$ is the variance of $\log_2(V_{i1})$ \textit{and} $\log_2(V_{i2})$.
+where $\sigma^2_{vol}$ is the variance of both $\log_2(V_{i1})$ and $\log_2(V_{i2})$.
 The volume addition procedure is the same for each spike-in set, so $V_{i1}$ and $V_{i2}$ should have the same distribution.
-Also, we consider the variance of $F_i$ because $R_{i1}$ and $R_{i2}$ are not independent, e.g., due to well-specific effects on capture efficiency.
+Also, we consider the variance of $F_i$ because $R_{i1}$ and $R_{i2}$ are not independent due to well-specific effects on capture efficiency.
 
 In the experiment where the spike-in sets are premixed before addition, $V_{i1}=aV_{i2}$ for some constant $a$ representing the proportions in which the two sets are mixed.
 (This should be close to unity.)
 If the same premixed solution is added to each well, the relative volume of ERCC spike-ins to SIRV spike-ins must be constant for all wells.
 This means that the log$_2$-ratio for the premixed experiment is 
 \[
-\theta^*_i = \log_2(a) + \varepsilon_{i1} - \varepsilon_{i2} + F_i \;.
+    \theta^*_i = \log_2(a) + \varepsilon_{i1} - \varepsilon_{i2} + F_i + \log_2\left[ \frac{l_1 \sum_{t_1} r_{t_1} c_{t_1}}{l_2\sum_{t_2} r_{t_2} c_{t_2}} \right] \;.
 \]
-As $a$ is constant for all $i$, the variance of $\theta^*_i$ is
+As $a$ is constant for all $i$, the variance of $\theta^*_i$ becomes
 \[
 \variance(\theta^*_i) = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(F_i) \;.
 \]
 This represents the technical variance attributable to the rest of the scRNA-seq protocol.
-To obtain an estimate of the variance of the volume addition step, simple arithmatic yields
+To obtain an estimate of the variance of the volume addition step, simple arithmetic yields
 \[
 \sigma^2_{vol} = \frac{\variance(\theta_i) - \variance(\theta^*_i)}{2} \;.
 \]
 It should be stressed that this variance estimate is relevant to all experiments using the same protocol for spike-in addition, even if the identity or concentration of the spike-in set is different.
 
-Using this mathematical framework, we proceeded to estimate the variance components from the data from our mixture experiments.
+With this mathematical framework, we estimated the variance components using the data from our mixture experiments.
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplementary Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
 Linear models are particularly useful as they allow blocking on additional structure in the experimental design (Methods).
@@ -220,11 +224,12 @@ The variance of the log-size factors is several orders of magnitude larger than 
 
 \subsection{Estimating the variance of capture efficiency}
 The variance of $F_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
-Even when the capture efficiency differs between sets, spike-in normalization may still be appropriate \textit{provided that the fold change in capture efficiency is the same in all wells}.
+Even when the capture efficiency differs between sets, spike-in normalization is still be appropriate \textit{provided that the fold change in capture efficiency is the same in all wells}.
 Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
-This scales up the counts for the spike-in transcripts in all libraries by the same amount, which cancels out between libraries (i.e., the fold changes between counts for endogenous or spike-in transcripts in different libraries are unaffected).
+This scales up the counts for the spike-in transcripts in all libraries by the same amount, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
-This is because changes in the capture efficiency for the spike-in transcripts are confounded with changes in efficiency for all transcripts in the well, precluding the use of spike-ins to normalize the counts for the endogenous trancripts.
+This is because specific changes in the capture efficiency for the spike-in transcripts are confounded with general changes in efficiency for all transcripts in the well.
+Differences in the coverage of spike-in transcripts may not represent technical biases affecting other transcripts, precluding their use in normalizing all counts.
 
 In our mathematical framework, the estimated variance of $\theta^*_i$ provides an upper bound for the variance of $F_i$.
 This quantifies the extent to which normalization is affected by differences in efficiency between two transcript sets.
