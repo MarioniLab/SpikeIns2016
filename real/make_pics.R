@@ -47,11 +47,12 @@ colnames(final) <- names
 final.err <- rbind(Separate=unlist(total.err), Premixed=unlist(premixed.err), Volume=unlist(volume.err))
 upper.limit <- final  + final.err
 
+ylim <- 0.03
 out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"), 
-               cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, 0.03))
+               cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, ylim))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
-legend(out[1]-0.5, max(final)+0.002, fill=cols, rownames(final), cex=1.2)
+legend(out[1]-0.5, ylim, fill=cols, rownames(final), cex=1.2)
 curcoords <- par()$usr
 mtext("a", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1]), font=2)
 
@@ -92,11 +93,11 @@ for (operator in c("Calero", "Liora")) {
     if (operator=="Calero") {
         datasets <- c("trial_20160113", "trial_20160325")
     } else if (operator=="Liora") {
-        datasets <- c("test_20160906", "test_20160906")
+        datasets <- c("test_20160906", "test_20170201")
     }
 
     for (dataset in datasets) {
-        y <- readRDS(file.path(operator, dataset, "analysis", "techsaved.rds"))
+        y <- readRDS(file.path(operator, dataset, "analysis", "object.rds"))
 
         sep <- y$samples$separate
         sep.groups <- factor(y$samples$group[sep])
@@ -177,11 +178,11 @@ for (operator in c("Calero", "Liora")) {
     if (operator=="Calero") {
         datasets <- c("trial_20160113", "trial_20160325")
     } else if (operator=="Liora") {
-        datasets <- c("test_20160906", "test_20160906")
+        datasets <- c("test_20160906", "test_20170201")
     }
 
     for (dataset in datasets) {
-        y <- readRDS(file.path(operator, dataset, "analysis", "techsaved.rds"))
+        y <- readRDS(file.path(operator, dataset, "analysis", "object.rds"))
         erccs[[index]] <- y$samples$sum1[y$samples$separate]
         sirvs[[index]] <- y$samples$sum2[y$samples$separate]
         index <- index + 1L
