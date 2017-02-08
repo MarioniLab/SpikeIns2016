@@ -264,9 +264,8 @@ Counts for the endogenous transcripts were used directly without any modificatio
 
 For DEG detection, we applied edgeR \cite{robinson2010edgeR} and MAST \cite{finak2015mast} to the original and simulated data after spike-in normalization.
 edgeR represents methods designed for DE analyses of bulk RNA-seq data, while MAST represents bespoke single-cell methods.
-In both cases, we observed only minor changes to the set of significant DEGs upon introducing spike-in variability in each data set (Figure~\ref{fig:setchange}a). 
-Fewer than 5\% of DEGs changed in most cases, with all changes under 8\% in the most extreme cases.
-Similar results were also observed in the top 200 DEGs with the smallest $p$-values.
+In both cases, we observed only minor ($<$ 5\%) changes to the set of significant DEGs upon introducing spike-in variability in each data set (Figure~\ref{fig:setchange}a). 
+Similar results were also observed in the top 200 DEGs with the smallest $p$-values, with fewer than 10\% of the genes in the set changing across iterations in all scenarios.
 For HVG detection, we used methods based on the coefficient of variation \cite{brennecke2013accounting} or the variance of log-expression values \cite{lun2016stepbystep}.
 Again, only minor changes were observed in most data sets (Figure~\ref{fig:setchange}b), for both the set of significant HVGs and for the top 200 HVGs with the smallest $p$-values.
 These results suggest that the detection and ranking of DEGs and HVGs are largely robust to variability in spike-in volume or behaviour.
