@@ -249,7 +249,7 @@ This suggests that $F_i$ will include some of the differences in behaviour betwe
 \subsection{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
-This included public data sets \cite{segerstople2016single,islam2011characterization,wilson2015combined} as well as our 416B and trophoblast data.
+This included public data sets \cite{segerstople2016single,islam2011characterization} as well as our 416B and trophoblast data.
 We then performed analyses such as detection of differentially expressed genes (DEGs) and highly variable genes (HVGs), as well as dimensionality reduction and clustering of cells.
 This was done without any modification of the data to obtain a set of ``original results''.
 
@@ -263,8 +263,9 @@ Counts for the endogenous transcripts were used directly without any modificatio
 
 For DEG detection, we applied edgeR \cite{robinson2010edgeR} and MAST \cite{finak2015mast} to the original and simulated data after spike-in normalization.
 edgeR represents methods designed for DE analyses of bulk RNA-seq data, while MAST represents bespoke single-cell methods.
-In both cases, we observed only minor (below 5\%) changes to the set of significant DEGs upon introducing spike-in variability in each data set (Figure~\ref{fig:setchange}a). 
-Small changes were also observed in the top 200 DEGs with the smallest $p$-values.
+In both cases, we observed only minor changes to the set of significant DEGs upon introducing spike-in variability in each data set (Figure~\ref{fig:setchange}a). 
+Fewer than 5\% of DEGs changed in most cases, with all changes under 8\% in the most extreme cases.
+Similar results were also observed in the top 200 DEGs with the smallest $p$-values.
 For HVG detection, we used methods based on the coefficient of variation \cite{brennecke2013accounting} or the variance of log-expression values \cite{lun2016stepbystep}.
 Again, only minor changes were observed in most data sets (Figure~\ref{fig:setchange}b), for both the set of significant HVGs and for the top 200 HVGs with the smallest $p$-values.
 These results suggest that the detection and ranking of DEGs and HVGs are largely robust to variability in spike-in volume or behaviour.
@@ -276,12 +277,12 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
     \caption{Effect of spike-in variability on DEG or HVG detection in simulated data.
         (a) The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
         This was also calculated for the top set of 200 DEGs with the smallest $p$-values.
-        Simulations were designed to test for differential expression between mouse embryonic stem cells (mESCs) and fibroblasts (MEFs) \cite{islam2011characterization},
-        or before and after induction of the CBFB-MYH11 oncogene in our 416B data set.
+        Simulations were based on our 416B data set, to detect DEGs before and after induction of the CBFB-MYH11 oncogene;
+        or on the data from Islam \textit{et al.} \cite{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
-        by the Brennecke \textit{et al.} method using the squared coefficient of variation (CV$^2$) or by the variance of log-expression.
+        using the Brennecke \textit{et al.} method based the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
         This was also calculated for the top set of 200 HVGs with the smallest $p$-values.
-        Simulations were designed to detect HVGs in our 416B and trophoblast data, and in haematopoietic stem cells (HSCs) \cite{wilson2015combined}.
+        Simulations were based on our 416B and trophoblast data to detect HVGs across cells.
         All values represent the mean of 20 simulation iterations, and error bars represent standard errors.
     }
     \label{fig:setchange}
@@ -292,15 +293,17 @@ While $t$-distributed stochastic neighbour embedding \cite{van2008visualizing} i
 We generated PCA plots of the first three principal components using both the original and simulated data.
 At each simulation iteration, coordinates of all cells in the simulated plots were mapped onto the corresponding original plots to determine the sensitivity of the original locations to spike-in variability.
 Figure~\ref{fig:dimclust}a indicates that changes in the location of each cell across simulation iterations were generally minor.
+In particular, movement of cells across iterations did not compromise the separation of different cell types. 
 Thus, spike-in variability does not appear to affect the visual interpretation of PCA plots.
 
 \begin{figure}[btp]
     \begin{center}
         \includegraphics[width=\textwidth]{../simulations/clustering/clust_effect.pdf}
     \end{center}
-    \caption{Effect of spike-in variability on dimensionality reduction and clustering in simulated data.
-        (a) PCA plots of the first three principal components, where each cell is coloured according to the annotated cell type in the original study \cite{segerstople2016single}.
-        The circle around each cell contains 95\% of remapped locations across the simulation iterations, and represents the deviation due to spike-in variability.
+    \caption{Effect of spike-in variability on dimensionality reduction and clustering in simulated data,
+        based on real scRNA-seq data for cells extracted from a healthy human pancreas \cite{segerstople2016single}.
+        (a) PCA plots of the first three principal components, where each cell is coloured according to its annotated cell type from the original study. 
+        The circle around each cell contains 95\% of remapped locations across the simulation iterations, and represents the deviation in location due to spike-in variability.
         (b) Clusters were identified from the original data by hierarchical clustering with Ward's criterion, followed by a tree cut with $k$ of 2, 5 or 10.
         This was repeated at each simulation iteration, and the maximum Jaccard index between each original cluster and any of the simulated clusters at the same $k$ was computed.
         Each value represents the mean of 20 simulation iterations, and the error bars represent standard errors.
@@ -475,6 +478,17 @@ This process was repeated with the simulated data, and the Jaccard index between
 For each original cluster, the maximum Jaccard index across all simulated clusters was recorded at each simulation iteration.
 This value represents the extent to which the membership of the original cluster was preserved in the most similar simulated cluster.
 We also compared the original clusters to those generated from complete-linkage clustering of the original HVG log-expression values.
+
+\section{Data access}
+Data are available on ArrayExpress under the accession E-MAT-XXXX.
+Code used for the statistical analysis and simulations are available at https://github.com/MarioniLab/SpikeIns2016.
+
+\section{Author contributions}
+ATLL proposed the mixture experiments and performed the statistical analysis and simulations.
+FJCN adapted the Smart-seq2 protocol for the spike-in mixtures and generated the 416B data.
+LHV generated the trophoblast data.
+BG and JCM provided direction and guidance on the project.
+All authors were involved in drafting the manuscript.
 
 \section{Acknowledgements}
 We thank Liliana Antunes for supplying the trophoblast cells.

@@ -135,7 +135,7 @@ Specifically, the spike-in totals were rescaled to have a mean of unity across a
 This represents spike-in normalization as each ``spike-in size factor'' scales the counts in each library so that the spike-in totals are the same. 
 We did \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
 The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package with min.bio.disp set to zero.
-If blocking factors were present, they were regressed out by applying the removeBatchEffect function from the limma package \cite{ritchie2015limma} to the counts prior to using technicalCV2.
+If blocking factors were present, they were regressed out by log-transforming the counts; applying the removeBatchEffect function from the limma package \cite{ritchie2015limma} to the log-counts; and converting the corrected log-values back to the count scale, prior to using technicalCV2.
 
 The second approach to detect HVGs was based on computing the variance of log-expression values \cite{lun2016stepbystep}.
 For each count in each library, a normalized log-expression value was defined as the log-ratio of the count with the spike-in size factor for that library.
@@ -176,6 +176,7 @@ For each cell, the smallest circle centered at its original location was drawn t
 
 Note that, for the data set used in this simulation, we removed cells that were already annotated as low quality in the associated metadata.
 No additional outlier-based quality control was performed.
+Moreover, we only used the cells extracted from a single individual (HP1502401, healthy male) for simplicity.
 
 \begin{figure}[btp]
     \begin{center}
