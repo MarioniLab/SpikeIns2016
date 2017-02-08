@@ -321,13 +321,14 @@ To put this into context, we repeated the clustering on the original data but us
 This yielded smaller indices for all clusters (Figure~\ref{fig:dimclust}c), indicating that spike-in variability has less effect on the results than the choice of clustering method.
 
 \section{Discussion}
-In this article, we performed mixture experiments to quantify the variability of spike-in addition across wells in a plate-based scRNA-seq protocol.
+In this article, we performed mixture experiments to quantify the variability of spike-in RNA addition across wells in a plate-based scRNA-seq protocol.
 We also obtained a rough estimate of the well-to-well variability in the differences in behaviour between two different sets of transcripts.
-Both values were at least an order of magnitude smaller than the variability in the actual spike-in coverage across cells, suggesting that they were negligible in the context of spike-in normalization.
-This was supported by simulations where the experimentally observed levels of spike-in variance yielded only minor changes in the results of DEG and HVG analyses as well as PCA and clustering.
-Our results indicate that spike-in normalization is reliable and can be used routinely in scRNA-seq data analyses.
+Both values were at least an order of magnitude smaller than the variance of spike-in coverage across cells, suggesting that differences in spike-in volume or behaviour were not major sources of error in the context of spike-in normalization.
+This was supported by simulations where the introduction of realistic levels of spike-in variance yielded only minor changes in the results of DEG and HVG analyses as well as PCA and clustering.
+Our results indicate that spike-in normalization is reliable enough for routine use in scRNA-seq data analyses.
+The common criticisms of using spike-in RNA for normalization are only weakly relevant, if at all, to single-cell transcriptome studies, and can be ignored in practice.
 
-Our conclusions differ from those of Risso \textit{et al.} \cite{risso2014normalization}, where spike-in normalization is not considered reliable enough for routine analyses of bulk RNA-seq data.
+Our conclusions differ from those of Risso \textit{et al.} \cite{risso2014normalization}, where spike-in normalization is not considered reliable enough for analyses of bulk RNA-seq data.
 We speculate that this difference may be due to the difficulty of adding an appropriate amount of spike-in RNA at the population level.
 For example, should spike-in RNA be added at a constant ratio with respect to the concentration of endogenous RNA, or to the number of cells in the sample?
 If the endogenous RNA concentration or the number of cells determines the amount of spike-in RNA to be added, these will need to be experimentally quantified for each sample.
@@ -337,7 +338,7 @@ These questions are not relevant to single-cell experiments where the obvious ap
 We have used the Smart-seq2 protocol in our study to reflect its widespread use in the scRNA-seq literature.
 However, our estimate of $\sigma^2_{vol}$ is agnostic to how reverse transcription, amplification and sequencing were performed, as these steps are represented by other mathematical terms.
 Thus, our conclusions are likely to be applicable to any scRNA-seq protocol where spike-in RNA is added in a similar manner (using electronic pipettes, see Methods).
-Our experimental framework may also be useful for evaluating the precision of spike-in addition when developing new protocols or setting up existing protocols in new laboratories, to ensure that spike-in RNA is added correctly to each cell.
+Our experimental framework may also be useful for evaluating the precision of spike-in addition when developing new protocols or setting up existing protocols in new laboratories, to ensure that spike-in RNA is being added correctly.
 
 We stress that our study only examines the reliability of spike-ins for ``relative'' normalization, i.e., to make counts comparable across cells.
 We do not consider the reliability of spike-ins for absolute quantification, i.e., to determine the number of molecules of each transcript or gene in each cell.
@@ -410,8 +411,8 @@ This yields
 
 Let us denote $x^2 = \sigma^2_{vol} + \variance(F_i)$, representing the total variance attributable to spike-in addition and capture efficiency.
 We also denote $\hat\sigma^2_s$ as the estimate of $\variance(T_{is})$ across wells, and $\hat\mu_s$ as the estimate of $E(T_{is})$.
-We use $\variance(\theta^*_i) \approx 0.01$ as our estimate $\hat{x}^2$ of the upper bound of $x^2$.
-This is based on the fact that the estimated $\variance(\theta^*_i)\approx 0.01$ provides an upper bound on $\variance(F_i)$, while $\sigma^2_{vol}$ is near-zero in Figure~\ref{fig:varestimates}a.
+We use the estimated $\variance(\theta^*_i) \approx 0.015$ in Figure~\ref{fig:varestimates}a as our estimate $\hat{x}^2$ of the upper bound of $x^2$.
+This is based on the fact that the estimated $\variance(\theta^*_i)$ provides an upper bound on $\variance(F_i)$, while $\sigma^2_{vol}$ is near-zero in Figure~\ref{fig:varestimates}a.
 For each well $i$, we compute a simulated log$_2$-total $T^*_{is}$ as
 \[
     T^*_{is} = (T_{is} - \hat\mu_s)\sqrt{1-\frac{ \hat{x}^2}{\hat\sigma^2_s}} + \hat\mu_s + X_i
