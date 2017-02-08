@@ -74,7 +74,7 @@ for (datatype in c("calero", "islam")) {
         design <- model.matrix(~Group, expvar)
     }
 
-    for (my.var in c(0.01)) {
+    for (my.var in c(0.015)) {
 		set.seed(231234)
 		results <- top.set <- list()
 		
@@ -140,7 +140,7 @@ for (datatype in c("calero", "islam")) {
         form <- ~cngeneson + Group
     }
 
-    for (my.var in c(0.01)) {
+    for (my.var in c(0.015)) {
         set.seed(3742)
         results <- top.set <- list()
     
