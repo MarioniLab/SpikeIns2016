@@ -1,7 +1,6 @@
 ###############################################################
 
 dir.create("pics")
-cols <- c("orange", "purple", "grey80")
 names <- c("416B (I)", "416B (II)", "Tropho (I)", "Tropho (II)")
 
 ###############################################################
@@ -10,6 +9,7 @@ names <- c("416B (I)", "416B (II)", "Tropho (I)", "Tropho (II)")
 require(simpaler)
 total <- premixed <- ERCC.first <- SIRV.first <- volume <- ERCC.sf <- SIRV.sf <- list()
 total.err <- premixed.err <- ERCC.first.err <- SIRV.first.err <- volume.err <- ERCC.sf.err <- SIRV.sf.err <- list()
+total.df <- premixed.df <- ERCC.first.df <- SIRV.first.df <- volume.df <- ERCC.sf.df <- SIRV.sf.df <- list()
 index <- 1L
 
 for (operator in c("Calero", "Liora")) {
@@ -23,35 +23,53 @@ for (operator in c("Calero", "Liora")) {
         out <- readRDS(file.path(operator, dataset, "analysis", "results.rds"))
         total[[index]] <- out$ratioSep.var
         total.err[[index]] <- attributes(out$ratioSep.var)$standard.error
+        total.df[[index]] <- attributes(out$ratioSep.var)$df
+        
         premixed[[index]] <- out$ratioPre.var
         premixed.err[[index]] <- attributes(out$ratioPre.var)$standard.error
+        premixed.df[[index]] <- attributes(out$ratioPre.var)$df
+        
         volume[[index]] <- out$ratioVol.var
         volume.err[[index]] <- attributes(out$ratioVol.var)$standard.error
+        volume.df[[index]] <- attributes(out$ratioVol.var)$df
+        
         ERCC.sf[[index]] <- out$sfERCC.var
         ERCC.sf.err[[index]] <- attributes(out$sfERCC.var)$standard.error
+        ERCC.sf.df[[index]] <- attributes(out$sfERCC.var)$df
+        
         SIRV.sf[[index]] <- out$sfSIRV.var
         SIRV.sf.err[[index]] <- attributes(out$sfSIRV.var)$standard.error
+        SIRV.sf.df[[index]] <- attributes(out$sfSIRV.var)$df
+        
         ERCC.first[[index]] <- out$ratioERCCfirst.var 
         ERCC.first.err[[index]] <- attributes(out$ratioERCCfirst.var)$standard.error
+        ERCC.first.df[[index]] <- attributes(out$ratioERCCfirst.var)$df
+        
         SIRV.first[[index]] <- out$ratioERCCsecond.var
         SIRV.first.err[[index]] <- attributes(out$ratioERCCsecond.var)$standard.error
+        SIRV.first.df[[index]] <- attributes(out$ratioERCCsecond.var)$df
         index <- index + 1L
     }
 }
 
 pdf("pics/variance_exp.pdf", width=14, height=7)
-par(mar=c(5.1, 5.1, 2.1, 2.1), mfrow=c(1,2))
+par(mar=c(5.1, 5.1, 2.1, 2.1), mfrow=c(1,2), xpd=TRUE)
 
+# First making a plot of separate vs premixed.
+
+cols <- c("orange", "purple", "grey80")
 final <- rbind(Separate=unlist(total), Premixed=unlist(premixed), Volume=unlist(volume))
 colnames(final) <- names
 final.err <- rbind(Separate=unlist(total.err), Premixed=unlist(premixed.err), Volume=unlist(volume.err))
 upper.limit <- final  + final.err
+final.df <- rbind(Separate=unlist(total.df), Premixed=unlist(premixed.df), Volume=unlist(volume.df))
 
 ylim <- 0.03
 out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"), 
                cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=cols, ylim=c(0, ylim))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
+text(out[-3,], upper.limit[-3,], final.df[-3,], pos=3, cex=0.9, offset=0.2)
 legend(out[1]-0.5, ylim, fill=cols, rownames(final), cex=1.2)
 curcoords <- par()$usr
 mtext("a", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1]), font=2)
@@ -60,27 +78,37 @@ final <- rbind(ERCC=unlist(ERCC.sf), SIRV=unlist(SIRV.sf))
 colnames(final) <- names
 final.err <- rbind(ERCC=unlist(ERCC.sf.err), SIRV=unlist(SIRV.sf.err))
 upper.limit <- final  + final.err
+final.df <- rbind(ERCC=unlist(ERCC.sf.df), SIRV=unlist(SIRV.sf.df))
+
+# Making a plot of the size factors.
 
 my.cols <- c("grey30", "grey70")
 out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"size factors"), 
         cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=my.cols, ylim=c(0, 0.3))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
+text(colMeans(out), apply(upper.limit, 2, max), final.df[1,], pos=3, cex=0.9, offset=0.2)
 legend("topright", fill=my.cols, rownames(final), cex=1.2)
 curcoords <- par()$usr
 mtext("b", line=0, cex=1.5, at=curcoords[1] - 0.14*(curcoords[2] - curcoords[1]), font=2)
 dev.off()
 
+# Ordering the elements.
+
 pdf("pics/variance_order.pdf", width=9, height=7)
 par(mar=c(5.1, 5.1, 2.1, 10.1), xpd=TRUE)
+
 final <- rbind("ERCC+SIRV"=unlist(ERCC.first), "SIRV+ERCC"=unlist(SIRV.first))
 colnames(final) <- names
 final.err <- rbind("ERCC+SIRV"=unlist(ERCC.first.err), "SIRV+ERCC"=unlist(SIRV.first.err))
 upper.limit <- final  + final.err
+final.df <- rbind("ERCC+SIRV"=unlist(ERCC.first.df), "SIRV+ERCC"=unlist(SIRV.first.df))
+
 out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"), 
                cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col=my.cols, ylim=c(0, max(upper.limit)))
 segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
+text(out, upper.limit, final.df, pos=3, cex=0.9, offset=0.2)
 legend(max(out)+0.5, max(final), fill=my.cols, rownames(final), cex=1.2)
 dev.off()
 

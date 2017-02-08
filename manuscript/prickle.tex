@@ -223,7 +223,8 @@ The variance of the log-size factors is around one order of magnitude larger tha
         Each estimate is the residual variance of a linear model fitted to the log-ratios or log-size factors across all wells on each plate.
         Results are shown for experiments with 416B cells or trophoblasts, each containing two replicate plates.
         Error bars represent the standard errors of the estimates, assuming the log-values are normally distributed.
-        Differences between the separate-addition and premixed variance estimates for each batch were assessed using a one-sided F-test, yielding $p$-values of 0.28, 1.00, 1.00 and 0.06 from left to right.
+        Numbers represent the residual degrees of freedom used for each estimate -- for (b), this was the same for each spike-in set.
+        Differences between the separate-addition and premixed estimates for each batch were assessed using a one-sided F-test, yielding $p$-values of 0.28, 1.00, 1.00 and 0.06 from left to right.
     }
     \label{fig:varestimates}
 \end{figure}
@@ -326,7 +327,7 @@ We also obtained a rough estimate of the well-to-well variability in the differe
 Both values were at least an order of magnitude smaller than the variance of spike-in coverage across cells, suggesting that differences in spike-in volume or behaviour were not major sources of error in the context of spike-in normalization.
 This was supported by simulations where the introduction of realistic levels of spike-in variance yielded only minor changes in the results of DEG and HVG analyses as well as PCA and clustering.
 Our results indicate that spike-in normalization is reliable enough for routine use in scRNA-seq data analyses.
-The common criticisms of using spike-in RNA for normalization are only weakly relevant, if at all, to single-cell transcriptome studies, and can be ignored in practice.
+The common criticisms of using spike-in RNA for normalization are only weakly relevant, if at all, to single-cell transcriptome studies, and can generally be ignored.
 
 Our conclusions differ from those of Risso \textit{et al.} \cite{risso2014normalization}, where spike-in normalization is not considered reliable enough for analyses of bulk RNA-seq data.
 We speculate that this difference may be due to the difficulty of adding an appropriate amount of spike-in RNA at the population level.
