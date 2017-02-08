@@ -37,10 +37,12 @@ for (datatype in c("wilson", "calero", "liora")) {
         } else { 
             incoming.1 <- readRDS("../../real/Liora/test_20160906/analysis/full.rds")
             incoming.1 <- incoming.1[,is.na(incoming.1$samples$control.well)]
-            incoming <- cbind(incoming.1$counts)
+            incoming.2 <- readRDS("../../real/Liora/test_20170201/analysis/full.rds")
+            incoming.2 <- incoming.2[,is.na(incoming.2$samples$control.well)]
+            incoming <- cbind(incoming.1$counts, incoming.2$counts)
             gdata <- incoming.1$genes
             block <- NULL
-#            block <- rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2)))
+            block <- rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2)))
         }
 
         # Getting rid of SIRVS (spike2), and setting ERCCs (spike1) as the spike-ins.
@@ -69,7 +71,7 @@ for (datatype in c("wilson", "calero", "liora")) {
     # Running through our various methods.
 
     for (method in c("VarLog", "TechCV")) { 
-        for (my.var in c(0.01)) { 
+        for (my.var in c(0.015)) { 
             set.seed(34271)
             results <- top.res <- sig.res <- list()
             
@@ -112,12 +114,15 @@ for (datatype in c("wilson", "calero", "liora")) {
                 } else {
                     sce2 <- sce
                     if (!is.null(block)) {   
-                        counts(sce2) <- removeBatchEffect(counts(sce2), block=block[okay.libs])
+                        leftovers <- removeBatchEffect(exprs(sce2), block=block[okay.libs])
+                        of.value <- t(t(2^leftovers - sce2@logExprsOffset) * sizeFactors(sce2))
+                        of.value[of.value < 0] <- 0
+                        counts(sce2) <- of.value
                     }
                     outt <- technicalCV2(sce2, min.bio.disp=0)
                     outt <- outt[!isSpike(sce2),]
                     my.rank <- rank(outt$p.value)
-                    is.sig <- outt$FDR <= 0.05                    
+                    is.sig <- outt$FDR <= 0.05
                 }
                     
                 top.ranked <- lapply(top.hits, function(x) { my.rank <= x })       

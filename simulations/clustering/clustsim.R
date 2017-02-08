@@ -72,7 +72,7 @@ clust.collected <- list()
 
 for (i in seq(0,20)) {
     # Running original data, then resampled versions.
-    if (i) { spike.data <- resampleSpikes(spike.param, var.log=0.01) }
+    if (i) { spike.data <- resampleSpikes(spike.param, var.log=0.015) }
     else { spike.data <- spike.param$counts }
   
     sce <- newSCESet(countData=rbind(countsCell, spike.data))
