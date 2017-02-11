@@ -223,6 +223,31 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
 }
 \end{figure}
 
+\begin{table}[btp]
+    \caption{Alignment and counting statistics for each batch of scRNA-seq data, including the total number of fragments (reads for single-end data, read pairs for paired-end data), percentage of reads mapped to the reference genome and percentage of fragments assigned to genic regions.
+    For each statistic, the median value across all wells in the batch is shown with first and third quartiles in brackets.}
+    \begin{center}
+        \begin{tabular}{l r r r}
+            \hline
+            \textbf{Data set} & \textbf{Total ($\times 10^6$)} & \textbf{Mapped (\%)} & \textbf{Counted (\%)} \\
+            \hline
+            416B (I)  & 2.80 (2.39-3.10) & 59.2 (56.6-61.6) & 46.3 (45.1-49.3) \\
+            416B (II) & 2.82 (2.40-3.26) & 50.3 (47.3-53.1) & 39.0 (36.5-42.3) \\
+            Tropho (I) & 2.02 (17.9-2.20) & 88.8 (88.1-89.3) & 74.9 (73.0-76.5) \\
+            Tropho (II) & 2.33 (2.08-2.57) & 89.1 (87.6-89.7) & 62.8 (61.5-65.5) \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+% blah <- read.table("my_qual.tsv", header=TRUE, comment="")
+% totals <- rowSums(blah)
+% mapped <- 1 - blah$Unassigned_Unmapped/totals
+% counted <- blah$Assigned/totals
+% summary(totals, digits=100)
+% summary(mapped)
+% summary(counted)
+
 \end{document}
 
 
