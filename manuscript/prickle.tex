@@ -5,8 +5,10 @@
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage[hidelinks]{hyperref}
-\usepackage{color}
 \urlstyle{same}
+
+\usepackage{textcomp}
+\usepackage{color}
 
 \newcommand{\suppfignorm}{1}
 \newcommand{\suppfigtotals}{2}
@@ -349,12 +351,34 @@ Nonetheless, our conclusions are still relevant as absolute quantification depen
 
 \section{Methods}
 
+\subsection{Culturing 416B cells and obtaining trophoblasts}
+\textcolor{red}{Need description of culturing, sorting}
+
 \subsection{Spike-in mixture experiments with Smart-seq2}
 % On a single plate, so no plate effects.
 % Mention cutting up of plate, especially for the two conditions.
 % No effect of different cell treatments.
 
-\textcolor{red}{Need description of culturing, sorting, protocol (+ modification for double spike-in), sequencing.}
+Single-cell RNA sequencing was performed using an adaptation of the previously described Smart-seq2 protocol \cite{picelli2014full}.
+Single 416B or trophoblast cells were sorted into individual wells of a 96-well microtiter plate.
+Each well contained 2.3~\textmu{}l of lysis buffer with RNAse inhibitor (Ambion) in a 0.2\% (v/v) Triton X-100 solution. 
+Reverse transcription (RT) was performed in a final volume of 13.2~\textmu{}l per well, containing 1~\textmu{}M of oligo-dT (Sigma-Aldrich), 1.04~mM of each dNTP (ThermoFisher), 100~U of SuperScript II retrotranscriptase (Invitrogen/ThermoFisher), 5~U of RNase inhibitor (Ambion), 5~mM of DTT, 1~M of Betaine (Sigma-Alrich), 6~mM of MgCl$_2$ (Ambion) and 1~\textmu{}M of TSO primer (Exiqon).
+Preamplification was performed in a total volume of 27~\textmu{}l that contained 13.5~\textmu{}l of HiFi Hotstart ReadyMix (2$\times$; KAPA Biosystems) and 0.1~\textmu{}M of IS PCR primer (Sigma-Aldrich). 
+After 23 cycles of amplification, samples were cleaned with 80\% (v/v) of Ampure beads (Beckman Coulter). 
+Sequencing libraries were prepared using the Nextera XT DNA sample preparation kit (Illumina).
+
+To perform the mixture experiments, spike-in RNA was mixed into the RT reagent solution and added to each well.
+This was done such that each well contained 0.1~\textmu{}l of a 1:3,000,000 dilution of the ERCC RNA Spike-In Mix (Invitrogen/ThermoFisher) and 0.12~\textmu{}l of a 1:3,000,000 dilution of the Spike-in RNA Variant (SIRV) Control Mix E0 (Lexogen). 
+Two separate solutions of RT reagents were prepared for the different spike-in sets.
+For one third of the wells, addition of the two spike-in sets was performed separately with the RT+ERCC solution first and the RT+SIRV solution second.
+For another third of the wells, the order was reversed, i.e., with the RT+SIRV solution first and the RT+ERCC solution second.
+For the remaining wells, the RT+SIRV and RT+ERCC solutions were premixed in a 1:1 ratio and the RT+SIRV+ERCC mixture was added twice to each well.
+All addition steps were performed independently for each well, using an electronic pipette dispensing X~\textmu{}l.
+
+Sequencing of the 416B libraries was performed at the Genomics Core facility of the Cancer Research UK Cambridge Institute.
+The first batch of libraries was sequenced with an Illumina HiSeq 2500 machine generating 125 bp single-end reads, while the second batch was sequenced with an Illumina HiSeq 4000 machine generating 50 bp single-end reads.
+Sequencing of the trophoblast libraries was performed at the Single Cell Genomics Core facility at the Wellcome Trust Sanger Institute.
+Both batches were sequenced using an Illumina HiSeq 4000 machine generating 75 bp paired-end reads.
 
 \subsection{Data analysis for the mixture experiments}
 Reads were mapped to the mm10 build of the mouse genome, including sequences of transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
