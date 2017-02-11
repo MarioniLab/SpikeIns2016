@@ -73,7 +73,7 @@ One particular advantage of this strategy is that it does not make any assumptio
 This means that spike-in normalization can be applied in situations where large-scale changes in expression (e.g., related to changes in total RNA content) are expected and of interest \cite{lun2016stepbystep}.
 
 There are several common criticisms of spike-in normalization that challenge the validity of its central assumptions.
-The first is that the same quantity of spike-in RNA may not be consistently added to each sample \cite{robinson2010tmm}, while the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \cite{grun2015design}.
+The first is that the same quantity of spike-in RNA may not be consistently added to each sample \cite{robinson2010tmm}, while the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \cite{grun2015design} (e.g., unequal efficiencies of capture and amplification, caused by differences in biophysical properties).
 Any differences in spike-in quantity or behaviour across cells will compromise the accuracy of spike-in normalization \cite{risso2014normalization}.
 These criticisms may contribute to the limited use of this normalization strategy in the scRNA-seq literature \cite{bacher2016design}.
 However, if one were to dismiss the use of spike-in normalization, there would be no general alternative for removing cell-specific biases in scRNA-seq data sets where a non-DE majority of genes cannot be assumed.
