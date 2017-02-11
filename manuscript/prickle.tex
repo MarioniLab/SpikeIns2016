@@ -341,15 +341,21 @@ These questions are not relevant to single-cell experiments where the obvious ap
 
 We have used the Smart-seq2 protocol in our study to reflect its widespread use in the scRNA-seq literature.
 However, our estimate of $\sigma^2_{vol}$ is agnostic to how reverse transcription, amplification and sequencing were performed, as these steps are represented by other mathematical terms.
-Thus, our conclusions are likely to be applicable to any scRNA-seq protocol where spike-in RNA is added in a similar manner (using electronic pipettes, see Methods).
-Our experimental framework may also be useful for evaluating the precision of spike-in addition when developing new protocols or setting up existing protocols in new laboratories, to ensure that spike-in RNA is being added correctly.
+Thus, we expect our conclusions to be broadly applicable to any scRNA-seq protocol where spike-in RNA is added in a similar manner (using repeater pipettes, see Methods).
+Different results will be obtained using other methods for spike-in addition, e.g., with robotics systems or microfluidics, where volume handling may be even more precise.
+Our experimental framework may also be useful for evaluating the precision of spike-in addition when developing new scRNA-seq protocols or setting up existing protocols in new laboratories, to ensure that spike-in RNA is added correctly to each cell.
+
+The term $\variance(F_i)$ represents the variability in the difference in behaviour between the SIRV and ERCC spike-in sets across wells.
+However, the relevant quantity is the variability in the difference $P_{is}$ between a synthetic spike-in set and endogenous RNA, as this affects the accuracy of normalization.
+It may be possible to obtain a rough estimate of $\variance(P_{is})$ by using pooled cellular RNA from another organism as one of the spike-in sets \cite{brennecke2013accounting}, so that $\variance(\theta^*_i)$ provides an upper bound on the variance in the differences in behaviour between synthetic and endogenous RNA.
+We chose not to do so because of the difficulty in reproducibly using the same pool of cellular RNA across batches, and in calibrating the concentration of RNA to be added to each well.
+Use of UMI counts may also provide a tighter bound on $\variance(F_i)$ or $\variance(P_{is})$ by reducing the contribution of amplification noise to $\variance(\theta^*_i)$.
 
 We stress that our study only examines the reliability of spike-ins for ``relative'' normalization, i.e., to make counts comparable across cells.
-We do not consider the reliability of spike-ins for absolute quantification, i.e., to determine the number of molecules of each transcript or gene in each cell.
+We do not consider the reliability of spike-ins for absolute quantification, i.e., to determine the number of molecules of each transcript in each cell.
 This is more difficult to evaluate as accuracy is affected by the magnitude of the differences in the behaviour of spike-in and endogenous transcripts.
-In contrast, relative normalization is only affected by variability in the differences in behaviour, as discussed above.
-Nonetheless, our conclusions are still relevant as absolute quantification depends on the same amount of spike-in RNA being added to each cell.
-
+In contrast, relative normalization is only affected by variability in the differences in behaviour across wells, as discussed above.
+Nonetheless, our conclusions are still relevant as absolute quantification depends on the precise addition of spike-in RNA to each cell.
 
 \section{Methods}
 
