@@ -109,3 +109,36 @@ sdrf.liora <- read.table("sdrf_Liora.tsv", header=TRUE, check.names=FALSE, comme
 stopifnot(identical(colnames(sdrf.calero), colnames(sdrf.liora)))
 write.table(file="sdrf.tsv", rbind(sdrf.calero, sdrf.liora), row.names=FALSE, quote=FALSE, sep="\t")
 
+##########################################################################3
+# Computing the spike-in quantity per well.
+
+# ERCC data taken from https://www.thermofisher.com/order/catalog/product/4456740,
+# under the link "ERCC Controls Analysis: ERCC RNA Spike-In Control Mixes (English)".
+ercc.vol <- 0.1 # in uL
+ercc.dil <- 3e6
+ercc.data <- read.table("cms_095046.txt", header=TRUE, check.names=FALSE, sep="\t", stringsAsFactors=FALSE)
+ercc.id <- ercc.data[,"ERCC ID"]
+ercc.quant <- ercc.vol/ercc.dil * ercc.data[,"concentration in Mix 1 (attomoles/ul)"]
+
+# SIRV data from https://www.lexogen.com/sirvs/downloads/,
+# under the link (SIRV sequence design overview (XLSX)).
+# We compute the total molarity across all transcripts for each gene (from femtomoles -> attomoles)
+sirv.vol <- 0.12 # in uL
+sirv.dil <- 3e6
+sirv.data <- c(SIRV1=8, SIRV2=6, SIRV3=11, SIRV4=7, SIRV5=12, SIRV6=18, SIRV7=7) * 1000
+sirv.id <- names(sirv.data)
+sirv.quant <- sirv.vol/sirv.dil * sirv.data
+
+# Sanity check:
+# library(edgeR)
+# full <- readRDS("../Calero/trial_20160113/analysis/full.rds")
+# plot(ercc.quant, rowSums(full$counts[full$genes$spike1,])[ercc.id])
+# points(sirv.quant, rowSums(full$counts[full$genes$spike2,])[sirv.id], col="red")
+
+spike.dir <- "spike-data"
+dir.create(spike.dir, showWarnings=FALSE)
+write.table(file=file.path(spike.dir, "spikes.txt"), sep="\t", quote=FALSE, row.names=FALSE,
+            data.frame(Name=c(ercc.id, sirv.id), "Attomole/well"=c(ercc.quant, sirv.quant), check.names=FALSE))
+
+
+
