@@ -5,7 +5,7 @@ collected <- list()
 fpath <- "/run/user/1753941046/gvfs/smb-share:server=jmlab-data,share=jmlab/group_folders/lun01/Internal/SpikeIns"
 relink <- "make_links_Calero.sh"
 write(file=relink, c("set -e", "set -u", "mkdir fastq_Calero"), ncol=1)
-
+library(edgeR)
 
 for (sample in c("Calero/trial_20160113", "Calero/trial_20160325")) {
     cpath <- file.path("..", sample, "analysis", "genic_counts.tsv")
@@ -51,7 +51,7 @@ output[["Source Name"]] <- collected$Sample
 output[["Characteristics[organism]"]] <- "Mus musculus"
 output[["Characteristics[cell line]"]] <- "416B"
 output[["Material Type"]] <- "RNA"
-output[[paste0(rep(c("Protocol REF", "Performer"), 6), collapse="\t")]] <- paste0(c("Obtaining 416B cells", "Fernando Calero",
+output[[paste0(rep(c("Protocol REF", "Performer"), 5), collapse="\t")]] <- paste0(c("Obtaining 416B cells", "Fernando Calero",
                                                                                     "Culturing 416B cells", "Fernando Calero",
                                                                                     "Reverse transcription", "Fernando Calero",
                                                                                     "Extracting RNA", "Fernando Calero",
@@ -71,7 +71,7 @@ output[["Assay Name"]] <- collected$Sample
 output[["Technology Type"]] <- "sequencing assay"
 output[["Comment[experiment batch]"]] <- collected$Batch
 output[["Array Data File"]] <- collected$File
-output[["Protocol REF"]] <- "Assigning reads to genes"
+output[["Protocol REF\tPerformer"]] <- "Assigning reads to genes\tAaron Lun"
 output[["Derived Array Data File"]] <- collected$Counts
 output[["Comment[MD5]"]] <- collected$MD5
 output[["Characteristics[single cell well quality]"]] <- "single cell"

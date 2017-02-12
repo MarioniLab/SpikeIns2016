@@ -101,4 +101,11 @@ for (x in names(all.out)) {
     write(file="idf.tsv", paste0(c(x, all.out[[x]]), collapse="\t"), append=TRUE)
 }
 
+##########################################################################3
+# Merging the two SDRF files together.
+
+sdrf.calero <- read.table("sdrf_Calero.tsv", header=TRUE, check.names=FALSE, comment="", sep="\t", quote="", stringsAsFactors=FALSE)
+sdrf.liora <- read.table("sdrf_Liora.tsv", header=TRUE, check.names=FALSE, comment="", sep="\t", quote="", stringsAsFactors=FALSE)
+stopifnot(identical(colnames(sdrf.calero), colnames(sdrf.liora)))
+write.table(file="sdrf.tsv", rbind(sdrf.calero, sdrf.liora), row.names=FALSE, quote=FALSE, sep="\t")
 

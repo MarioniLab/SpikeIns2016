@@ -5,8 +5,9 @@ collected <- list()
 fpath <- "../Liora"
 relink <- "make_links_Liora.sh"
 write(file=relink, c("set -e", "set -u", "mkdir fastq_Liora"), ncol=1)
+library(edgeR)
 
-for (sample in c("test_20160906")) {# "test_20170201")) {
+for (sample in c("test_20160906", "test_20170201")) {
     cpath <- file.path(fpath, sample, "analysis", "genic_counts.tsv")
     all.files <- read.table(cpath, nrows=1, stringsAsFactor=FALSE, comment="")
     prefixes <- as.character(all.files[-c(1:2)])
@@ -30,6 +31,7 @@ for (sample in c("test_20160906")) {# "test_20170201")) {
     # Adding in the MD5 sums.
     md5.sums <- read.table(file.path(fpath, sample, "fastq", "md5.all"),
                            header=FALSE, stringsAsFactor=FALSE, comment="")
+    md5.sums <- md5.sums[order(gsub("_", "X", md5.sums[,2])),] # weird sorting order with underscores in UTF-8
     m <- match(sub("_[12].fq.gz$", "", md5.sums[,2]), prefixes)
 
     # Creating links to files.
@@ -53,7 +55,7 @@ output[["Source Name"]] <- collected$Sample
 output[["Characteristics[organism]"]] <- "Mus musculus"
 output[["Characteristics[cell line]"]] <- "Trophoblast"
 output[["Material Type"]] <- "RNA"
-output[[paste0(rep(c("Protocol REF", "Performer"), 6), collapse="\t")]] <- paste0(c("Obtaining trophoblasts", "Liora Vilmovsky",
+output[[paste0(rep(c("Protocol REF", "Performer"), 5), collapse="\t")]] <- paste0(c("Obtaining trophoblasts", "Liora Vilmovsky",
                                                                                     "Culturing trophoblasts", "Liora Vilmovsky",
                                                                                     "Reverse transcription", "Liora Vilmovsky",
                                                                                     "Extracting RNA", "Liora Vilmovsky",
@@ -73,7 +75,7 @@ output[["Assay Name"]] <- collected$Sample
 output[["Technology Type"]] <- "sequencing assay"
 output[["Comment[experiment batch]"]] <- collected$Batch
 output[["Array Data File"]] <- collected$File
-output[["Protocol REF"]] <- "Assigning reads to genes"
+output[["Protocol REF\tPerformer"]] <- "Assigning reads to genes\tAaron Lun"
 output[["Derived Array Data File"]] <- collected$Counts
 output[["Comment[MD5]"]] <- collected$MD5
 output[["Characteristics[single cell well quality]"]] <- collected$Well
