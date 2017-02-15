@@ -1,13 +1,12 @@
 \documentclass{article}
 \usepackage[margin=3cm]{geometry}
-\usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage[hidelinks]{hyperref}
 \urlstyle{same}
 
-\usepackage{textcomp}
+\usepackage{textgreek}
 \usepackage{color}
 
 \newcommand{\suppfignorm}{1}
@@ -106,9 +105,9 @@ These results suggest that spike-ins can be safely used for routine normalizatio
 We aimed to assess the variability in the added spike-in quantity across cells.
 To do so, we performed mixture experiments using two distinct spike-in sets (Figure~\ref{fig:expdesign}) -- the External RNA Controls Consortium (ERCC) set and the Spike-in RNA Variants (SIRV) set.
 An equal volume of each spike-in set was added separately to a single well of a 96-well microtiter plate.
-Each well also contained a single mouse cell (416B cells or trophoblasts) to mimic real experimental conditions.
+Each well also contained a single mouse cell -- a 416B cell or trophoblast stem cell (TSC) -- to mimic real experimental conditions.
 The resulting pool of endogenous/spike-in RNA in each well was used to generate a library with the Smart-seq2 protocol.
-This process was repeated for multiple wells and sequencing was performed on all libraries.
+This process was repeated for multiple wells and sequencing was performed.
 
 \begin{figure}[tbp]
 \begin{center}
@@ -185,7 +184,7 @@ Computing the variance of $\theta_i$ yields
 \]
 where $\sigma^2_{vol}$ is the variance of both $\log_2(V_{i1})$ and $\log_2(V_{i2})$.
 The volume addition procedure is the same for each spike-in set, so $V_{i1}$ and $V_{i2}$ should have the same distribution.
-Also, we consider the variance of $F_i$ because $R_{i1}$ and $R_{i2}$ are not independent due to well-specific effects on capture efficiency.
+We consider the variance of $F_i$ because $R_{i1}$ and $R_{i2}$ are not independent (due to well-specific factors, as previously mentioned).
 
 In the experiment where the spike-in sets are premixed before addition, $V_{i1}=aV_{i2}$ for some constant $a$ representing the proportions in which the two sets are mixed.
 (This should be close to unity.)
@@ -225,8 +224,8 @@ The variance of the log-size factors is around one order of magnitude larger tha
     \end{center}
     \caption{Variance estimates of (a) the log$_2$-ratio between the ERCC and SIRV total counts across wells, or (b) the log$_2$-size factors computed from those totals.
         Each estimate is the residual variance of a linear model fitted to the log-ratios or log-size factors across all wells on each plate.
-        Results are shown for experiments with 416B cells or trophoblasts, each containing two replicate plates.
-        Error bars represent the standard errors of the estimates, assuming the log-values are normally distributed.
+        Results are shown for experiments with 416B cells or TSCs, with two replicate plates for each cell type.
+        Error bars represent the standard errors of the estimates, assuming log-values are normally distributed.
         Numbers represent the residual degrees of freedom used for each estimate -- for (b), this was the same for each spike-in set.
         Differences between the separate-addition and premixed estimates for each batch were assessed using a one-sided F-test, yielding $p$-values of 0.28, 1.00, 1.00 and 0.06 from left to right.
     }
@@ -254,7 +253,7 @@ This suggests that $F_i$ will include some of the differences in behaviour betwe
 \subsection{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
-This included public data sets \cite{segerstople2016single,islam2011characterization} as well as our 416B and trophoblast data.
+This included public data sets \cite{segerstople2016single,islam2011characterization} as well as our 416B and TSC data.
 We then performed analyses such as detection of differentially expressed genes (DEGs) and highly variable genes (HVGs), as well as dimensionality reduction and clustering of cells.
 This was done without any modification of the data to obtain a set of ``original results''.
 
@@ -286,7 +285,7 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
         using the Brennecke \textit{et al.} method based the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
         This was also calculated for the top set of 200 HVGs with the smallest $p$-values.
-        Simulations were based on our 416B and trophoblast data to detect HVGs across cells.
+        Simulations were based on our 416B and TSC data to detect HVGs across cells.
         All values represent the mean of 20 simulation iterations, and error bars represent standard errors.
     }
     \label{fig:setchange}
@@ -359,8 +358,12 @@ Nonetheless, our conclusions are still relevant as absolute quantification depen
 
 \section{Methods}
 
-\subsection{Culturing 416B cells and obtaining trophoblasts}
+\subsection{Obtaining and culturing 416B cells and TSCs}
 \textcolor{red}{Need description of culturing, sorting}
+
+TSCs were kindly provided by Dr. Jennifer Nichols and cultured on mouse embryonic fibroblast (MEF) feeders with TSC culturing medium (a combination of 70\% MEF conditioned media (R\&D systems) and 30\% RPMI 1640, supplemented with 20\% FBS, 2 mM L-Glutamine, 1 mM Sodium Pyruvate, 100 \textmu{}M \textbeta{}-Mercaptoethanol, 25 ng/mL human recombinant FGF4 (R\&D systems) and 1 \textmu{}g/mL heparin (Tocris Bioscience)). 
+To prepare for single-cell sorting, cells were harvested with trypsin and MEF feeders were depleted by plating the cells onto a gelatinised plate followed by incubation for 1h at 37$^{\circ}$C on TSC culturing medium. 
+The supernatant containing TSCs was used for sorting.
 
 \subsection{Spike-in mixture experiments with Smart-seq2}
 % On a single plate, so no plate effects.
@@ -368,13 +371,13 @@ Nonetheless, our conclusions are still relevant as absolute quantification depen
 % No effect of different cell treatments.
 
 Single-cell RNA sequencing was performed using an adaptation of the previously described Smart-seq2 protocol \cite{picelli2014full}.
-Single 416B or trophoblast cells were sorted into individual wells of a 96-well microtiter plate.
+Single 416B cells or TSCs were sorted into individual wells of a 96-well microtiter plate.
 Each well contained 2.3~\textmu{}l of lysis buffer with RNAse inhibitor (Ambion) in a 0.2\% (v/v) Triton X-100 solution. 
 Reverse transcription (RT) was performed in a final volume of 13.2~\textmu{}l per well, containing 1~\textmu{}M of oligo-dT (Sigma-Aldrich), 1.04~mM of each dNTP (ThermoFisher), 100~U of SuperScript II retrotranscriptase (Invitrogen/ThermoFisher), 5~U of RNase inhibitor (Ambion), 5~mM of DTT, 1~M of Betaine (Sigma-Alrich), 6~mM of MgCl$_2$ (Ambion) and 1~\textmu{}M of TSO primer (Exiqon).
 Preamplification was performed in a total volume of 27~\textmu{}l that contained 13.5~\textmu{}l of HiFi Hotstart ReadyMix (2$\times$; KAPA Biosystems) and 0.1~\textmu{}M of IS PCR primer (Sigma-Aldrich). 
 After 23 cycles of amplification, samples were cleaned with 80\% (v/v) of Ampure beads (Beckman Coulter). 
 Sequencing libraries were prepared using the Nextera XT DNA sample preparation kit (Illumina).
-This was repeated to obtain several batches of data, with each batch consisting of one plate.
+This was repeated to obtain several batches of sequencing data, with each batch consisting of one plate of cells of the same type.
 
 To perform the mixture experiments, spike-in RNA was mixed into the RT reagent solution and added to each well.
 This was done such that each well contained 0.1~\textmu{}l of a 1:3,000,000 dilution of the ERCC RNA Spike-In Mix (Invitrogen/ThermoFisher) and 0.12~\textmu{}l of a 1:3,000,000 dilution of the Spike-in RNA Variant (SIRV) Control Mix E0 (Lexogen). 
@@ -382,32 +385,32 @@ Two separate solutions of RT reagents were prepared for the different spike-in s
 For one third of the wells, addition of the two spike-in sets was performed separately with the RT+ERCC solution first and the RT+SIRV solution second.
 For another third of the wells, the order was reversed, i.e., with the RT+SIRV solution first and the RT+ERCC solution second.
 For the remaining wells, the RT+SIRV and RT+ERCC solutions were premixed in a 1:1 ratio and the RT+SIRV+ERCC mixture was added twice to each well.
-Each addition was performed independently for each well, using a repeater pipette dispensing X~\textmu{}l at a time.
+Each addition was performed independently for each well, using a repeater pipette dispensing 2~\textmu{}l at a time.
 
 Sequencing of the 416B libraries was performed at the Genomics Core facility of the Cancer Research UK Cambridge Institute.
 The first batch of libraries was sequenced with an Illumina HiSeq 2500 machine generating 125 bp single-end reads, while the second batch was sequenced with an Illumina HiSeq 4000 machine generating 50 bp single-end reads.
-Sequencing of the trophoblast libraries was performed at the Single Cell Genomics Core facility at the Wellcome Trust Sanger Institute.
+Sequencing of the TSC libraries was performed at the Single Cell Genomics Core facility at the Wellcome Trust Sanger Institute.
 Both batches were sequenced using an Illumina HiSeq 4000 machine generating 75 bp paired-end reads.
 
 \subsection{Data analysis for the mixture experiments}
 Reads were mapped to the mm10 build of the mouse genome, including sequences of transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
 (The sequence of the CBFB-MYH11 oncogene was also included in the reference when aligning data from 416B cells.)
 Mapping was performed using the subread aligner v1.5.1 \cite{liao2013subread} in RNA-seq mode with unique alignment.
-The 416B data were aligned in single-end mode while the trophoblast data were aligned in paired-end mode.
+The 416B data were aligned in single-end mode while the TSC data were aligned in paired-end mode.
 Reads with mapping qualities greater than or equal to 10 were assigned to exonic regions of genes using the featureCounts function in the Rsubread package v1.24.1 \cite{liao2014featurecounts}.
 Genes were defined using Ensembl v82 annotation for the GRCm38 mouse assembly and annotation for the ERCC and SIRV transcripts.
 This yielded a count for each endogenous gene and spike-in transcript in each well.
-Mapping and counting statistics for each batch are summarized in Supplementary Table~\supptabstats{}.
+Mapping and counting statistics for each batch of libraries are summarized in Supplementary Table~\supptabstats{}.
 
 Variance components were estimated from the libraries generated from a single plate.
 In each well, the sum of counts across all transcripts in each spike-in set was computed, and the log$_2$-ratio between the ERCC and SIRV sums was calculated.
 To estimate $\variance(\theta_i)$, a linear model with a one-way layout was fitted to the log-ratios for all wells where the two spike-in sets were added separately.
 In each plate of the 416B data set, each combination of treatment (control or oncogene-induced) and spike-in addition order (ERCC or SIRV first) was treated as a group in the one-way layout.
-In each plate of the trophoblast data, only the spike-in addition order was used to define the groups.
+In each plate of the TSC data, only the spike-in addition order was used to define the groups.
 After fitting the model, the mean of the squared residual effects was used as an estimate of $\variance(\theta_i)$.
 This was repeated for $\variance(\theta^*_i)$ using all wells where premixed spike-ins were added.
 Here, addition order was irrelevant so the one-way layout contained only the two treatment groups in the 416B data set.
-Similarly, only a single group was defined for the trophoblast data.
+Similarly, only a single group was defined for the TSC data.
 Linear modelling ensures that any changes in the mean log-ratio across groups do not inflate the variance estimate.
 Note that we fit linear models to each plate separately, to check whether the estimates are consistent across replicate plates.
 
@@ -483,11 +486,9 @@ The proportion of the top 200 genes with the smallest $p$-values that were share
 This was repeated for 20 simulation iterations and the average proportion across iterations was reported for each method.
 
 \subsection{Evaluating the robustness of HVG detection}
-Three data sets were used to test the effect of spike-in variability on HVG detection.
-This included the 416B and trophoblast data sets generated previously.
+Our 416B and TSC data sets were used to assess the effect of spike-in variability on detection of HVGs.
 In the former, blocking was performed to remove plate- and treatment-specific effects on mean expression, i.e., HVGs were detected within treatment conditions on each plate.
-Similarly, blocking was performed on the plate of origin for each cell in the trophoblast data set to remove plate effects.
-The final data set was obtained from NCBI GEO with the accession number GSE61533 and contained a single plate of haematopoietic stem cells \cite{wilson2015combined}.
+Similarly, blocking was performed on the plate of origin for each cell in the TSC data set to remove plate effects.
 
 In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-in counts 
 (See Section~\suppsecsim{} in the Supplementary Materials for implementation details of each method.)
@@ -521,12 +522,12 @@ Code used for the statistical analysis and simulations are available at https://
 \section{Author contributions}
 ATLL proposed the mixture experiments and performed the statistical analysis and simulations.
 FJCN adapted the Smart-seq2 protocol for the spike-in mixtures and generated the 416B data.
-LHV generated the trophoblast data.
+LHV generated the TSC data.
 BG and JCM provided direction and guidance on the project.
 All authors were involved in drafting the manuscript.
 
 \section{Acknowledgements}
-We thank Liliana Antunes for supplying the trophoblast cells.
+We thank Liliana Antunes for supplying the TSCs.
 We also thank Victoria Moignard and Wajid Jawaid for helpful discussions about the experimental design.
 
 \section{Funding}
