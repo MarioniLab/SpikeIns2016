@@ -1,7 +1,7 @@
 ###############################################################
 
 dir.create("pics")
-names <- c("416B (I)", "416B (II)", "Tropho (I)", "Tropho (II)")
+names <- c("416B (I)", "416B (II)", "TSC (I)", "TSC (II)")
 
 ###############################################################
 # Making a barplot of the variance estimates.

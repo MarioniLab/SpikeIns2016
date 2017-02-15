@@ -87,7 +87,7 @@ segments(out, means, out, means+stderrs)
 segments(out-0.2, means+stderrs, out+0.2, means+stderrs)
 
 legend("topright", fill=all.cols, legend=c("416B (all HVGs)", "416B (top 200)", 
-                                          "Tropho (all HVGs)", "Tropho (top 200)"),
+                                          "TSC (all HVGs)", "TSC (top 200)"),
 #                                          "HSC (all HVGs)", "HSC (top 200")), 
     cex=1.4)
 

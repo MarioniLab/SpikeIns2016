@@ -53,10 +53,10 @@ collected <- do.call(rbind, collected)
 output <- list()
 output[["Source Name"]] <- collected$Sample
 output[["Characteristics[organism]"]] <- "Mus musculus"
-output[["Characteristics[cell line]"]] <- "Trophoblast"
+output[["Characteristics[cell line]"]] <- "Trophoblast stem cell"
 output[["Material Type"]] <- "RNA"
-output[[paste0(rep(c("Protocol REF", "Performer"), 5), collapse="\t")]] <- paste0(c("Obtaining trophoblasts", "Liora Vilmovsky",
-                                                                                    "Culturing trophoblasts", "Liora Vilmovsky",
+output[[paste0(rep(c("Protocol REF", "Performer"), 5), collapse="\t")]] <- paste0(c("Obtaining TSCs", "Liora Vilmovsky",
+                                                                                    "Culturing TSCs", "Liora Vilmovsky",
                                                                                     "Reverse transcription", "Liora Vilmovsky",
                                                                                     "Extracting RNA", "Liora Vilmovsky",
                                                                                     "Creating libraries","Liora Vilmovsky"

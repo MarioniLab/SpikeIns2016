@@ -1,7 +1,7 @@
 all.out <- list()
 all.out[["MAGE-TAB Version"]] <- "1.1"
 all.out[["Investigation Title"]] <- "Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data"
-all.out[["Experiment Description"]] <- "This study aims to assess the reliability of spike-in normalization for analyzing single-cell RNA sequencing data. This is done by performing mixture experiments where two different sets of spike-in RNA (ERCC and SIRV) are added separately to each cell (416B or trophoblasts), and generating sequencing libraries using a modified version of the Smart-seq2 protocol. The aim is to measure the variance of the log-ratio of the total counts between the two spike-in sets. This will quantify how precisely the spike-in RNA was added to each well. As a control, addition was also performed with a premixed solution of both spike-ins, to quantify the variability in the log-ratios due to the experimental protocol. The same data can also be used to measure the well-to-well variability in the differences in behaviour between the two spike-in sets."
+all.out[["Experiment Description"]] <- "This study aims to assess the reliability of spike-in normalization for analyzing single-cell RNA sequencing data. This is done by performing mixture experiments where two different sets of spike-in RNA (ERCC and SIRV) are added separately to each cell (416B or trophoblast stem cells (TSCs)), and generating sequencing libraries using a modified version of the Smart-seq2 protocol. The aim is to measure the variance of the log-ratio of the total counts between the two spike-in sets. This will quantify how precisely the spike-in RNA was added to each well. As a control, addition was also performed with a premixed solution of both spike-ins, to quantify the variability in the log-ratios due to the experimental protocol. The same data can also be used to measure the well-to-well variability in the differences in behaviour between the two spike-in sets."
 
 all.out[["Experimental Design"]] <- c("hardware variation design", "normalization testing design", "operator variation design")
 all.out[["Experimental Design Term Source REF"]] <- c("EFO", "EFO", "EFO") 
@@ -23,9 +23,9 @@ all.out[["Person Affiliation"]] <- "Cancer Research UK Cambridge Institute"
 all.out[["Person Roles"]] <- "submitter"
 
 all.out[["Protocol Name"]] <- c("Obtaining 416B cells",
-                                "Obtaining trophoblasts",
+                                "Obtaining TSCs",
                                 "Culturing 416B cells",
-                                "Culturing trophoblasts",
+                                "Culturing TSCs",
                                 "Extracting RNA",
                                 "Creating libraries",
                                 "Sequencing libraries",
