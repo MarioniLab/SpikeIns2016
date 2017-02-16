@@ -54,6 +54,7 @@ output <- list()
 output[["Source Name"]] <- collected$Sample
 output[["Characteristics[organism]"]] <- "Mus musculus"
 output[["Characteristics[cell line]"]] <- "Trophoblast stem cell"
+output[["Characteristics[single cell well quality]"]] <- collected$Well
 output[["Material Type"]] <- "RNA"
 output[[paste0(rep(c("Protocol REF", "Performer"), 5), collapse="\t")]] <- paste0(c("Obtaining TSCs", "Liora Vilmovsky",
                                                                                     "Culturing TSCs", "Liora Vilmovsky",
@@ -73,14 +74,13 @@ output[["Comment[ORIENTATION]"]] <- "5'-3'-3'-5'"
 output[["Protocol REF\tPerformer"]] <- "Sequencing libraries\tLiora Vilmovsky"
 output[["Assay Name"]] <- collected$Sample
 output[["Technology Type"]] <- "sequencing assay"
-output[["Comment[experiment batch]"]] <- collected$Batch
 output[["Array Data File"]] <- collected$File
 output[["Protocol REF\tPerformer"]] <- "Assigning reads to genes\tAaron Lun"
 output[["Derived Array Data File"]] <- collected$Counts
 output[["Comment[MD5]"]] <- collected$MD5
-output[["Characteristics[single cell well quality]"]] <- collected$Well
 output[["Factor Value[spike-in addition]"]] <- collected$Addition
 output[["Factor Value[treatment]"]] <- collected$Treatment
+output[["Factor Value[block]"]] <- collected$Batch
 
 # Constructing the sdrf.tsv file.
 
