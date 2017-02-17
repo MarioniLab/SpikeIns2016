@@ -4,7 +4,7 @@
 collected <- list()
 fpath <- "../Liora"
 relink <- "make_links_Liora.sh"
-write(file=relink, c("set -e", "set -u", "mkdir fastq_Liora"), ncol=1)
+write(file=relink, c("set -e", "set -u", "mkdir fastq_Liora", "cd fastq_Liora"), ncol=1)
 library(edgeR)
 
 for (sample in c("test_20160906", "test_20170201")) {
@@ -37,9 +37,9 @@ for (sample in c("test_20160906", "test_20170201")) {
     # Creating links to files.
     curpath <- file.path(fpath, sample, "fastq")
     chosen <- list.files(curpath, pattern="fq.gz$")
-    write(file=relink, paste0("ln -s ", file.path(curpath, chosen), " ", file.path("fastq", chosen)), append=TRUE, ncol=1)
+    write(file=relink, paste0("ln -s ", file.path("..", curpath, chosen), " ", chosen), append=TRUE, ncol=1)
     new.count.file <- paste0("counts_Liora_", batch, ".tsv")
-    write(file=relink, paste0("ln -s ", normalizePath(cpath), " ", file.path("fastq", new.count.file)), append=TRUE, ncol=1)
+    write(file=relink, paste0("ln -s ", normalizePath(cpath), " ", new.count.file), append=TRUE, ncol=1)
 
     out <- data.frame(Sample=prefixes, Batch=batch, Addition=addition.mode, Treatment=treatment, 
                       Well=well.type, Counts=new.count.file)[m,]
