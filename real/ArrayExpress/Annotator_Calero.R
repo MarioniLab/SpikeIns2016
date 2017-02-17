@@ -4,7 +4,7 @@
 collected <- list()
 fpath <- "/run/user/1753941046/gvfs/smb-share:server=jmlab-data,share=jmlab/group_folders/lun01/Internal/SpikeIns"
 relink <- "make_links_Calero.sh"
-write(file=relink, c("set -e", "set -u", "mkdir fastq_Calero"), ncol=1)
+write(file=relink, c("set -e", "set -u", "mkdir fastq_Calero", "cd fastq_Calero"), ncol=1)
 library(edgeR)
 
 for (sample in c("Calero/trial_20160113", "Calero/trial_20160325")) {
@@ -35,9 +35,9 @@ for (sample in c("Calero/trial_20160113", "Calero/trial_20160325")) {
     # Creating links to files.
     curpath <- file.path(fpath, sample, "fastq")
     chosen <- list.files(curpath, pattern="fq.gz$")
-    write(file=relink, paste0("ln -s ", file.path(curpath, chosen), " ", file.path("fastq", chosen)), append=TRUE, ncol=1)
+    write(file=relink, paste0("ln -s ", file.path(curpath, chosen), " ", chosen), append=TRUE, ncol=1)
     new.count.file <- paste0("counts_Calero_", batch, ".tsv")
-    write(file=relink, paste0("ln -s ", normalizePath(cpath), " ", file.path("fastq", new.count.file)), append=TRUE, ncol=1)
+    write(file=relink, paste0("ln -s ", normalizePath(cpath), " ", new.count.file), append=TRUE, ncol=1)
 
     collected[[sample]] <- data.frame(Sample=prefixes, Batch=batch, Addition=addition.mode, Treatment=treatment,
                                       File=fnames, MD5=md5.sums, Counts=new.count.file)
