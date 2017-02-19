@@ -42,6 +42,18 @@
 
 \maketitle
 
+\begin{quote}
+\textbf{Abstract:}
+By profiling the transcriptomes of individual cells, single-cell RNA sequencing provides unparalleled resolution to study cellular heterogeneity.
+However, this comes at the cost of high technical noise, including cell-specific biases in capture efficiency and library generation.
+One strategy for removing these biases is to add a constant amount of spike-in RNA to each cell, and to scale the observed expression values so that the coverage of spike-in RNA is constant across cells.
+This approach has previously been criticized as its accuracy depends on the precise addition of spike-in RNA to each sample, and on similarities in behaviour (e.g., capture efficiency) between the spike-in and endogenous transcripts.
+Here, we perform mixture experiments using two different sets of spike-in RNA to quantify the variance in the amount of spike-in RNA added to each well in a plate-based protocol.
+We also obtain an upper bound on the variance due to differences in behaviour between the two spike-in sets.
+We demonstrate that both factors are small contributors to the total technical variance and have only minor effects on downstream analyses such as detection of highly variable genes and clustering.
+Our results suggest that spike-in normalization is reliable enough for routine use in single-cell RNA sequencing data analyses.
+\end{quote}
+
 \section{Introduction}
 Single-cell RNA sequencing (scRNA-seq) is a powerful technique for studying transcriptional activity in individual cells.
 Briefly, RNA is isolated from single cells, reverse transcribed into cDNA and sequenced using massively parallel sequencing technologies \cite{shapiro2013singlecell}.
@@ -361,6 +373,7 @@ Nonetheless, our conclusions are still relevant as absolute quantification depen
 \subsection{Obtaining and culturing 416B cells and TSCs}
 
 The murine multipotent myeloid progenitor cell line 416B \cite{dexter1979isolation} was maintained in RPMI medium, supplemented with 10\% fetal calf serum and antibiotics.
+\textcolor{red}{Need details of oncogene and its induction.}
 
 Murine TSCs were kindly provided by Dr. Jennifer Nichols and cultured on mouse embryonic fibroblast (MEF) feeders with TSC culturing medium (a combination of 70\% MEF conditioned media (R\&D systems) and 30\% RPMI 1640, supplemented with 20\% FBS, 2 mM L-glutamine, 1 mM sodium pyruvate, 100 \textmu{}M \textbeta{}-mercaptoethanol, 25 ng/mL human recombinant FGF4 (R\&D systems) and 1 \textmu{}g/mL heparin (Tocris Bioscience)). 
 To prepare for single-cell sorting, cells were harvested with trypsin and MEF feeders were depleted by plating the cells onto a gelatinised plate followed by incubation for 1h at 37$^{\circ}$C on TSC culturing medium. 
@@ -517,7 +530,7 @@ This value represents the extent to which the membership of the original cluster
 We also compared the original clusters to those generated from complete-linkage clustering of the original HVG log-expression values.
 
 \section{Data access}
-Data are available on ArrayExpress under the accession E-MAT-XXXX.
+Data are available on ArrayExpress under the accession E-MAT-5522.
 Code used for the statistical analysis and simulations are available at https://github.com/MarioniLab/SpikeIns2016.
 
 \section{Author contributions}
@@ -534,7 +547,7 @@ We also thank Victoria Moignard and Wajid Jawaid for helpful discussions about t
 \section{Funding}
 This work was supported by core funding from the CRUK (award no. A17197) to JCM;
 core funding from EMBL to JCM;
-an EMBL Interdisciplinary Postdocs fellowship to LHV;
+an EMBL Interdisciplinary Postdoctoral fellowship to LHV;
 \textcolor{red}{need Bertie + Fernando statement.}
 
 \section{Supplementary materials}
