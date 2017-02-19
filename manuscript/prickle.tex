@@ -20,13 +20,13 @@
 \newcommand{\supptabstats}{1}
 
 \title{Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data}
-\author{Aaron T. L. Lun$^1$, Fernando J. Calero-Nieto$^2$, Liora Haim-Vilmovsky$^{3,4}$, \\ Bertie G\"ottgens$^2$, John C. Marioni$^{1,3,4}$}
+\author{Aaron T. L. Lun$^1$, Fernando J. Calero-Nieto$^2$, Liora Haim-Vilmovsky$^{3,4}$, \\ Berthold G\"ottgens$^2$, John C. Marioni$^{1,3,4}$}
 \date{
     \begin{minipage}{0.9\textwidth}
         \begin{flushleft} 
             \begin{small}
                 $^1$Cancer Research UK Cambridge Institute, University of Cambridge, Li Ka Shing Centre, Robinson Way, Cambridge CB2 0RE, United Kingdom \\
-                $^2$Cambridge Institute for Medical Research,  University of Cambridge, Wellcome Trust/MRC Building, Hills Road, Cambridge CB2 0XY, United Kingdom \\
+                $^2$Wellcome Trust and MRC Cambridge Stem Cell Institute,  University of Cambridge, Wellcome Trust/MRC Building, Hills Road, Cambridge CB2 0XY, United Kingdom \\
                 $^3$EMBL European Bioinformatics Institute, Wellcome Genome Campus, Hinxton, Cambridge CB10 1SD, United Kingdom \\
                 $^4$Wellcome Trust Sanger Institute, Wellcome Genome Campus, Hinxton, Cambridge CB10 1SA, United Kingdom \\
             \end{small}
@@ -81,7 +81,7 @@ Normalization is performed by scaling the counts for each cell such that the cou
 The central assumptions of this approach are that (i) the same amount of spike-in RNA is added to each cell, and (ii) the spike-in and endogenous transcripts are similarly affected by cell-to-cell fluctuations in capture efficiency.
 Under these assumptions, any differences in the coverage of the spike-in transcripts between cells must be artifactual in origin and should be removed by scaling.
 One particular advantage of this strategy is that it does not make any assumptions about the endogenous expression profile, unlike the non-DE approach described above.
-This means that spike-in normalization can be applied in situations where large-scale changes in expression (e.g., related to changes in total RNA content) are expected and of interest \cite{lun2016stepbystep}.
+This means that spike-in normalization can be applied in situations where large-scale changes in expression (e.g., related to changes in total RNA content) are expected and of interest \cite{lun2016stepbystep,nestorowa2016single}.
 
 There are several common criticisms of spike-in normalization that challenge the validity of its central assumptions.
 The first is that the same quantity of spike-in RNA may not be consistently added to each sample \cite{robinson2010tmm}, while the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \cite{grun2015design} (e.g., unequal efficiencies of capture and amplification, caused by differences in biophysical properties).
@@ -117,9 +117,9 @@ These results suggest that spike-ins can be safely used for routine normalizatio
 We aimed to assess the variability in the added spike-in quantity across cells.
 To do so, we performed mixture experiments using two distinct spike-in sets (Figure~\ref{fig:expdesign}) -- the External RNA Controls Consortium (ERCC) set and the Spike-in RNA Variants (SIRV) set.
 An equal volume of each spike-in set was added separately to a single well of a 96-well microtiter plate.
-Each well also contained a single mouse cell -- a 416B cell or trophoblast stem cell (TSC) -- to mimic real experimental conditions.
-The resulting pool of endogenous/spike-in RNA in each well was used to generate a library with the Smart-seq2 protocol.
-This process was repeated for multiple wells and sequencing was performed.
+Each well also contained a single mouse cell -- a mouse 416B myeloid progenitor cell or trophoblast stem cell (TSC) -- to mimic real experimental conditions.
+The resulting pool of endogenous/spike-in RNA in each well was used to generate a cDNA library, using a modified version of the Smart-seq2 protocol.
+This process was repeated for multiple wells and high-throughput sequencing was performed on all libraries.
 
 \begin{figure}[tbp]
 \begin{center}
@@ -156,7 +156,7 @@ We used a protocol based on microtiter plates rather than microfluidics as it is
 Our experimental design requires two separate additions of spike-in RNA to each reaction (see Methods).
 This is not straightforward to achieve on, say, the Fluidigm C1 chip where the added volume for each reagent depends on the design on the reaction chamber.
 %Plate-based protocols also tend to be cheaper and are compatible with existing laboratory techniques such as indexed fluorescently-activated cell sorting (FACS).
-Our focus on data from plate-based protocols reflects their widespread use in single-cell studies \cite{segerstople2016single,islam2011characterization,wilson2015combined}.
+Our focus on data from plate-based protocols reflects their widespread use in single-cell studies \cite{segerstople2016single,islam2011characterization,wilson2015combined,scialdone2016resolving}.
 Obviously, the procedure we describe here can be adapted to any protocol where the spike-in addition can be easily modified, e.g., plate-based CEL-seq \cite{hashimshony2016celseq2} or STRT-seq \cite{islam2011characterization}.
 
 \subsection{Estimating the variance of volume addition}
@@ -538,17 +538,16 @@ ATLL proposed the mixture experiments and performed the statistical analysis and
 FJCN adapted the Smart-seq2 protocol for the spike-in mixtures and generated the 416B data.
 LHV generated the TSC data.
 BG and JCM provided direction and guidance on the project.
-All authors were involved in drafting the manuscript.
+All authors wrote and approved the manuscript.
 
 \section{Acknowledgements}
 We thank Jennifer Nichols and Liliana Antunes for supplying the TSCs.
 We also thank Victoria Moignard and Wajid Jawaid for helpful discussions about the experimental design.
 
 \section{Funding}
-This work was supported by core funding from the CRUK (award no. A17197) to JCM;
-core funding from EMBL to JCM;
-an EMBL Interdisciplinary Postdoctoral fellowship to LHV;
-\textcolor{red}{need Bertie + Fernando statement.}
+This work was supported by core funding from the CRUK (award no. A17197) and core funding from EMBL to JCM.
+LHV was supported by an EMBL Interdisciplinary Postdoctoral fellowship.
+Work in the G\"ottgens group was supported by CRUK, Bloodwise, NIDDK, the Leukemia and Lymphoma Society and core infrastructure grants from the Wellcome Trust and MRC to the Cambridge Stem Cell Institute.
 
 \section{Supplementary materials}
 The Supplementary Materials is a single PDF file that consists of Sections~1-\suppsecsim{} and contains Supplementary Figures~1-\suppfigbiophys{} and Supplementary Table~1.
