@@ -41,8 +41,17 @@ for (sample in c("test_20160906", "test_20170201")) {
     new.count.file <- paste0("counts_Liora_", batch, ".tsv")
     write(file=relink, paste0("ln -s ", normalizePath(cpath), " ", new.count.file), append=TRUE, ncol=1)
 
+    # Setting manual standard deviation values.
+    if (sample=="test_20170201") {
+        ave.frag <- 461
+        sd.frag <- 182
+    } else {
+        ave.frag <- 402
+        sd.frag <- 194       
+    }
+
     out <- data.frame(Sample=prefixes, Batch=batch, Addition=addition.mode, Treatment=treatment, 
-                      Well=well.type, Counts=new.count.file)[m,]
+                      Well=well.type, Counts=new.count.file, MeanFrag=ave.frag, SDFrag=sd.frag)[m,]
     out$File <- md5.sums[,2]
     out$MD5 <- md5.sums[,1]
     collected[[sample]] <- out 
@@ -68,8 +77,8 @@ output[["Comment[LIBRARY_SELECTION]"]] <- "Oligo-dT"
 output[["Comment[LIBRARY_SOURCE]"]] <- "TRANSCRIPTOMIC"
 output[["Comment[LIBRARY_STRAND]"]] <- "not applicable"
 output[["Comment[LIBRARY_STRATEGY]"]] <- "RNA-seq"
-output[["Comment[NOMINAL_LENGTH]"]] <- 300
-output[["Comment[NOMINAL_SDEV]"]] <- 50
+output[["Comment[NOMINAL_LENGTH]"]] <- collected$MeanFrag
+output[["Comment[NOMINAL_SDEV]"]] <- collected$SDFrag
 output[["Comment[ORIENTATION]"]] <- "5'-3'-3'-5'"
 output[["Protocol REF\tPerformer"]] <- "Sequencing libraries\tLiora Vilmovsky"
 output[["Assay Name"]] <- collected$Sample
