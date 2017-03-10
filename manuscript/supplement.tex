@@ -3,7 +3,6 @@
 \usepackage[margin=2.5cm]{geometry}
 \usepackage[labelfont=bf]{caption}
 \usepackage{color}
-\usepackage{xcite}
 \usepackage{amsmath}
 \usepackage{natbib}
 \usepackage{textcomp}
@@ -23,8 +22,6 @@
 %\renewcommand{\thefigure}{\@arabic\c@figure} 
 %\renewcommand{\thetable}{\@arabic\c@table} 
 \newcommand{\figvarestimates}{2}
-
-\externalcitedocument{prickle}
 
 \usepackage{url}
 \urlstyle{same}
@@ -202,6 +199,10 @@ Note that, for the data set used in this simulation, we removed cells that were 
 No additional outlier-based quality control was performed.
 Moreover, we only used the cells extracted from a single individual (HP1502401, healthy male) for simplicity.
 
+\bibliography{refnorm}
+\bibliographystyle{plainnat}
+
+\newpage
 \begin{figure}[btp]
     \begin{center}
         \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/qq_separate.pdf}
