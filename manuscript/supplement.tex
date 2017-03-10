@@ -156,7 +156,7 @@ Putative DE genes between the relevant conditions were identified using the lrTe
 
 \subsection{Methods for detecting highly variable genes}
 The first HVG detection method was based on the approach described by \cite{brennecke2013accounting}, with some modifications to the size factors to perform spike-in normalization.
-Specifically, the spike-in totals were rescaled to have a mean of unity across all libraries, and the size factor for each library was defined as its rescaled spike-in total (i.e., $T_{i1}$).
+Specifically, the spike-in totals were rescaled such that their mean across all libraries was equal to unity, and the size factor for each library was defined as its rescaled spike-in total.
 We did \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
 The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package with min.bio.disp set to zero.
 If blocking factors were present, they were regressed out by log-transforming the counts; applying the removeBatchEffect function from the limma package \citep{ritchie2015limma} to the log-counts; and converting the corrected log-values back to the count scale, prior to using technicalCV2.
@@ -170,7 +170,7 @@ The biological component of the variance and a $p$-value was computed for each g
 If blocking factors were present, they were used to construct a design matrix for modelling in trendVar.
 
 \subsection{Methods for dimensionality reduction and clustering}
-Size factors were defined from the spike-in totals as previously described. 
+Size factors for all libraries were defined from the spike-in totals as previously described. 
 HVG detection was performed using the variance-of-log-expression method, where HVGs were defined as genes detected at a FDR of 5\% and with biological components above 0.5.
 PCA was performed on the normalized log-expression values of the HVGs, using the prcomp function from the stats package with scaling.
 The first two PCs were used as the coordinates for each cell in one PCA plot, and the first and third PCs were used as coordinates in another plot.

@@ -230,9 +230,10 @@ Finally, the order of spike-in addition did not significantly affect the varianc
 Our results indicate that $\sigma^2_{vol}$ is consistently smaller than the variance in the rest of the protocol (Figure~\ref{fig:varestimates}a).
 Indeed, no significant difference was detected between the estimated $\variance(\theta_i)$ and $\variance(\theta^*_i)$ of each plate.
 This indicates that variability of spike-in volume addition is a minor contributor to the technical variability of the spike-in counts.
-To further put these estimates into context, consider that $T_{is}$ represents the log$_2$-transformed ``size factor'' for the library generated from well $i$.
-In other words, all counts in this library are scaled by a factor of $2^{-T_{is}}$ to correct for well/cell-specific biases during spike-in normalization.
-The variance of the log-size factors is around one order of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b), which suggests that the latter will not have a major effect on normalization.
+To put these estimates into context, consider that $T_{is}$ represents the log$_2$-transformed ``size factor'' for the library generated from well $i$.
+Spike-in normalization is performed by scaling all counts in this library by the size factor, i.e., $2^{-T_{is}}$.
+This eliminates differences in the coverage of spike-in set $s$ between cells and corrects for well/cell-specific technical biases.
+The variance of the log-size factors is approximately one order of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b), which suggests that the latter will not have a major effect on normalization.
 
 \begin{figure}[btp]
     \begin{center}
@@ -305,7 +306,7 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
     \caption{Effect of spike-in variability on DEG or HVG detection in simulated data.
         (a) The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
         This was also calculated for the top set of 200 DEGs with the smallest $p$-values.
-        Simulations were based on our 416B data set, to detect DEGs after inducing expression of a \textit{Cbfb-MYH11} oncogene compared to a mCherry control (see Methods);
+        Simulations were based on our 416B data set, to detect DEGs after inducing expression of a \textit{CBFB-MYH11} oncogene compared to a mCherry control (see Methods);
         or on the data from Islam \textit{et al.} \citep{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
         using the Brennecke \textit{et al.} method based on the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
@@ -386,7 +387,7 @@ Nonetheless, our conclusions are still relevant as absolute quantification depen
 
 \subsection{Obtaining and culturing 416B cells and TSCs}
 
-The murine multipotent myeloid progenitor cell line 416B \citep{dexter1979isolation} was stably transduced with a TetOn construct of the \textit{Cbfb-MYH11} (CM) oncogene (type A cDNA), using an in-frame F2A-mCherry protein as a reporter. 
+The murine multipotent myeloid progenitor cell line 416B \citep{dexter1979isolation} was stably transduced with a TetOn construct of the \textit{CBFB-MYH11} (CM) oncogene (type A cDNA), using an in-frame F2A-mCherry protein as a reporter. 
 As a control, cells were alternatively transduced with a version of the construct lacking the CM cDNA. 
 Cells were maintained in RPMI medium, supplemented with 10\% fetal calf serum and antibiotics.
 Expression of the CM oncogene or the mCherry control was induced by treatment with 1 \textmu{}g/ml of doxycycline, and induction was confirmed after 24 hours by measurement of mCherry levels by fluorescence activated cell sorting (BD Fortessa).
@@ -424,7 +425,7 @@ Both batches were sequenced on an Illumina HiSeq 4000 machine generating 75 bp p
 
 \subsection{Data analysis for the mixture experiments}
 Reads were mapped to the mm10 build of the mouse genome, including sequences of transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
-(The sequence of the \textit{Cbfb-MYH11} oncogene was also included in the reference when aligning data from 416B cells.)
+(The sequence of the \textit{CBFB-MYH11} oncogene was also included in the reference when aligning data from 416B cells.)
 Mapping was performed using the subread aligner v1.5.1 \citep{liao2013subread} in RNA-seq mode with unique alignment.
 The 416B data were aligned in single-end mode while the TSC data were aligned in paired-end mode.
 Reads with mapping qualities greater than or equal to 10 were assigned to exonic regions of genes using the featureCounts function in the Rsubread package v1.24.1 \citep{liao2014featurecounts}.
