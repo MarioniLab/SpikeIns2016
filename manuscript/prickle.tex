@@ -116,10 +116,10 @@ These results suggest that spike-ins can be safely used for routine normalizatio
 \subsection{Overview of the mixture experiments}
 We aimed to assess the variability in the added spike-in quantity across cells.
 To do so, we performed mixture experiments using two distinct spike-in sets (Figure~\ref{fig:expdesign}) -- the External RNA Controls Consortium (ERCC) set and the Spike-in RNA Variants (SIRV) set.
-An equal volume of each spike-in set was added separately to a single well of a 96-well microtiter plate.
-Each well also contained a single mouse cell -- a mouse 416B myeloid progenitor cell or trophoblast stem cell (TSC) -- to mimic real experimental conditions.
-The resulting pool of endogenous/spike-in RNA in each well was used to generate a cDNA library, using a modified version of the Smart-seq2 protocol.
-This process was repeated for multiple wells and high-throughput sequencing was performed on all libraries.
+An equal volume of each spike-in set was added separately to all wells of a 96-well microtiter plate.
+Each well contained a single lysed mouse cell -- a mouse 416B myeloid progenitor cell or trophoblast stem cell (TSC) -- thus mimicking real experimental conditions.
+The resulting pool of endogenous/spike-in RNA in each well was used to generate a cDNA library, using a modified version of the Smart-seq2 protocol (see Methods).
+This process was repeated for all wells and high-throughput sequencing was performed on all libraries.
 
 \begin{figure}[tbp]
 \begin{center}
@@ -246,7 +246,7 @@ The variance of the log-size factors is around one order of magnitude larger tha
 
 \subsection{Estimating the variance of capture efficiency}
 The variance of $F_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
-Even when the capture efficiency differs between sets, spike-in normalization is still be appropriate \textit{provided that the fold change in capture efficiency is the same in all wells}.
+Even when the capture efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in capture efficiency is the same in all wells}.
 Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
 This scales up the counts for the spike-in transcripts in all libraries by the same amount, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
@@ -295,7 +295,7 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
         Simulations were based on our 416B data set, to detect DEGs after inducing expression of a Cbfb-Myh11 oncogene compared to a mCherry control (see Methods);
         or on the data from Islam \textit{et al.} \cite{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
-        using the Brennecke \textit{et al.} method based the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
+        using the Brennecke \textit{et al.} method based on the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
         This was also calculated for the top set of 200 HVGs with the smallest $p$-values.
         Simulations were based on our 416B and TSC data to detect HVGs across cells.
         All values represent the mean of 20 simulation iterations, and error bars represent standard errors.
@@ -329,11 +329,12 @@ Thus, spike-in variability does not appear to affect the visual interpretation o
 
 Finally, we performed hierarchical clustering and applied a tree cut to identify clusters of cells in the original data.
 This was repeated at each simulation iteration to obtain a corresponding set of simulated clusters.
-For each original cluster, we computed the Jaccard index with respect to each of the simulated clusters, and we recorded the maximum value across all simulated clusters.
-A large maximum Jaccard index means that the original cluster is successfully recovered in one of the simulated clusters.
+For each original cluster, we computed the Jaccard index with respect to each of the simulated clusters and recorded the maximum value across all simulated clusters.
+A large maximum Jaccard index means that most of the cells in the original cluster are still grouped together in the simulation,
+i.e., the original cluster is (mostly) successfully recovered in one of the simulated clusters.
 We observed that the maximum Jaccard indices were moderate to large (Figure~\ref{fig:dimclust}b), with values above 0.6 for most of the original clusters.
-To put this into context, we repeated the clustering on the original data but using a different algorithm.
-This yielded smaller indices for all clusters (Figure~\ref{fig:dimclust}c), indicating that spike-in variability has less effect on the results than the choice of clustering method.
+To put this into context, we re-clustered the original data using a different algorithm.
+This yielded smaller Jaccard indices for all clusters (Figure~\ref{fig:dimclust}c), indicating that spike-in variability has less effect on the results than the choice of clustering method.
 
 \section{Discussion}
 In this article, we performed mixture experiments to quantify the variability of spike-in RNA addition across wells in a plate-based scRNA-seq protocol.
