@@ -338,7 +338,7 @@ This yielded smaller Jaccard indices for all clusters (Figure~\ref{fig:dimclust}
 
 \section{Discussion}
 In this article, we performed mixture experiments to quantify the variability of spike-in RNA addition across wells in a plate-based scRNA-seq protocol.
-We also obtained a rough estimate of the well-to-well variability in the differences in behaviour between two different sets of transcripts.
+We also obtained a rough estimate of the well-to-well variability in the differences in behaviour between two different sets of spike-in transcripts.
 Both values were at least an order of magnitude smaller than the variance of spike-in coverage across cells, suggesting that differences in spike-in volume or behaviour were not major sources of error in the context of spike-in normalization.
 This was supported by simulations where the introduction of realistic levels of spike-in variance yielded only minor changes in the results of DEG and HVG analyses as well as PCA and clustering.
 Our results indicate that spike-in normalization is reliable enough for routine use in scRNA-seq data analyses.
@@ -358,7 +358,7 @@ Different results will be obtained using other methods for spike-in addition, e.
 Our experimental framework may also be useful for evaluating the precision of spike-in addition when developing new scRNA-seq protocols or setting up existing protocols in new laboratories, to ensure that spike-in RNA is added correctly to each cell.
 
 The term $\variance(F_i)$ represents the variability in the difference in behaviour between the SIRV and ERCC spike-in sets across wells.
-However, the relevant quantity is the variability in the difference $P_{is}$ between a synthetic spike-in set and endogenous RNA, as this affects the accuracy of normalization.
+However, arguably a more relevant quantity is the variability in the difference $P_{is}$ between synthetic spike-in and endogenous RNA, as this affects the accuracy of normalization.
 It may be possible to obtain a rough estimate of $\variance(P_{is})$ by using pooled cellular RNA from another organism as one of the spike-in sets \cite{brennecke2013accounting}, so that $\variance(\theta^*_i)$ provides an upper bound on the variance in the differences in behaviour between synthetic and endogenous RNA.
 We chose not to do so because of the difficulty in reproducibly using the same pool of cellular RNA across batches, and in calibrating the concentration of RNA to be added to each well.
 Use of UMI counts may also provide a tighter bound on $\variance(F_i)$ or $\variance(P_{is})$ by reducing the contribution of amplification noise to $\variance(\theta^*_i)$.
