@@ -22,7 +22,7 @@
 \newcommand{\supptabstats}{1}
 
 \title{Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data}
-\author{Aaron T. L. Lun$^1$, Fernando J. Calero-Nieto$^2$, Liora Haim-Vilmovsky$^{3,4}$, \\ Berthold G\"ottgens$^2$, John C. Marioni$^{1,3,4}$}
+\author{Aaron T. L. Lun$^1$, Fernando J. Calero-Nieto$^2$, Liora Haim-Vilmovsky$^{3,4}$, \\ Berthold G\"ottgens$^2$, John C. Marioni$^{1,3,4,*}$}
 \date{
     \begin{minipage}{0.9\textwidth}
         \begin{flushleft} 
@@ -31,6 +31,7 @@
                 $^2$Wellcome Trust and MRC Cambridge Stem Cell Institute, University of Cambridge, Wellcome Trust/MRC Building, Hills Road, Cambridge CB2 0XY, United Kingdom \\
                 $^3$EMBL European Bioinformatics Institute, Wellcome Genome Campus, Hinxton, Cambridge CB10 1SD, United Kingdom \\
                 $^4$Wellcome Trust Sanger Institute, Wellcome Genome Campus, Hinxton, Cambridge CB10 1SA, United Kingdom \\
+                $^*$Corresponding author (email: marioni@ebi.ac.uk)
             \end{small}
         \end{flushleft}
     \end{minipage}\\[0.2in]
@@ -268,7 +269,8 @@ We also performed simulations to gauge the relative contribution of $\variance(F
 Counts for spike-in transcripts were simulated such that any variability in the log-ratios was only caused by stochastic sampling noise i.e., $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
 Our results suggest that most of the estimated variance of $\theta^*_i$ in Figure~\ref{fig:varestimates} is driven by sampling noise (Supplementary Figure~\suppfignoise{}), further reducing the potential impact of differences in behaviour.
 We also observed that the variance of the log-ratios was robust to decreases to the coverage of the spike-in transcripts in this simulation.
-A common recommendation is that the spike-in transcripts should take up 5-10\% of the library size (50000-100000 reads in our data) but the variance estimates were largely unchanged at 10-fold lower coverage.
+A common recommendation is that the spike-in transcripts should take up 5-10\% of the library size (50000-100000 reads in our data).
+Here, the variance estimates were largely unchanged at 10-fold lower coverage.
 Thus, spike-in normalization is still reliable when relatively low amounts of spike-in RNA are added or sequenced.
 This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
 
@@ -546,6 +548,10 @@ We also compared the original clusters to those generated from complete-linkage 
 Data are available on ArrayExpress using the accession E-MAT-5522.
 Code used for the statistical analysis and simulations are available at https://github.com/MarioniLab/SpikeIns2016.
 
+\section{Acknowledgements}
+We thank Jennifer Nichols and Liliana Antunes for supplying the TSCs.
+We also thank Victoria Moignard and Wajid Jawaid for helpful discussions about the experimental design.
+
 \section{Author contributions}
 ATLL proposed the mixture experiments and performed the statistical analysis and simulations.
 FJCN adapted the Smart-seq2 protocol for the spike-in mixtures and generated the 416B data.
@@ -553,9 +559,8 @@ LHV generated the TSC data.
 BG and JCM provided direction and guidance on the project.
 All authors wrote and approved the manuscript.
 
-\section{Acknowledgements}
-We thank Jennifer Nichols and Liliana Antunes for supplying the TSCs.
-We also thank Victoria Moignard and Wajid Jawaid for helpful discussions about the experimental design.
+\section{Disclosure declaration}
+No conflicts of interest are declared.
 
 \section{Funding}
 This work was supported by Cancer Research UK (core funding to JCM, award no.\ A17197), the University of Cambridge and Hutchison Whampoa Limited.
