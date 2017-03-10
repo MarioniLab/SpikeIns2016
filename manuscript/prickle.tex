@@ -13,9 +13,11 @@
 \newcommand{\suppfigtotals}{2}
 \newcommand{\suppfigorder}{3}
 \newcommand{\suppfigbiophys}{4}
+\newcommand{\suppfignoise}{5}
 
 \newcommand{\suppsecmath}{1}
-\newcommand{\suppsecsim}{2}
+\newcommand{\suppsecnoise}{2}
+\newcommand{\suppsecsim}{3}
 
 \newcommand{\supptabstats}{1}
 
@@ -26,7 +28,7 @@
         \begin{flushleft} 
             \begin{small}
                 $^1$Cancer Research UK Cambridge Institute, University of Cambridge, Li Ka Shing Centre, Robinson Way, Cambridge CB2 0RE, United Kingdom \\
-                $^2$Wellcome Trust and MRC Cambridge Stem Cell Institute,  University of Cambridge, Wellcome Trust/MRC Building, Hills Road, Cambridge CB2 0XY, United Kingdom \\
+                $^2$Wellcome Trust and MRC Cambridge Stem Cell Institute, University of Cambridge, Wellcome Trust/MRC Building, Hills Road, Cambridge CB2 0XY, United Kingdom \\
                 $^3$EMBL European Bioinformatics Institute, Wellcome Genome Campus, Hinxton, Cambridge CB10 1SD, United Kingdom \\
                 $^4$Wellcome Trust Sanger Institute, Wellcome Genome Campus, Hinxton, Cambridge CB10 1SA, United Kingdom \\
             \end{small}
@@ -244,23 +246,31 @@ The variance of the log-size factors is around one order of magnitude larger tha
     \label{fig:varestimates}
 \end{figure}
 
-\subsection{Estimating the variance of capture efficiency}
+\subsection{Estimating the variance of differential behaviour}
 The variance of $F_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
-Even when the capture efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in capture efficiency is the same in all wells}.
+Even when capture or amplification efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in efficiency is the same in all wells}.
 Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
 This scales up the counts for the spike-in transcripts in all libraries by the same amount, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
-This is because specific changes in the capture efficiency for the spike-in transcripts are confounded with general changes in efficiency for all transcripts in the well.
-Differences in the coverage of spike-in transcripts may not represent technical biases affecting other transcripts, precluding their use in normalizing all counts.
+This is because specific changes in efficiency for the spike-in transcripts are confounded with general changes in efficiency for all transcripts in the well.
+Differences in the coverage of spike-in transcripts may not represent technical biases affecting other transcripts, precluding their use for normalizing all counts.
 
-In our mathematical framework, the estimated variance of $\theta^*_i$ provides an upper bound for the variance of $F_i$.
+In our mathematical framework, the variance of $\theta^*_i$ provides an upper bound for the variance of $F_i$.
 This quantifies the extent to which normalization is affected by differences in efficiency between two transcript sets.
-We observe that $\variance(\theta^*_i)$ is an order of magnitude lower than the variance of the log-size factors in each plate (Figure~\ref{fig:varestimates}).
-This indicates that the potential variance in efficiency across wells, while greater than $\sigma^2_{vol}$, is still relatively small compared to other biases in the system, e.g., differences in cellular RNA content, well-to-well variability in capture efficiency for all transcripts.
-Obviously, $F_i$ is computed between two spike-in sets whereas the differences between synthetic spike-in and endogenous transcripts are likely to be greater.
+Our estimate of $\variance(\theta^*_i)$ is an order of magnitude lower than the estimated variance of the log-size factors in each plate (Figure~\ref{fig:varestimates}).
+This indicates that the potential variance in differential behaviour across wells, while greater than $\sigma^2_{vol}$, is still relatively small compared to other biases in the system, e.g., differences in cellular RNA content, well-to-well variability in capture efficiency for all transcripts.
+Here, $F_i$ is computed between two spike-in sets whereas the differences between synthetic spike-in and endogenous transcripts are likely to be greater.
 Nonetheless, the SIRV and ERCC spike-ins do vary in their biophysical properties (Supplementary Figure~\suppfigbiophys{}).
 For example, the SIRV transcripts have more variable length and lower GC content compared to the ERCC transcripts.
 This suggests that $F_i$ will include some of the differences in behaviour between synthetic and endogenous RNA, such that $\variance(F_i)$ can be used as a rough estimate of the magnitude of the associated variability.
+
+We also performed simulations to gauge the relative contribution of $\variance(F_i)$ and $\sigma^2_{lib(s)}$ to $\variance(\theta^*_i)$ (see Section~\suppsecnoise{} of the Supplementary Materials).
+Counts for spike-in transcripts were simulated such that any variability in the log-ratios was only caused by stochastic sampling noise i.e., $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
+Our results suggest that most of the estimated variance of $\theta^*_i$ in Figure~\ref{fig:varestimates} is driven by sampling noise (Supplementary Figure~\suppfignoise{}), further reducing the potential impact of differences in behaviour.
+We also observed that the variance of the log-ratios was robust to decreases to the coverage of the spike-in transcripts in this simulation.
+A common recommendation is that the spike-in transcripts should take up 5-10\% of the library size (50000-100000 reads in our data) but the variance estimates were largely unchanged at 10-fold lower coverage.
+Thus, spike-in normalization is still reliable when relatively low amounts of spike-in RNA are added or sequenced.
+This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
 
 \subsection{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
