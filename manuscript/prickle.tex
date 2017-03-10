@@ -86,7 +86,7 @@ One particular advantage of this strategy is that it does not make any assumptio
 This means that spike-in normalization can be applied in situations where large-scale changes in expression (e.g., related to changes in total RNA content, or involving highly heterogeneous populations containing many cell types) are expected and of interest \cite{lun2016stepbystep,nestorowa2016single}.
 
 There are two common criticisms of spike-in normalization that challenge the validity of its central assumptions.
-The first is that the same quantity of spike-in RNA may not be consistently added to each sample \cite{robinson2010tmm}, and the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \cite{grun2015design} (e.g., unequal efficiencies of capture and amplification, caused by differences in biophysical properties).
+The first is that the same quantity of spike-in RNA may not be consistently added to each sample \cite{robinson2010tmm}, and the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \cite{grun2015design} (i.e., unequal capture efficiencies, caused by differences in the biophysical properties of the transcripts).
 Any differences in spike-in quantity or behaviour across cells will compromise the accuracy of spike-in normalization \cite{risso2014normalization}.
 These criticisms may contribute to the limited use of this normalization strategy in the scRNA-seq literature \cite{bacher2016design}.
 However, if one were to dismiss the use of spike-in normalization, there would be no general alternative for removing cell-specific biases in scRNA-seq data sets where a non-DE majority of genes cannot be assumed.
@@ -96,7 +96,7 @@ To our knowledge, this has yet to be rigorously studied.
 In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
 We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells, 
 and show that it is quantitatively negligible in real experiments across a range of conditions. 
-We also quantify the cell-to-cell variability in the difference in behaviour (i.e., the fold-change in capture and amplification efficiencies) between the two spike-in sets.
+We also obtain an upper bound on the cell-to-cell variability in the differences in behaviour (i.e., the fold-changes in the capture efficiencies) between the two spike-in sets.
 Simulations indicate that both factors have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
 These results suggest that spike-ins can be safely used for routine normalization of scRNA-seq data.
 
@@ -248,7 +248,7 @@ The variance of the log-size factors is around one order of magnitude larger tha
 
 \subsection{Estimating the variance of differential behaviour}
 The variance of $F_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
-Even when capture or amplification efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in efficiency is the same in all wells}.
+Even when the average capture efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in efficiency is the same in all wells}.
 Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
 This scales up the counts for the spike-in transcripts in all libraries by the same amount, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
