@@ -166,7 +166,7 @@ for (index in seq_along(separate)) {
 qq.cols <- c("blue", "lightblue", "red", "pink")
 plot(0,0,type="n", xlim=c(-xlim[1], xlim[2]), ylim=c(-ylim[1], ylim[2]), main="Separate addition", cex.main=1.4, 
      xlab="Theoretical quantiles", ylab="Sample quantiles", cex.axis=1.2, cex.lab=1.4)
-abline(a=0, b=1, col="grey", lwd=2, lty=2)
+abline(a=0, b=1, col="black", lwd=2, lty=2)
 for (index in seq_along(collected)) {
     out <- collected[[index]]
     points(out$x, out$y, col=qq.cols[index], pch=16)
@@ -189,7 +189,7 @@ for (index in seq_along(premixed)) {
 
 plot(0,0,type="n", xlim=c(-xlim[1], xlim[2]), ylim=c(-ylim[1], ylim[2]), main="Premixed addition", cex.main=1.4, 
      xlab="Theoretical quantiles", ylab="Sample quantiles", cex.axis=1.2, cex.lab=1.4)
-abline(a=0, b=1, col="grey", lwd=2, lty=2)
+abline(a=0, b=1, col="black", lwd=2, lty=2)
 for (index in seq_along(collected)) {
     out <- collected[[index]]
     points(out$x, out$y, col=qq.cols[index], pch=16)
