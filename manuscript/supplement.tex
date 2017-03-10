@@ -94,11 +94,11 @@ In practice, $L_i$ is effectively independent of $V_{is}$ and $R_{is}$ for any p
 This is because the denominator of the above expression is dominated by the vastly larger number of cDNA fragments from the set of endogenous transcripts.
 Any correlation between $L_i$ and the other terms would be negligible compared to the biological variance of expression.
 
-The error term $\varepsilon_{is}$ describes the variability due to sequencing noise in the spike-in counts for set $s$.
+The error term $\varepsilon_{is}$ denotes the variability due to sequencing noise in the counts for spike-in set $s$.
 We defined its variance as $\sigma^2_{lib(s)}$, which implicitly assumes that there is no relationship between the variance and the mean of $T_{is}$.
 This is a strong assumption given that mean-variance relationships are often observed in RNA-seq data \citep{mccarthy2012differential,law2014voom}.
-However, we note that the distribution of $T_{is}$ is similar between separate-addition and premixed-addition wells within each plate (Supplementary Figure~\ref{fig:totals}).
-If the mean of $T_{is}$ does not change, neither will the value of $\sigma^2_{lib(s)}$, regardless of the nature of the mean-variance relationship. 
+However, we note that the distribution of $T_{is}$ across wells with separate addition of spike-ins is similar to that across wells with premixed addition on the same plate (Supplementary Figure~\ref{fig:totals}).
+If the mean of $T_{is}$ does not change between separate/premixed experiments, neither will the value of $\sigma^2_{lib(s)}$, regardless of the nature of the mean-variance relationship. 
 This suggests that $\sigma^2_{lib(s)}$ will not change between $\variance(\theta_i)$ and $\variance(\theta^*_i)$, allowing calculation of $\sigma^2_{vol}$ from their difference.
 
 \section{Computing the contribution of stochastic noise}
@@ -129,54 +129,51 @@ This means that we need to test the effect of reducing coverage on $\sigma^2_{li
 \section{Implementation details for the downstream analyses}
 
 \subsection{Data pre-processing}
-Quality control was performed by removing libraries with outlier values for various metrics \citep{lun2016stepbystep}, including 
-the log-transformed total read count across all genes and the log-transformed total number of expressed genes, where small outliers were removed; 
+Quality control was performed by removing libraries with outlier values for various metrics \citep{lun2016stepbystep}.
+These metrics included the log-transformed total read count across all genes and the log-transformed total number of expressed genes, where small outliers were removed; 
 and the proportion of reads mapped to spike-in transcripts or mitochondrial genes, where large outliers were removed.
-Outlier values were defined as those that were more than three median absolute deviations away from the median value in the specified direction.
+Outliers were defined as values that were more than three median absolute deviations away from the median in the specified direction.
 Genes were also removed if the average count across all cells was below 1.
-This filters out low-abundance genes that do not contain much information for stable inference.
-For the data sets generated here, only the ERCC spike-in transcripts were used in the analyses below.
-Counts for the SIRV transcripts were discarded for simplicity.
+This filters out low-abundance genes that do not contain enough information for reliable inference.
+For our data sets, only the ERCC spike-in transcripts were used in downstream analyses.
+All SIRV transcripts were discarded for simplicity.
 
 \subsection{Methods for detecting differentially expressed genes}
 For DEG detection with edgeR v3.16.3, a NB GLM was fitted to the counts for each gene \citep{mccarthy2012differential} using a suitable design matrix.
 The log-transformed total count for the spike-in transcripts was used as the offset for each library.
+This is equivalent to spike-in normalization as each count is effectively downscaled by the spike-in total.
 An abundance-dependent trend was fitted to the NB dispersions of all genes using the estimateDisp function.
-Empirical Bayes shrinkage was performed towards this trend to obtain a shrunken NB dispersion for each gene.
-The likelihood ratio test was applied to test for significant differences in expression between conditions for each gene. 
-Finally, the Benjamini-Hochberg correction was applied to control the FDR.
+For each gene, empirical Bayes shrinkage was performed towards the trend to obtain a shrunken NB dispersion, and the likelihood ratio test was applied to test for significant differences in expression between conditions.
+The Benjamini-Hochberg correction was applied to control the FDR.
 
 For MAST v1.0.5, an effective library size was defined by multiplying the total spike-in count by a constant value $C$ for each library.
 We set $C$ to the ratio of the average total count for the endogenous genes to the average total count for the spike-in transcripts, where each average was computed across all libraries.
-This procedure simply adjusts the library size for each cell to reflect the difference in the spike-in totals across cells.
-Counts were converted to count-per-million (CPM) values using the effective library sizes.
-This is the same as spike-in normalization, as the sum of CPMs across spike-in transcripts is equal across libraries.
-CPMs were log-transformed after adding a pseudo-count of 1.
+This procedure recapitulates the effect of spike-in normalization by ensuring that the fold-differences in the effective library sizes are equal to the fold-differences in the spike-in totals between cells.
+Counts were converted to count-per-million (CPM) values using the effective library sizes, which were further log-transformed after adding a pseudo-count of 1.
 For each gene, a hurdle model was fitted to the log-CPMs across all cells using the zlm.SingleCellAssay function with default parameters.
 Along with the experimental factors, the proportion of genes with non-zero counts in each library was included as a covariate \citep{finak2015mast} in the model.
 Putative DE genes between the relevant conditions were identified using the lrTest function.
 
 \subsection{Methods for detecting highly variable genes}
-The first HVG detection method was based on the approach described by \cite{brennecke2013accounting}, with some modifications to the size factors in order to perform spike-in normalization.
-Specifically, the spike-in totals were rescaled to have a mean of unity across all libraries, and the size factor for each library was defined as its rescaled spike-in total.
-This represents spike-in normalization as each ``spike-in size factor'' scales the counts in each library so that the spike-in totals are the same. 
+The first HVG detection method was based on the approach described by \cite{brennecke2013accounting}, with some modifications to the size factors to perform spike-in normalization.
+Specifically, the spike-in totals were rescaled to have a mean of unity across all libraries, and the size factor for each library was defined as its rescaled spike-in total (i.e., $T_{i1}$).
 We did \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
 The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package with min.bio.disp set to zero.
 If blocking factors were present, they were regressed out by log-transforming the counts; applying the removeBatchEffect function from the limma package \citep{ritchie2015limma} to the log-counts; and converting the corrected log-values back to the count scale, prior to using technicalCV2.
 
 The second approach to detect HVGs was based on computing the variance of log-expression values \citep{lun2016stepbystep}.
 For each count in each library, a normalized log-expression value was defined as the log-ratio of the count with the spike-in size factor for that library.
-(A pseudo-count of 1 was added prior to log-transformation to avoid undefined values.)
+(A pseudo-count of 1 was added to avoid undefined values upon log-transformation.)
 The variance of log-expression was computed across all cells for each spike-in transcript.
 A loess curve was fitted to the log-variance against the mean for all spike-in transcripts using the trendVar function in scran, representing the mean-variance relationship due to technical noise.
 The biological component of the variance and a $p$-value was computed for each gene using the decomposeVar function.
 If blocking factors were present, they were used to construct a design matrix for modelling in trendVar.
 
 \subsection{Methods for dimensionality reduction and clustering}
-Spike-in size factors were defined from the spike-in totals as previously described. 
+Size factors were defined from the spike-in totals as previously described. 
 HVG detection was performed using the variance-of-log-expression method, where HVGs were defined as genes detected at a FDR of 5\% and with biological components above 0.5.
-PCA was performed on the normalized log-expression values of the HVGs, using the prcomp function from the stats package with scaling and centring.
-The first two PCs were used as the coordinates for each cell in one PCA plot, while the first and third PCs were used as the coordinates in another plot.
+PCA was performed on the normalized log-expression values of the HVGs, using the prcomp function from the stats package with scaling.
+The first two PCs were used as the coordinates for each cell in one PCA plot, and the first and third PCs were used as coordinates in another plot.
 Each point was coloured according to its annotated cell type \citep{segerstople2016single}.
 
 The procedure above was repeated at each simulation iteration with new spike-in counts.
