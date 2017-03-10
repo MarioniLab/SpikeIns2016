@@ -90,6 +90,7 @@ This means that spike-in normalization can be applied in situations where large-
 There are two common criticisms of spike-in normalization that challenge the validity of its central assumptions.
 The first is that the same quantity of spike-in RNA may not be consistently added to each sample \citep{robinson2010tmm}, and the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \citep{grun2015design} (i.e., unequal capture efficiencies, caused by differences in the biophysical properties of the transcripts).
 Any differences in spike-in quantity or behaviour across cells will compromise the accuracy of spike-in normalization \citep{risso2014normalization}.
+In some cases, it may also be difficult to gauge how much spike-in RNA should be added, especially if the quantity of endogenous RNA per cell is unknown, resulting in insufficient spike-in coverage for normalization.
 These criticisms may contribute to the limited use of this normalization strategy in the scRNA-seq literature \citep{bacher2016design}.
 However, if one were to dismiss the use of spike-in normalization, there would be no general alternative for removing cell-specific biases in scRNA-seq data sets where a non-DE majority of genes cannot be assumed.
 Thus, it is of particular interest whether or not the aforementioned criticisms of spike-in normalization are relevant to real scRNA-seq experiments.
