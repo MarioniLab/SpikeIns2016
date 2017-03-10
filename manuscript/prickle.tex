@@ -304,7 +304,7 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
     \caption{Effect of spike-in variability on DEG or HVG detection in simulated data.
         (a) The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
         This was also calculated for the top set of 200 DEGs with the smallest $p$-values.
-        Simulations were based on our 416B data set, to detect DEGs after inducing expression of a Cbfb-Myh11 oncogene compared to a mCherry control (see Methods);
+        Simulations were based on our 416B data set, to detect DEGs after inducing expression of a \textit{Cbfb-MYH11} oncogene compared to a mCherry control (see Methods);
         or on the data from Islam \textit{et al.} \cite{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
         using the Brennecke \textit{et al.} method based on the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
@@ -385,7 +385,7 @@ Nonetheless, our conclusions are still relevant as absolute quantification depen
 
 \subsection{Obtaining and culturing 416B cells and TSCs}
 
-The murine multipotent myeloid progenitor cell line 416B \cite{dexter1979isolation} was stably transduced with a TetOn construct of the Cbfb-Myh11 (CM) oncogene (type A cDNA), using an in-frame F2A-mCherry protein as a reporter. 
+The murine multipotent myeloid progenitor cell line 416B \cite{dexter1979isolation} was stably transduced with a TetOn construct of the \textit{Cbfb-MYH11} (CM) oncogene (type A cDNA), using an in-frame F2A-mCherry protein as a reporter. 
 As a control, cells were alternatively transduced with a version of the construct lacking the CM cDNA. 
 Cells were maintained in RPMI medium, supplemented with 10\% fetal calf serum and antibiotics.
 Expression of the CM oncogene or the mCherry control was induced by treatment with 1 \textmu{}g/ml of doxycycline, and induction was confirmed after 24 hours by measurement of mCherry levels by fluorescence activated cell sorting (BD Fortessa).
@@ -423,7 +423,7 @@ Both batches were sequenced on an Illumina HiSeq 4000 machine generating 75 bp p
 
 \subsection{Data analysis for the mixture experiments}
 Reads were mapped to the mm10 build of the mouse genome, including sequences of transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
-(The sequence of the Cbfb-Myh11 oncogene was also included in the reference when aligning data from 416B cells.)
+(The sequence of the \textit{Cbfb-MYH11} oncogene was also included in the reference when aligning data from 416B cells.)
 Mapping was performed using the subread aligner v1.5.1 \cite{liao2013subread} in RNA-seq mode with unique alignment.
 The 416B data were aligned in single-end mode while the TSC data were aligned in paired-end mode.
 Reads with mapping qualities greater than or equal to 10 were assigned to exonic regions of genes using the featureCounts function in the Rsubread package v1.24.1 \cite{liao2014featurecounts}.
@@ -562,7 +562,7 @@ All authors wrote and approved the manuscript.
 \section{Disclosure declaration}
 No conflicts of interest are declared.
 
-\section{Funding}
+\section{Funding statement}
 This work was supported by Cancer Research UK (core funding to JCM, award no.\ A17197), the University of Cambridge and Hutchison Whampoa Limited.
 JCM was also supported by core funding from EMBL.
 LHV was supported by an EMBL Interdisciplinary Postdoctoral fellowship.
