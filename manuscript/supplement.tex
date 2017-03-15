@@ -103,7 +103,7 @@ We performed simulations to obtain a rough estimate of the contribution of $\sig
 For each data set (416B or TSC), we extracted the spike-in count data for the premixed wells.
 For each spike-in set (SIRV or ERCC), the log-transformed sum of counts across all transcripts in that set was used as the GLM offset. 
 The NB dispersion was estimated for each spike-in transcript using the estimateDisp function from edgeR, using a design matrix that accounted for the batch of origin for each well (and other factors, e.g., induction status for the 416B cells).
-Fitted values of the GLM were also calculated for each transcript after coercing the offsets of all cells to be equal.
+Fitted values of the GLM were also calculated for each transcript after setting the offsets of all cells to be equal to the mean offset.
 The cell- and transcript-specific fitted values and the transcript-specific dispersion were used as the parameters for a NB distribution from which counts were resampled.
 In this manner, simulated counts were obtained for each spike-in transcript in each cell.
 
@@ -115,13 +115,13 @@ We also downscaled the fitted values to determine the effect of reducing coverag
 The variance of the log-ratios in both data sets were largely unchanged, even when only 10\% of the original coverage was used.
 These results suggest that spike-in normalization is robust to the use of low quantities of spike-in RNA.
 
-(We do not examine the effect of reducing coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
+We do not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
 Both of these terms refer to experimental processes that should be independent of the concentration of spike-in RNA.
 For example, the process of adding a volume of a solution is unrelated to the solution's contents.
 Similarly, the process of capturing a transcript molecule is unrelated to the number of other transcript molecules, excepting the presence of limiting reagents.
 Thus, the true values of $\sigma^2_{vol}$ or $\variance(F_i)$ should generally be unaffected by the depth of coverage.
 In contrast, sampling noise during sequencing depends on the coverage and will contribute to the true value of $\sigma^2_{lib(s)}$.
-This means that we need to test the effect of reducing coverage on $\sigma^2_{lib(s)}$.)
+This means that we need to test the effect of reducing coverage on $\sigma^2_{lib(s)}$.
 
 \section{Implementation details for the downstream analyses}
 

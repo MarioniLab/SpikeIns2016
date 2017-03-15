@@ -271,8 +271,8 @@ This suggests that $F_i$ will include some of the differences in behaviour betwe
 We also performed simulations to gauge the relative contribution of $\variance(F_i)$ and $\sigma^2_{lib(s)}$ to $\variance(\theta^*_i)$ (see Section~\suppsecnoise{} of the Supplementary Materials).
 Counts for spike-in transcripts were simulated such that any variability in the log-ratios was only caused by stochastic sampling noise i.e., $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
 Our results suggest that most of the estimated variance of $\theta^*_i$ in Figure~\ref{fig:varestimates} is driven by sampling noise (Supplementary Figure~\suppfignoise{}), further reducing the potential impact of differences in behaviour.
-We also observed that the variance of the log-ratios was robust to decreases to the coverage of the spike-in transcripts in this simulation.
-A common recommendation is that the spike-in transcripts should take up 5-10\% of the library size (50000-100000 reads in our data).
+We also observed that the variance of the log-ratios was robust to decreases in the coverage of the spike-in transcripts in this simulation.
+In typical experiments, spike-in transcripts take up 5-10\% of the library size for each cell (50000-100000 reads in our data).
 Here, the variance estimates were largely unchanged at 10-fold lower coverage.
 Thus, spike-in normalization is still reliable when relatively low amounts of spike-in RNA are added or sequenced.
 This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
