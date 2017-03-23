@@ -1,0 +1,135 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.85in,left=2.75in,footskip=0.75in,marginparwidth=2in]{geometry}
+
+% use Unicode characters - try changing the option if you run into troubles with special characters (e.g. umlauts)
+\usepackage[utf8]{inputenc}
+
+% clean citations
+\usepackage{cite}
+
+% hyperref makes references clicky. use \url{www.example.com} or \href{www.example.com}{description} to add a clicky url
+\usepackage{nameref,hyperref}
+
+% line numbers
+\usepackage[right]{lineno}
+
+% improves typesetting in LaTeX
+\usepackage{microtype}
+\DisableLigatures[f]{encoding = *, family = * }
+
+% text layout - change as needed
+\raggedright
+\setlength{\parindent}{0.5cm}
+\textwidth 5.25in 
+\textheight 8.75in
+
+% Remove % for double line spacing
+%\usepackage{setspace} 
+%\doublespacing
+
+% use adjustwidth environment to exceed text width (see examples in text)
+\usepackage{changepage}
+
+% adjust caption style
+\usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,singlelinecheck=off]{caption}
+
+% remove brackets from references
+\makeatletter
+\renewcommand{\@biblabel}[1]{\quad#1.}
+\makeatother
+
+% headrule, footrule and page numbers
+\usepackage{lastpage,fancyhdr,graphicx}
+\usepackage{epstopdf}
+\pagestyle{myheadings}
+\pagestyle{fancy}
+\fancyhf{}
+\rfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
+\fancyheadoffset[L]{2.25in}
+\fancyfootoffset[L]{2.25in}
+
+% use \textcolor{color}{text} for colored text (e.g. highlight to-do areas)
+\usepackage{color}
+
+% define custom colors (this one is for figure captions)
+\definecolor{Gray}{gray}{.25}
+
+% this is required to include graphics
+\usepackage{graphicx}
+
+% use if you want to put caption to the side of the figure - see example in text
+\usepackage{sidecap}
+
+% use for have text wrap around figures
+\usepackage{wrapfig}
+\usepackage[pscoord]{eso-pic}
+\usepackage[fulladjust]{marginnote}
+\reversemarginpar
+
+% Adding multirow.
+\usepackage{multirow}
+
+% Other required things:
+\usepackage{textgreek}
+\usepackage{color}
+
+\newcommand{\suppfignorm}{1}
+\newcommand{\suppfigtotals}{2}
+\newcommand{\suppfigorder}{3}
+\newcommand{\suppfigbiophys}{4}
+\newcommand{\suppfignoise}{5}
+
+\newcommand{\suppsecmath}{1}
+\newcommand{\suppsecnoise}{2}
+\newcommand{\suppsecsim}{3}
+
+\newcommand{\supptabstats}{1}
+
+% document begins here
+\begin{document}
+\vspace*{0.35in}
+
+% title goes here:
+\begin{flushleft}
+{\Large
+    \textbf\newline{Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data}
+}
+\newline
+% authors go here:
+\\
+Aaron T. L. Lun\textsuperscript{1}, 
+Fernando J. Calero-Nieto\textsuperscript{2},
+Liora Haim-Vilmovsky\textsuperscript{3,4}, 
+Berthold G\"ottgens\textsuperscript{2},
+John C. Marioni\textsuperscript{1,3,4,*}
+\\
+\bigskip
+\bf{1} Cancer Research UK Cambridge Institute, University of Cambridge, Li Ka Shing Centre, Robinson Way, Cambridge CB2 0RE, United Kingdom
+\\
+\bf{2} Wellcome Trust and MRC Cambridge Stem Cell Institute, University of Cambridge, Wellcome Trust/MRC Building, Hills Road, Cambridge CB2 0XY, United Kingdom
+\\
+\bf{3} EMBL European Bioinformatics Institute, Wellcome Genome Campus, Hinxton, Cambridge CB10 1SD, United Kingdom
+\\
+\bf{4} Wellcome Trust Sanger Institute, Wellcome Genome Campus, Hinxton, Cambridge CB10 1SA, United Kingdom
+\\
+\bigskip
+* marioni@ebi.ac.uk
+
+\end{flushleft}
+
+\newcommand{\revised}[1]{#1}
+
+\section*{Abstract}
+By profiling the transcriptomes of individual cells, single-cell RNA sequencing provides unparalleled resolution to study cellular heterogeneity.
+However, this comes at the cost of high technical noise, including cell-specific biases in capture efficiency and library generation.
+One strategy for removing these biases is to add a constant amount of spike-in RNA to each cell, and to scale the observed expression values so that the coverage of spike-in RNA is constant across cells.
+This approach has previously been criticized as its accuracy depends on the precise addition of spike-in RNA to each sample, and on similarities in behaviour (e.g., capture efficiency) between the spike-in and endogenous transcripts.
+Here, we perform mixture experiments using two different sets of spike-in RNA to quantify the variance in the amount of spike-in RNA added to each well in a plate-based protocol.
+We also obtain an upper bound on the variance due to differences in behaviour between the two spike-in sets.
+We demonstrate that both factors are small contributors to the total technical variance and have only minor effects on downstream analyses such as detection of highly variable genes and clustering.
+Our results suggest that spike-in normalization is reliable enough for routine use in single-cell RNA sequencing data analyses.
+
+% now start line numbers
+\linenumbers
+
