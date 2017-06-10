@@ -34,9 +34,9 @@ The second factor is how the spike-ins have been added -- ERCCs followed by SIRV
 
 ```{r, message=FALSE}
 library(simpaler)
-anno <- read.table("sdrf.tsv", header=TRUE, sep="\t", fill=TRUE, check.names=FALSE, stringsAsFactors=FALSE)
+anno <- read.table("sdrf.tsv", header=TRUE, sep="\t", fill=TRUE, check.names=FALSE, stringsAsFactors=FALSE, comment="")
 anno <- anno[match(colnames(all.counts), anno[,"Source Name"]),]
-is.induced <- anno[,"Factor Value[treatment]"]=="Induced"
+is.induced <- anno[,"Factor Value[phenotype]"]=="induced CBFB-MYH11 oncogene expression"
 ercc.first <- anno[,"Factor Value[spike-in addition]"]=="ERCC+SIRV"
 sirv.first <- anno[,"Factor Value[spike-in addition]"]=="SIRV+ERCC"
 premixed <- anno[,"Factor Value[spike-in addition]"]=="Premixed"
