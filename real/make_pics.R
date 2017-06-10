@@ -297,10 +297,11 @@ boxplot(c(lcollected.ercc, lcollected.sirv, lcollected.mouse), col=rep(my.cols, 
 legend("topleft", fill=my.cols, legend=c("ERCC", "SIRV", "Mouse"))
 dev.off()
 
-# Plotting against the theoretical concentrations of ERCCs.
+# Plotting against the theoretical concentrations of ERCCs, obtained from
+# https://tools.thermofisher.com/content/sfs/manuals/cms_095046.txt
 
-spike.conc <- read.table("ArrayExpress/spike-data/spikes.txt", header=TRUE, row.names=1, check.names=FALSE)
-spike.conc <- setNames(spike.conc[,"Attomole/well"], rownames(spike.conc))
+spike.conc <- read.table("https://tools.thermofisher.com/content/sfs/manuals/cms_095046.txt", header=TRUE, row.names=1, check.names=FALSE, sep="\t")
+spike.conc <- setNames(spike.conc[,"concentration in Mix 1 (attomoles/ul)"], spike.conc[,"ERCC ID"])
 
 all.yranges <- range(sapply(collected.ercc, FUN=function(x) { range(x[x>0]) }))
 all.xranges <- range(spike.conc[spike.conc>0])
@@ -312,7 +313,7 @@ for (x in seq_along(collected.ercc)) {
     get.x <- x > 2
     get.y <- x%%2==1
     plot(expected, observed, log="xy", 
-         xlab=ifelse(get.x, "Theoretical concentration (attomoles/well)", ""),
+         xlab=ifelse(get.x, expression("Theoretical concentration (attomoles/"*mu*"l)"), expression("")),
          ylab=ifelse(get.y, "Observed average read count", ""),
          pch=16, cex.axis=1.2, cex.lab=1.4, main=names[x], cex.main=1.4, ylim=all.yranges, xlim=all.xranges,
          yaxt=ifelse(get.y, "s", "n"), xaxt=ifelse(get.x, "s", "n"))
