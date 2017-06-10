@@ -65,7 +65,6 @@ for (datatype in c("wilson", "calero", "liora")) {
     high.ab <- rowMeans(incoming) >= 1
 	countsCell <- as.matrix(incoming[high.ab & !spike.in,])
 	spike.param <- spikeParam(incoming[high.ab & spike.in,])
-	diag.done <- FALSE
 
     #########################################################################
     # Running through our various methods.
@@ -82,7 +81,7 @@ for (datatype in c("wilson", "calero", "liora")) {
                 
                 sce <- newSCESet(countData=rbind(countsCell, countsSpike))
                 sce <- calculateQCMetrics(sce, feature_controls=list(Spike=rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(countsSpike)))))
-                isSpike(sce) <- "Spike"
+                setSpike(sce) <- "Spike"
                 sce <- computeSpikeFactors(sce)
                 sce <- normalize(sce)
                 
@@ -100,16 +99,16 @@ for (datatype in c("wilson", "calero", "liora")) {
                     is.sig <- out2$FDR <= 0.05 
 
                     # Some diagnostics for this data set.
-        			if (!diag.done) { 
+        			if (i==0) { 
                         pdf(paste0("diagnostics_", datatype, ".pdf"))
                         plot(out$mean, out$var)
                         curve(out$trend(x), col="red", lwd=2, add=TRUE)
                         dev.off()
-
+                    }
+                    if (i<=1) {
                         output <- out2[is.sig,]
-                        write.table(file=paste0("out_", datatype, ".tsv"), output[order(output$bio, decreasing=TRUE),], 
+                        write.table(file=paste0("log_", datatype, "_", i, ".tsv"), output[order(output$bio, decreasing=TRUE),], 
                                     quote=FALSE, sep="\t", col.names=NA)
-                        diag.done <- TRUE
                     }
                 } else {
                     sce2 <- sce
@@ -123,6 +122,12 @@ for (datatype in c("wilson", "calero", "liora")) {
                     outt <- outt[!isSpike(sce2),]
                     my.rank <- rank(outt$p.value)
                     is.sig <- outt$FDR <= 0.05
+
+                    if (i<=1) {
+                        output <- outt[is.sig,]
+                        write.table(file=paste0("cv2_", datatype, "_", i, ".tsv"), output[order(output$cv2, decreasing=TRUE),], 
+                                    quote=FALSE, sep="\t", col.names=NA)
+                    } 
                 }
                     
                 top.ranked <- lapply(top.hits, function(x) { my.rank <= x })       

@@ -67,7 +67,6 @@ for (datatype in c("calero", "islam")) {
 	# Running edgeR first.
 
 	y.ref <- DGEList(cell.counts)
-	diag.done <- FALSE
     if (datatype=="calero") {
         design <- model.matrix(~Batch + Group, expvar)
     } else if (datatype=="islam") {
@@ -93,7 +92,7 @@ for (datatype in c("calero", "islam")) {
 			res <- glmLRT(fit)
 
 			# Check if diagnostics look okay:
-			if (!diag.done) {
+			if (i==0) {
 				pdf(paste0("diagnostics_", datatype, ".pdf"))
 				plotBCV(y) # Nice downward trend
 				limma::plotMDS(edgeR::cpm(y, log=TRUE), pch=16,
@@ -112,10 +111,10 @@ for (datatype in c("calero", "islam")) {
 				best <- top.ranked
 			}
 
-			if (!diag.done) {
+			if (i<=1) {
 				# Top genes also look like the ones listed in Islam's paper, which is good, e.g. Sparc, S100a6, Vim, Fn1.
 				de.out <- topTags(res, n=Inf)
-				write.table(file=paste0("outEB_", datatype, ".tsv"), de.out, row.names=TRUE, 
+				write.table(file=paste0("edgeR_", datatype, "_", i, ".tsv"), de.out, row.names=TRUE, 
 					quote=FALSE, sep="\t", col.names=NA)
 				diag.done <- TRUE
 			}
@@ -153,20 +152,21 @@ for (datatype in c("calero", "islam")) {
             spike.totals <- colSums(spike.data)
             eff.lib.size <- spike.totals/mean(spike.totals) * mean(colSums(cell.counts))
             
-            # Computing log2-(CPM+1), as suggested on the page.
+            # Computing log2-(CPM+1), as suggested in the vignette.
             lcpms <- log2(t(t(cell.counts)/eff.lib.size)*1e6 + 1)
             suppressMessages({
                 sca <- FromMatrix(lcpms, cData=data.frame(wellKey=colnames(lcpms)), fData=data.frame(primerid=rownames(lcpms)))
                 colData(sca) <- cbind(colData(sca), expvar)
                 colData(sca)$cngeneson <- scale(colMeans(cell.counts>0))
                 
-                mfit <- zlm.SingleCellAssay(form, sca)
+                mfit <- zlm(form, sca)
                 mlrt <- lrTest(mfit, "Group")
                 MAST.p <- mlrt[, "hurdle", "Pr(>Chisq)"]
             })
 
-            # Choosing stuff. 
-			chosen <- p.adjust(MAST.p, method="BH") <= fdr.threshold
+            # Choosing significant genes.
+            fdr <- p.adjust(MAST.p, method="BH")
+			chosen <- fdr <= fdr.threshold
 		    top.ranked <- rank(MAST.p) <= top.hits
 			if (i) { 
 				results[[i]] <- sum(original!=chosen)/sum(original)
@@ -174,6 +174,12 @@ for (datatype in c("calero", "islam")) {
 			} else {
 				original <- chosen
 				best <- top.ranked
+			}
+
+            # Storing diagnostics.
+			if (i<=1) {
+				write.table(file=paste0("MAST_", datatype, "_", i, ".tsv"), cbind(mlrt, FDR=fdr), 
+                            row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
 			}
 		}
 
