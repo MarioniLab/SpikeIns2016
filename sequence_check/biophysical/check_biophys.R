@@ -1,3 +1,4 @@
+#############################################################
 # Get the length and GC content of the ERCCs.
 
 library(Biostrings)
@@ -34,6 +35,8 @@ mm10.gtf <- import("/lustre/jmlab/resources/annotation/processed/mm10.gtf")
 chosen.mm10.gtf <- mm10.gtf[grep("^chr", seqnames(mm10.gtf))]
 sub.mm10 <- getSeq(BSgenome.Mmusculus.UCSC.mm10, chosen.mm10.gtf)
 all.transcript <- split(sub.mm10, chosen.mm10.gtf$transcript_id)
+
+set.seed(1000) # Picking 2000 transcripts to show, otherwise this takes too long.
 by.transcript <- all.transcript[sample(length(all.transcript), 2000)]
 mm10 <- DNAStringSet(unlist(lapply(by.transcript, paste0, collapse="")))
 
