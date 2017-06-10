@@ -34,10 +34,12 @@ The second factor is how the spike-ins have been added -- ERCCs followed by SIRV
 
 ```{r, message=FALSE}
 library(simpaler)
-is.induced <- grepl("S50[5-8]", colnames(all.counts))
-ercc.first <- grepl("N70[1-4]", colnames(all.counts))
-sirv.first <- grepl("N70[5-8]", colnames(all.counts))
-premixed <- grepl("N7(09|10|11|12)", colnames(all.counts))
+anno <- read.table("sdrf.tsv", header=TRUE, sep="\t", fill=TRUE, check.names=FALSE, stringsAsFactors=FALSE)
+anno <- anno[match(colnames(all.counts), anno[,"Source Name"]),]
+is.induced <- anno[,"Factor Value[treatment]"]=="Induced"
+ercc.first <- anno[,"Factor Value[spike-in addition]"]=="ERCC+SIRV"
+sirv.first <- anno[,"Factor Value[spike-in addition]"]=="SIRV+ERCC"
+premixed <- anno[,"Factor Value[spike-in addition]"]=="Premixed"
 colSums(data.frame(Induced=is.induced, ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
 ```
 
