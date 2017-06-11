@@ -1,6 +1,35 @@
 # This code estimates the increase in technical variance with decreasing depth.
 
 library(simpaler)
+getRescalingFunction <- function(d, design) {
+    d <- estimateDisp(d, design, prior.df=0)
+    fit <- glmFit(d, design)
+    fitted <- exp(fit$unshrunk.coefficients %*% t(design) + mean(fit$offset))
+    fitted[is.na(fitted)] <- 0
+
+    means <- rowMeans(fitted)
+    disp <- fit$dispersion
+    lmean <- log(means)
+    ldisp <- log(disp)
+    keep <- is.finite(lmean)
+    lmean <- lmean[keep]
+    ldisp <- ldisp[keep]
+    
+    trend <- loess(ldisp ~ lmean, degree=1)
+    function(scale) {
+        new.fitted <- fitted*scale
+        new.means <- rowMeans(new.fitted)
+        lnew.means <- log(new.means)[keep]
+        
+        new.disp <- disp
+        new.disp[keep] <- exp(predict(trend, data.frame(lmean = lnew.means)) + residuals(trend))
+        upper.bound <- exp(max(fitted(trend))) # Setting to the upper bound at low counts.
+        new.disp <- pmin(upper.bound, new.disp)
+        new.disp[is.na(new.disp)] <- upper.bound
+        return(list(fitted=new.fitted, disp=new.disp))
+    }
+}
+
 pdf("depth_effect.pdf")
 par(mar=c(5.1, 5.1, 4.1, 2.1))
 for (person in c("Liora", "Calero")) { 
@@ -30,16 +59,10 @@ for (person in c("Liora", "Calero")) {
 
     library(edgeR)
     ercc.only <- DGEList(my.counts[grepl("ERCC", rownames(my.counts)),])
-    ercc.only <- estimateDisp(ercc.only, design, prior.df=0)
-    ercc.fit <- glmFit(ercc.only, design)
-    ercc.means <- exp(ercc.fit$unshrunk.coefficients %*% t(design) + mean(ercc.fit$offset))
-    ercc.means[is.na(ercc.means)] <- 0
+    ercc.FUN <- getRescalingFunction(ercc.only, design)
     
     sirv.only <- DGEList(my.counts[grepl("SIRV", rownames(my.counts)),])
-    sirv.only <- estimateDisp(sirv.only, design, prior.df=0)
-    sirv.fit <- glmFit(sirv.only, design)
-    sirv.means <- exp(sirv.fit$unshrunk.coefficients %*% t(design) + mean(sirv.fit$offset))
-    sirv.means[is.na(sirv.means)] <- 0
+    sirv.FUN <- getRescalingFunction(sirv.only, design)
     
     # Simulating to estimate the effect of depth on the variability of ratios.
     # Note that we assume the offsets are true when estimating the dispersions.
@@ -47,15 +70,18 @@ for (person in c("Liora", "Calero")) {
     
     set.seed(100)
     collected <- list()
-    all.props <- seq_len(10)/10
+    all.props <- c(0.01, 0.02, 0.05, 0.1, 0.2, 0.4, 0.6, 0.8, 1)
     for (p in seq_along(all.props)) { 
         prop <- all.props[p]
         to.collect <- list()
     
         for (it in seq_len(20)) { 
-            sim.ercc <- matrix(rnbinom(length(ercc.fit$fitted.values), mu=ercc.means*prop, size=1/ercc.fit$dispersion),
+            new.ercc <- ercc.FUN(prop)
+            sim.ercc <- matrix(rnbinom(length(new.ercc$fitted), mu=new.ercc$fitted, size=1/new.ercc$disp),
                                nrow=nrow(ercc.only), ncol=ncol(ercc.only))
-            sim.sirv <- matrix(rnbinom(length(sirv.fit$fitted.values), mu=sirv.means*prop, size=1/sirv.fit$dispersion),
+
+            new.sirv <- sirv.FUN(prop)
+            sim.sirv <- matrix(rnbinom(length(new.sirv$fitted), mu=new.sirv$fitted, size=1/new.sirv$disp),
                                nrow=nrow(sirv.only), ncol=ncol(sirv.only))
     
             ratios <- log2(colSums(sim.ercc)/colSums(sim.sirv))
@@ -68,16 +94,16 @@ for (person in c("Liora", "Calero")) {
     
     var.est <- sapply(collected, mean)
     var.sd <- sapply(collected, sd)/sqrt(lengths(collected))
-    depth <- all.props*mean(ercc.fit$samples$lib.size)
+    depth <- all.props*100
     upper <- var.est + var.sd
     
-    plot(depth, var.est, xlab="Coverage of ERCC transcripts (reads/well)", 
+    plot(depth, var.est, xlab="Percentage of spike-in coverage",
          ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"),
-         ylim=c(min(var.est), max(upper)), pch=16, 
+         ylim=c(min(var.est), max(upper)), pch=16, log="y", 
          main=top, cex.axis=1.2, cex.lab=1.4, cex.main=1.5)
     lines(depth, var.est)
     segments(depth, var.est, y1=upper)
-    segments(depth-1000, upper, depth+1000, upper)
+    segments(depth-1, upper, depth+1, upper)
 }
   
 dev.off()
