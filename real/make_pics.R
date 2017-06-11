@@ -10,9 +10,9 @@ batch.cols <- c("blue", "lightblue", "red", "pink")
 # Making a barplot of the variance estimates.
 
 require(simpaler)
-total <- premixed <- ERCC.first <- SIRV.first <- volume <- ERCC.sf <- SIRV.sf <- list()
-total.err <- premixed.err <- ERCC.first.err <- SIRV.first.err <- volume.err <- ERCC.sf.err <- SIRV.sf.err <- list()
-total.df <- premixed.df <- ERCC.first.df <- SIRV.first.df <- volume.df <- ERCC.sf.df <- SIRV.sf.df <- list()
+total <- premixed <- ERCC.first <- SIRV.first <- volume <- ERCC.sf <- SIRV.sf <- cell <- list()
+total.err <- premixed.err <- ERCC.first.err <- SIRV.first.err <- volume.err <- ERCC.sf.err <- SIRV.sf.err <- cell.err <- list()
+total.df <- premixed.df <- ERCC.first.df <- SIRV.first.df <- volume.df <- ERCC.sf.df <- SIRV.sf.df <- cell.df <- list()
 index <- 1L
 
 for (operator in c("Calero", "Liora")) {
@@ -43,6 +43,10 @@ for (operator in c("Calero", "Liora")) {
         SIRV.sf[[index]] <- out$sfSIRV.var
         SIRV.sf.err[[index]] <- attributes(out$sfSIRV.var)$standard.error
         SIRV.sf.df[[index]] <- attributes(out$sfSIRV.var)$df
+
+        cell[[index]] <- out$cell.var
+        cell.err[[index]] <- attributes(out$cell.var)$standard.error
+        cell.df[[index]] <- attributes(out$cell.var)$df
         
         ERCC.first[[index]] <- out$ratioERCCfirst.var 
         ERCC.first.err[[index]] <- attributes(out$ratioERCCfirst.var)$standard.error
@@ -111,6 +115,23 @@ segments(out, final, y1=upper.limit)
 segments(out-0.1, upper.limit, out+0.1)
 text(out, upper.limit, final.df, pos=3, cex=0.9, offset=0.2)
 legend(max(out)+0.5, max(final), fill=spike.cols, rownames(final), cex=1.2)
+dev.off()
+
+# Making a plot of the ratios of mouse totals to the size factors.
+pdf("pics/variance_cell.pdf")
+par(mar=c(5.1, 5.1, 2.1, 2.1), xpd=TRUE)
+final <- unlist(cell)
+names(final) <- names
+final.err <- unlist(cell.err)
+upper.limit <- final  + final.err
+final.df <- unlist(cell.df)
+
+out <- barplot(final, beside=TRUE, ylab=expression("Variance of"~log[2]~"[mouse/ERCC]"), 
+               cex.axis=1.2, cex.lab=1.4, cex.names=1.4, col="grey80", 
+               ylim=c(0, max(upper.limit)))
+segments(out, final, y1=upper.limit)
+segments(out-0.1, upper.limit, out+0.1)
+text(out, upper.limit, final.df, pos=3, cex=0.9, offset=0.2)
 dev.off()
 
 ###############################################################

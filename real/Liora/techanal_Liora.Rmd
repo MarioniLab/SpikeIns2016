@@ -261,7 +261,8 @@ This easily exceeds the variability due to spike-in addition or behaviour, which
 
 ```{r}
 cellular <- log2(colSums(spike.data$counts[spike.data$genes$mouse,])/spike.data$samples$sum1)
-estimateVariance(ratios=cellular, design=design)
+cell.var <- estimateVariance(ratios=cellular, design=design)
+cell.var
 ```
 
 We also compute the variability of each of the spike-in totals across all cells, blocking on the various conditions.
@@ -283,7 +284,7 @@ sessionInfo()
 We collect the results of interest and save them into an object.
 
 ```{r}
-saveRDS(list(sfERCC.var=ercc.var, sfSIRV.var=sirv.var,
+saveRDS(list(sfERCC.var=ercc.var, sfSIRV.var=sirv.var, cell.var=cell.var,
              ratioERCCfirst.var=by.order$var[["ERCC+SIRV"]], 
              ratioERCCsecond.var=by.order$var[["SIRV+ERCC"]], 
              ratioOrder.sig=by.order$pval[1,2],
