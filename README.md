@@ -14,7 +14,7 @@ To run the simulations, enter the `simulations` directory:
 
 1. Enter `variance` and run `varsim.R` to perform the simulations for detecting HVGs.
 2. Enter `diffexp` and run `desim.R` to perform the simulations for detecting DEGs.
-This requires you to download a count matrix from [GEO](ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE29nnn/GSE29087/suppl/GSE29087%5FL139%5Fexpression%5Ftab%2Etxt%2Egz).
+This requires you to download the `GSE29087_L139_expression_tab.txt.gz` count matrix at [GSE29087](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29087).
 3. Enter `clustering` and run `clustsim.R` to perform the simulations for clustering and PCA.
 This requires you to obtain `pancreas_refseq_rpkms_counts_3514sc.txt.gz` from the processed files in [E-MAT-5061](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5061/E-MTAB-5061.processed.1.zip), along with the corresponding [SDRF file](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5061/E-MTAB-5061.sdrf.txt).
 4. Enter `pics/` and run `picmaker.R` and `get_properties.R` to reproduce the figures in the paper.
