@@ -1,5 +1,5 @@
-# This checks the swapping in the Calero data set by examining the
-# expression of the CBFB-MYH11 oncogene.
+# This checks the swapping in the Calero data set by examining the expression of the CBFB-MYH11 oncogene.
+# If swapping was occurring, the log-fold change should be closer to zero in the 4000 data set.
 
 pdf("Calero_check.pdf")
 par(mar=c(5.1, 5.1, 4.1, 2.1))
@@ -16,28 +16,25 @@ for (dataset in c("trial_20160113", "trial_20160325")) {
 dev.off()
 
 # This checks the swapping in the Liora data set by examining the negative control wells.
-
-collected <- is.pos <- is.neg <- list()
-for (dataset in c("test_20160906", "test_20170201")) {
-    full.data <- readRDS(file.path("..", "Liora", dataset, "analysis", "full.rds"))
-    ercc.sums <- colSums(full.data$counts[full.data$genes$spike1,])
-#    sirv.sums <- log10(colSums(full.data$counts[full.data$genes$spike2,]))
-    mouse.sums <- colSums(full.data$counts[full.data$genes$mouse,])
-            
-    dname <- ifelse(dataset=="test_20160906", "TSC (I)", "TSC (II)")
-    collected[[dname]] <- log10(mouse.sums/ercc.sums)
-    is.neg[[dname]] <- which(full.data$samples$control.well=="-")
-    is.pos[[dname]] <- which(full.data$samples$control.well=="+")
-#    points(1:3, c(ercc.sums[is.neg], sirv.sums[is.neg], mouse.sums[is.neg]), col="red", pch=16, cex=1.8)
-#    points(1:3, c(ercc.sums[is.pos], sirv.sums[is.pos], mouse.sums[is.pos]), col="blue", pch=17, cex=1.8)
-}
+# Swapping should be at least partly responsible for any mouse counts in the negative control.
 
 pdf("Liora_check.pdf")
-par(mar=c(5.1, 5.1, 4.1, 2.1))
-boxplot(collected, ylab=expression("Log"[10]~"(Mouse/ERCC)"),
-        col="grey80", cex.axis=1.2, cex.names=1.2, cex.main=1.4, cex.lab=1.4)
-for (x in seq_along(is.pos)) {
-    points(x, collected[[x]][[is.neg[[x]]]], col="red", pch=16, cex=1.8)
-    points(x, collected[[x]][[is.pos[[x]]]], col="blue", pch=17, cex=1.8)
+collected <- is.neg <- list()
+for (dataset in c("test_20160906", "test_20170201")) {
+    full.data <- readRDS(file.path("..", "Liora", dataset, "analysis", "full.rds"))
+    mouse.sums <- colSums(full.data$counts[full.data$genes$mouse,])
+    log.counts <- log10(mouse.sums)    
+
+    out <- hist(log.counts, breaks=20, xlab=expression("Log"[10]~"total mouse counts"),
+         cex.axis=1.2, cex.lab=1.4, cex.main=1.4, col="grey80",
+         main=ifelse(dataset=="test_20160906", "TSC (I)", "TSC (II)"))
+    is.neg <- which(full.data$samples$control.well=="-")
+    i <- findInterval(log.counts[is.neg], out$breaks)
+    points(out$mids[i], out$counts[i]+1, col="red", pch=25, cex=1.8, bg="red")
 }
 dev.off()
+
+# Consider the proportion of mouse counts in the negative control to that of other cells.
+# This represents the proportion of counts in each well due to switching (and other factors, e.g., cell-free RNA).
+# Note that there's no need to consider cell-specific biases here, as swapping occurs after cell-specific capture processes.
+
