@@ -109,12 +109,11 @@ The cell- and transcript-specific fitted values and the transcript-specific disp
 In this manner, simulated counts were obtained for each spike-in transcript in each cell.
 
 The aim is to compute the variance of the log-ratios of the total counts between spike-in sets from the simulated data.
-By forcing the offsets to be equal, any variance in the log-ratios must be due to stochastic sampling noise, i.e.,  $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$
-We observed that the variance in the simulations ranged from 0.008-0.011 (Supplementary Figure~\ref{fig:sampledepth}), which is more than half of the variance of $\theta^*_i$ in Figure~\figvarestimates{}.
-This suggests that most of the variance in the premixed experiments is due to sampling noise rather than variability in the differences in behaviour between spike-in sets, i.e., $\variance(F_i)$.
+By forcing the offsets \revised{of all wells} to be equal, \revised{we remove differences in the log-ratios between wells due to cell-specific capture efficiency and sequencing depth.
+This means that any variance in the simulated log-ratios across wells} must be due to stochastic sampling noise, i.e.,  $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
 We also downscaled the fitted values to determine the effect of reducing coverage of the spike-in transcripts, e.g., due to addition of less spike-in RNA.
-The variance of the log-ratios in both data sets were largely unchanged, even when only 10\% of the original coverage was used.
-These results suggest that spike-in normalization is robust to the use of low quantities of spike-in RNA.
+\revised{To preserve the mean-variance relationship, we fitted a loess curve of degree 1 to the log-transformed NB dispersions against the log-mean count.
+We used this trend to determine the new NB dispersion for each feature after downscaling its mean, and used this value during count sampling.}
 
 We do not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
 Both of these terms refer to experimental processes that should be independent of the concentration of spike-in RNA.
@@ -271,7 +270,7 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
     \end{center}
     \caption{Effect of spike-in coverage on the variance of the log-ratios of the ERCC and SIRV total counts, using simulations based on the 416B (left) or TSC data sets (right).
         Simulations were performed where the only source of variation between cells was the stochastic sampling of counts from a NB distribution with parameters estimated from real data.
-        This was repeated after scaling the NB means for each spike-in transcript to 10-100\% of the original coverage. 
+        This was repeated after scaling the NB means for each spike-in transcript to 1-100\% of the original coverage. 
         Each point represents the mean variance from 20 simulation iterations, with error bars representing standard errors of the variance estimates.
     }
     \label{fig:sampledepth}
