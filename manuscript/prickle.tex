@@ -42,6 +42,9 @@
 \usepackage{setspace}
 \spacing{1.5}
 
+\newcommand{\revised}[1]{\textcolor{red}{#1}}
+\newcommand\variance{\mbox{var}}
+
 \begin{document}
 
 \maketitle
@@ -58,7 +61,7 @@ We demonstrate that both factors are small contributors to the total technical v
 Our results suggest that spike-in normalization is reliable enough for routine use in single-cell RNA sequencing data analyses.
 \end{quote}
 
-\section{Introduction}
+\section*{Introduction}
 Single-cell RNA sequencing (scRNA-seq) is a powerful technique for studying transcriptional activity in individual cells.
 Briefly, RNA is isolated from single cells, reverse transcribed into cDNA and sequenced using massively parallel sequencing technologies \citep{shapiro2013singlecell}.
 This can be performed using microfluidics platforms like the Fluidigm C1 \citep{pollen2014lowcoverage}; 
@@ -96,13 +99,6 @@ However, if one were to dismiss the use of spike-in normalization, there would b
 Thus, it is of particular interest whether or not the aforementioned criticisms of spike-in normalization are relevant to real scRNA-seq experiments.
 To our knowledge, this has yet to be rigorously studied.
 
-In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
-We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells, 
-and show that it is quantitatively negligible in real experiments across a range of conditions. 
-We also obtain an upper bound on the cell-to-cell variability in the differences in behaviour (i.e., the fold-changes in the capture efficiencies) between the two spike-in sets.
-Simulations indicate that both factors have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
-These results suggest that spike-ins can be safely used for routine normalization of scRNA-seq data.
-
 % The advantage of spike-ins is that it can capture cell size and doesn't require a non-DE majority.
 % However, is the cell size interesting, or should it be normalized out (in which case accurate spike-in addition wouldn't be required at all)?
 % It's most obviously useful for cell cycle considerations -- possibly also cancer and in some aspects of differentiation.
@@ -114,11 +110,17 @@ These results suggest that spike-ins can be safely used for routine normalizatio
 % On the other hand, any non-DE genes with no change in the molecule number will be called as significant in standard normalization, which is definitively wrong.
 % You could have your cake and eat it by separating the DE list into up/down changes for easier examination of the up/down changes.
 
-\section{Results}
+\section*{Results}
 
-\newcommand\variance{\mbox{var}}
+\subsection*{Overview}
+In this paper, we conduct a series of experiments to estimate the reliability of spike-in normalization in single-cell transcriptome studies employing plate-based protocols.
+We use mixtures of two distinct spike-in RNA sets to quantify the variance of the added spike-in volume across cells, 
+and show that it is quantitatively negligible in real experiments across a range of conditions. 
+We also obtain an upper bound on the cell-to-cell variability in the differences in behaviour (i.e., the fold-changes in the capture efficiencies) between the two spike-in sets.
+Simulations indicate that both factors have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
+These results suggest that spike-ins can be safely used for routine normalization of scRNA-seq data.
 
-\subsection{Overview of the mixture experiments}
+\subsection*{Description of the mixture experiments}
 We aimed to assess the variability in the added spike-in quantity across cells.
 To do so, we performed mixture experiments using two distinct spike-in sets (Figure~\ref{fig:expdesign}) -- the External RNA Controls Consortium (ERCC) set and the Spike-in RNA Variants (SIRV) set.
 An equal volume of each spike-in set was added separately to all wells of a 96-well microtiter plate.
@@ -164,7 +166,7 @@ This is not straightforward to achieve on, say, the Fluidigm C1 chip where the a
 Our focus on data from plate-based protocols reflects their widespread use in single-cell studies \citep{segerstople2016single,islam2011characterization,wilson2015combined,scialdone2016resolving}.
 Obviously, the procedure we describe here can be adapted to any protocol where the spike-in addition can be easily modified, e.g., plate-based CEL-seq \citep{hashimshony2016celseq2} or STRT-seq \citep{islam2011characterization}.
 
-\subsection{Estimating the variance of volume addition}
+\subsection*{Estimating the variance of volume addition}
 Denote the log$_2$-transformed total read count for well $i$ and spike-in set $s$ as
 \[
 T_{is} = \log_2 \left[ L_i l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right] + \varepsilon_{is}
@@ -183,9 +185,9 @@ The product of all of these terms defines the expected number of reads for each 
 In addition, $\varepsilon_{is}$ represents the effect of sequencing noise on the log-total count, where $E(\varepsilon_{is})=0$ and $\variance(\varepsilon_{is})= \sigma^2_{lib(s)}$.
 
 We assume that $R_{is}$, $V_{is}$ and $\varepsilon_{is}$ are mutually independent of each other, as they describe separate steps in the protocol.
-We also assume that $V_{is_1}$ and $V_{is_2}$ are independent for sets $s_1$ and $s_2$, as each spike-in set is added separately to each well.
-Similarly, $\varepsilon_{is_1}$ and $\varepsilon_{is_2}$ are assumed to be independent as sequencing noise for each transcript should be unaffected by that of other transcripts.
-(However, $R_{is_1}$ and $R_{is_2}$ are not independent due to well-specific factors affecting capture efficiency for all transcripts).
+We also assume that \revised{$V_{i1}$} and \revised{$V_{i2}$} are independent for sets \revised{$s=1$} and \revised{2}, as each spike-in set is added separately to each well.
+Similarly, \revised{$\varepsilon_{i1}$} and \revised{$\varepsilon_{i2}$} are assumed to be independent as sequencing noise for each transcript should be unaffected by that of other transcripts.
+(However, \revised{$R_{i1}$} and \revised{$R_{i2}$} are not independent due to well-specific factors affecting capture efficiency for all transcripts).
 Further details on these variables are provided in Section~\suppsecmath{} of the Supplementary Materials.
 
 Let $s=1$ represent the ERCC spike-in set and $s=2$ represent the SIRV spike-in set.
@@ -225,7 +227,7 @@ With this mathematical framework, we estimated the variance components using the
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplementary Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
 Linear models are particularly useful as they allow blocking on additional structure in the experimental design (Methods).
-The size of $T_{is}$ was also similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplementary Figure~\suppfigtotals{}, Section~\suppsecmath{} of the Supplementary Materials for details).
+The \revised{value} of $T_{is}$ was also similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplementary Figure~\suppfigtotals{}, Section~\suppsecmath{} of the Supplementary Materials for details).
 Finally, the order of spike-in addition did not significantly affect the variance estimates for the separate-addition wells in most plates (Supplementary Figure~\suppfigorder{}).
 
 Our results indicate that $\sigma^2_{vol}$ is consistently smaller than the variance in the rest of the protocol (Figure~\ref{fig:varestimates}a).
@@ -250,7 +252,7 @@ The variance of the log-size factors is approximately one order of magnitude lar
     \label{fig:varestimates}
 \end{figure}
 
-\subsection{Estimating the variance of differential behaviour}
+\subsection*{Estimating the variance of differential behaviour}
 The variance of $F_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
 Even when the average capture efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in efficiency is the same in all wells}.
 Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
@@ -277,7 +279,7 @@ Here, the variance estimates were largely unchanged at 10-fold lower coverage.
 Thus, spike-in normalization is still reliable when relatively low amounts of spike-in RNA are added or sequenced.
 This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
 
-\subsection{Assessing the downstream effect of variability with simulations}
+\subsection*{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
 This included public data sets \citep{segerstople2016single,islam2011characterization} as well as our 416B and TSC data.
@@ -351,7 +353,7 @@ We observed that the maximum Jaccard indices were moderate to large (Figure~\ref
 To put this into context, we re-clustered the original data using a different algorithm.
 This yielded smaller Jaccard indices for all clusters (Figure~\ref{fig:dimclust}c), indicating that spike-in variability has less effect on the results than the choice of clustering method.
 
-\section{Discussion}
+\section*{Discussion}
 In this article, we performed mixture experiments to quantify the variability of spike-in RNA addition across wells in a plate-based scRNA-seq protocol.
 We also obtained a rough estimate of the well-to-well variability in the differences in behaviour between two different sets of spike-in transcripts.
 Both values were at least an order of magnitude smaller than the variance of spike-in coverage across cells, suggesting that differences in spike-in volume or behaviour were not major sources of error in the context of spike-in normalization.
@@ -384,9 +386,9 @@ This is more difficult to evaluate as accuracy is affected by the magnitude of t
 In contrast, relative normalization is only affected by variability in the differences in behaviour across wells, as discussed above.
 Nonetheless, our conclusions are still relevant as absolute quantification depends on the precise addition of spike-in RNA to each cell.
 
-\section{Methods}
+\section*{Methods}
 
-\subsection{Obtaining and culturing 416B cells and TSCs}
+\subsection*{Obtaining and culturing 416B cells and TSCs}
 
 The murine multipotent myeloid progenitor cell line 416B \citep{dexter1979isolation} was stably transduced with a TetOn construct of the \textit{CBFB-MYH11} (CM) oncogene (type A cDNA), using an in-frame F2A-mCherry protein as a reporter. 
 As a control, cells were alternatively transduced with a version of the construct lacking the CM cDNA. 
@@ -397,7 +399,7 @@ Murine TSCs were kindly provided by Dr.\ Jennifer Nichols (Wellcome Trust and MR
 To prepare for single-cell sorting, cells were harvested with trypsin and MEF feeders were depleted by plating the cells onto a gelatinised plate followed by incubation for 1h at 37$^{\circ}$C on TSC culturing medium. 
 The supernatant containing TSCs was used for sorting.
 
-\subsection{Spike-in mixture experiments with Smart-seq2}
+\subsection*{Spike-in mixture experiments with Smart-seq2}
 % On a single plate, so no plate effects.
 % Mention cutting up of plate, especially for the two conditions.
 % No effect of different cell treatments.
@@ -424,7 +426,7 @@ The first batch of libraries was sequenced on an Illumina HiSeq 2500 machine gen
 Sequencing of the TSC libraries was performed at the Wellcome Trust Sanger Institute after library preparation by the Single Cell Genomics Core facility.
 Both batches were sequenced on an Illumina HiSeq 4000 machine generating 75 bp paired-end reads.
 
-\subsection{Data analysis for the mixture experiments}
+\subsection*{Data analysis for the mixture experiments}
 Reads were mapped to the mm10 build of the mouse genome, including sequences of transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
 (The sequence of the \textit{CBFB-MYH11} oncogene was also included in the reference when aligning data from 416B cells.)
 Mapping was performed using the subread aligner v1.5.1 \citep{liao2013subread} in RNA-seq mode with unique alignment.
@@ -455,7 +457,7 @@ We calculated $\sigma^2_{vol}$ from estimates of $\variance(\theta_i)$ and $\var
 However, if the difference between $\variance(\theta_i)$ and $\variance(\theta^2_i)$ was negative, $\sigma^2_{vol}$ was set to zero instead.
 To assess the effect of the order of spike-in addition, a linear model was fitted to the subset of relevant wells on each plate to obtain an order-specific variance estimate.
 
-\subsection{Simulation design for resampling spike-in variability}
+\subsection*{Simulation design for resampling spike-in variability}
 For each data set, we compute $T_{is}$ for each cell $i$ and spike-in set $s$.
 To simplify the design of the simulations, we only consider the ERCC spike-in set here, i.e., $s=1$.
 The variance of $T_{is}$ is
@@ -503,7 +505,7 @@ This new quantile was used as the simulated count for transcript $t$ in $i$.
 % For example, if it turned out that you added half the amount of spike-in to one well, it wouldn't distort the estimation of the (conditional) mean.
 % Okay, maybe the trended dispersion would be a bit weird, because technical variability should depend on the amount of RNA, but some inaccuracy there is forgivable.
 
-\subsection{Evaluating the robustness of DEG detection}
+\subsection*{Evaluating the robustness of DEG detection}
 Two data sets were used to test the effect of spike-in variability on DEG detection.
 The first was the 416B data generated previously, where DEGs were detected between control and oncogene-induced cells in both plates.
 Here, we used an additive model with a treatment term and a blocking factor for the plate.
@@ -517,7 +519,7 @@ This procedure was repeated for the simulated data, and the number of genes that
 The proportion of the top 200 genes with the smallest $p$-values that were shared between the original and simulated results was also computed.
 This was repeated for 20 simulation iterations and the average proportion across iterations was reported for each method.
 
-\subsection{Evaluating the robustness of HVG detection}
+\subsection*{Evaluating the robustness of HVG detection}
 Our 416B and TSC data sets were used to assess the effect of spike-in variability on detection of HVGs.
 In the former, blocking was performed to remove plate- and treatment-specific effects on mean expression, i.e., HVGs were detected within treatment conditions on each plate.
 Similarly, blocking was performed on the plate of origin for each cell in the TSC data set to remove plate effects.
@@ -530,7 +532,7 @@ Each method was applied on the original and simulated data, and a set of signifi
 The proportion of HVGs common to both the original and simulated sets was computed, along with the common proportion among the top 200 genes with the lowest $p$-values.
 This was repeated for 20 simulation iterations and the average proportion across iterations was reported for each method.
 
-\subsection{Evaluating dimensionality reduction and clustering}
+\subsection*{Evaluating dimensionality reduction and clustering}
 Count data from a study of pancreatic islet cells \citep{segerstople2016single} were obtained from ArrayExpress with the acession E-MTAB-5061.
 Spike-in normalization was performed and a set of HVGs was defined using the variance-of-log-expression method.
 PCA plots of the first three components were constructed from the matrix of log-expression values for the HVGs.
@@ -547,31 +549,31 @@ For each original cluster, the maximum Jaccard index across all simulated cluste
 This value represents the extent to which the membership of the original cluster was preserved in the most similar simulated cluster.
 We also compared the original clusters to those generated from complete-linkage clustering of the original HVG log-expression values.
 
-\section{Data access}
+\section*{Data access}
 Data are available on ArrayExpress using the accession E-MAT-5522.
 Code used for the statistical analysis and simulations are available at https://github.com/MarioniLab/SpikeIns2016.
 
-\section{Acknowledgements}
+\section*{Acknowledgements}
 We thank Jennifer Nichols and Liliana Antunes for supplying the TSCs.
 We also thank Victoria Moignard and Wajid Jawaid for helpful discussions about the experimental design.
 
-\section{Author contributions}
+\section*{Author contributions}
 ATLL proposed the mixture experiments and performed the statistical analysis and simulations.
 FJCN adapted the Smart-seq2 protocol for the spike-in mixtures and generated the 416B data.
 LHV generated the TSC data.
 BG and JCM provided direction and guidance on the project.
 All authors wrote and approved the manuscript.
 
-\section{Disclosure declaration}
+\section*{Disclosure declaration}
 No conflicts of interest are declared.
 
-\section{Funding statement}
+\section*{Funding statement}
 This work was supported by Cancer Research UK (core funding to JCM, award no.\ A17197), the University of Cambridge and Hutchison Whampoa Limited.
 JCM was also supported by core funding from EMBL.
 LHV was supported by an EMBL Interdisciplinary Postdoctoral fellowship.
 Work in the G\"ottgens group was supported by Cancer Research UK, Bloodwise, the National Institute of Diabetes and Digestive and Kidney Diseases, the Leukemia and Lymphoma Society and core infrastructure grants from the Wellcome Trust and the Medical Research Council to the Cambridge Stem Cell Institute.
 
-\section{Supplementary materials}
+\section*{Supplementary materials}
 The Supplementary Materials is a single PDF file that consists of Sections~1-\suppsecsim{} and contains Supplementary Figures~1-\suppfignoise{} and Supplementary Table~1.
 
 {\small
