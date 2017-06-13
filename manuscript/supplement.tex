@@ -205,13 +205,30 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
 \newpage
 \begin{figure}[btp]
     \begin{center}
-        \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/qq_separate.pdf}
-        \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/qq_premixed.pdf}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/qq_separate.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/qq_premixed.pdf}
+            \caption{}
+        \end{subfigure} \\[0.1in]
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/dist_separate.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/dist_premixed.pdf}
+            \caption{}
+        \end{subfigure}
     \end{center}
-    \caption{Quantile-quantile plots of the log-ratios after separate addition of spike-ins (left) or premixed addition (right).
-        For each plate, a linear model was fitted to the log-ratios to account for the experimental design.
-        Residuals were standardized and plotted against the theoretical quantiles of a standard normal distribution.
+    \caption{
+        \revised{Distribution} of the log-ratios after separate or premixed addition of spike-in sets.
+        For each plate, a linear model was fitted to the log-ratios of the corresponding wells to account for the experimental design.
+        \revised{(a, b) Quantile-quantile plots of the residuals of the fitted model for each plate.
+        Residuals were standardized and plotted against the theoretical quantiles of a standard normal distribution.}
         The dotted line represents equality between the sample and theoretical quantiles.
+        \revised{(c, d) Density estimates of the residuals from each plate, computed using a Gaussian kernel with twice the default bandwidth.}
     }
 \end{figure}
 
