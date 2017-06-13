@@ -247,9 +247,19 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
         \includegraphics[width=0.7\textwidth,trim=0mm 10mm 0mm 5mm,clip]{../real/pics/variance_order.pdf}
     \end{center}
     \caption{Estimated variance of the log-ratio of total counts between spike-in sets, computed across wells in which the ERCC spike-in set was added before the SIRV set or vice versa.
-        This exploits the presence of a number of wells in each plate for which the order of spike-in addition was reversed.
+        This exploits the presence of a number of wells in each plate \revised{(indicated above each bar)} for which the order of spike-in addition was reversed.
         Error bars represent standard errors of the variance estimates for normally distributed log-ratios.
-        Differences between the ERCC- and SIRV-first variance estimates of each batch were assessed using a two-sided F-test, yielding $p$-values of 0.96, 0.66, 0.02 and 0.33 for the respective batches from left to right.
+        Differences between the ERCC- and SIRV-first estimates of each batch were assessed using a two-sided F-test, yielding $p$-values of 0.96, 0.66, 0.02 and 0.33 for the respective batches from left to right.
+    }
+\end{figure}
+
+\begin{figure}[btp]
+    \begin{center}
+        \includegraphics[width=0.7\textwidth,trim=0mm 10mm 0mm 5mm,clip]{../real/pics/variance_cell.pdf}
+    \end{center}
+    \caption{\revised{Estimated variance of the log-ratio of total counts across all endogenous mouse genes to that across all ERCC transcripts, computed across all wells on each plate (numbers shown above each bar).
+        Error bars represent standard errors of the variance estimates for normally distributed log-ratios.
+        }
     }
 \end{figure}
 
