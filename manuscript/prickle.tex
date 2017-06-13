@@ -16,8 +16,9 @@
 \newcommand{\suppfigcell}{4}
 \newcommand{\suppfigbiophys}{5}
 \newcommand{\suppfignoise}{6}
-\newcommand{\suppfigspikeconc}{7}
-\newcommand{\suppfigspikeave}{8}
+\newcommand{\suppfiglostsim}{7}
+\newcommand{\suppfigspikeconc}{8}
+\newcommand{\suppfigspikeave}{9}
 
 \newcommand{\suppsecmath}{1}
 \newcommand{\suppsecnoise}{2}
@@ -194,7 +195,8 @@ Similarly, \revised{$\varepsilon_{i1}$} and \revised{$\varepsilon_{i2}$} are ass
 Further details on these variables are provided in Section~\suppsecmath{} of the Supplementary Materials.
 
 Let $s=1$ represent the ERCC spike-in set and $s=2$ represent the SIRV spike-in set.
-In the experiment where each spike-in set is added separately to each well, denote the log$_2$-ratio of the total counts between the two sets as $\theta_i = T_{i1} - T_{i2}$ for well $i$.
+\revised{The log$_2$-total count across all spike-in transcripts in the ERCC and SIRV set is $T_{i1}$ and $T_{i2}$, respectively.}
+In the experiment where each spike-in set is added separately to each well, we denote the log$_2$-ratio of the total counts between the two sets as $\theta_i = T_{i1} - T_{i2}$ for well $i$.
 This can also be written as
 \[
     \theta_i = \log_2(V_{i1}) + \varepsilon_{i1} - \log_2(V_{i2}) - \varepsilon_{i2} + F_i + \log_2\left[ \frac{l_1 \sum_{t_1} r_{t_1} c_{t_1}}{l_2\sum_{t_2} r_{t_2} c_{t_2}} \right]
@@ -230,7 +232,7 @@ It should be stressed that this variance estimate is relevant to all experiments
 Uing our mathematical framework, we estimated the variance components using the data from our mixture experiments.
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplementary Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
-Linear models are particularly useful as they allow blocking on additional structure in the experimental design (Methods).
+Linear models are particularly useful as they allow blocking on additional structure in the experimental design \revised{-- we used a one-way layout to account for shifts in the mean due to addition order or oncogene induction (see} Methods).
 The \revised{value} of $T_{is}$ was also similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplementary Figure~\suppfigtotals{}, Section~\suppsecmath{} of the Supplementary Materials for details).
 Finally, the order of spike-in addition did not significantly affect the variance estimates for the separate-addition wells in most plates (Supplementary Figure~\suppfigorder{}).
 
@@ -302,7 +304,6 @@ Once the optimal concentration is determined, it can be used for all experiments
 In contrast, the variability of volume addition and of spike-in behaviour cannot be easily controlled even if all other parameters are optimized. 
 }
 
-
 \subsection*{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
@@ -325,6 +326,8 @@ Similar results were also observed in the top 200 DEGs with the smallest $p$-val
 For HVG detection, we used methods based on the coefficient of variation \citep{brennecke2013accounting} or the variance of log-expression values \citep{lun2016stepbystep}.
 Again, only minor changes were observed in most data sets (Figure~\ref{fig:setchange}b), for both the set of significant HVGs and for the top 200 HVGs with the smallest $p$-values.
 These results suggest that the detection and ranking of DEGs and HVGs are largely robust to variability in spike-in volume or behaviour.
+\revised{Indeed, genes that were not consistently detected across simulation iterations tended to have weak log-fold changes for DEGs, or small biological components for HVGs (Supplementary Figure~\suppfiglostsim{}).
+This is expected as genes on the borderline of significance are more susceptible to random fluctuations in the normalization process.}
 
 \begin{figure}[bt]
     \begin{center}
@@ -334,7 +337,7 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
         (a) The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
         This was also calculated for the top set of 200 DEGs with the smallest $p$-values.
         Simulations were based on our 416B data set, to detect DEGs after inducing expression of a \textit{CBFB-MYH11} oncogene compared to a mCherry control (see Methods);
-        or on the data from Islam \textit{et al.} \citep{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
+        or on the data from \cite{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
         using the Brennecke \textit{et al.} method based on the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
         This was also calculated for the top set of 200 HVGs with the smallest $p$-values.

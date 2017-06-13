@@ -103,7 +103,7 @@ This suggests that $\sigma^2_{lib(s)}$ will not change between $\variance(\theta
 We performed simulations to obtain a rough estimate of the contribution of $\sigma^2_{lib(s)}$ to the variance of $\theta^*_i$.
 For each data set (416B or TSC), we extracted the spike-in count data for the premixed wells.
 For each spike-in set (SIRV or ERCC), the log-transformed sum of counts across all transcripts in that set was used as the GLM offset. 
-The NB dispersion was estimated for each spike-in transcript using the estimateDisp function from edgeR, using a design matrix that accounted for the batch of origin for each well (and other factors, e.g., induction status for the 416B cells).
+The NB dispersion was estimated for each spike-in transcript using the estimateDisp function from edgeR, using a design matrix that accounted for the \revised{plate} of origin for each well (and other factors, e.g., induction status for the 416B cells).
 Fitted values of the GLM were also calculated for each transcript after setting the offsets of all cells to be equal to the mean offset.
 The cell- and transcript-specific fitted values and the transcript-specific dispersion were used as the parameters for a NB distribution from which counts were resampled.
 In this manner, simulated counts were obtained for each spike-in transcript in each cell.
@@ -286,6 +286,31 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
     \label{fig:sampledepth}
 \end{figure}
 
+\begin{figure}[btp]
+    \begin{center}
+        \begin{subfigure}{0.24\textwidth}
+            \includegraphics[width=\textwidth,page=2]{../simulations/pics/comparison_edgeR_DEG.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.24\textwidth}
+            \includegraphics[width=\textwidth,page=4]{../simulations/pics/comparison_edgeR_DEG.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.24\textwidth}
+            \includegraphics[width=\textwidth,page=2]{../simulations/pics/comparison_log_HVG.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.24\textwidth}
+            \includegraphics[width=\textwidth,page=4]{../simulations/pics/comparison_log_HVG.pdf}
+            \caption{}
+        \end{subfigure}
+    \end{center}
+    \caption{\revised{Properties of genes that were detected as DEGs or HVGs in the original data, and those that were no longer detected (lost) after simulating spike-in variability.
+        (a, b) Absolute magnitudes of the log-fold changes of DEGs that were originally detected by edgeR or lost upon simulation in the 416B or mESC data sets.
+    (c, d) Biological components of variation of HVGs that were originally detected by the variance of log-expression method or lost upon simulation in the 416B and TSC data sets.}
+    }
+\end{figure}
+
 \begin{table}[btp]
     \caption{Alignment and counting statistics for each batch of scRNA-seq data, including the total number of fragments (reads for single-end data, read pairs for paired-end data), percentage of reads mapped to the reference genome and percentage of fragments assigned to genic regions.
     For each statistic, the median value across all wells in the batch is shown with first and third quartiles in brackets.}
@@ -329,7 +354,7 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
     \begin{center}
         \includegraphics[width=0.5\textwidth]{../real/pics/feature_abundances.pdf}
     \end{center}
-    \caption{\revised{Distribution of average counts across the ERCC and SIRV spike-in transcripts and endogenous genes.
+    \caption{\revised{Distribution of average counts across the ERCC and SIRV spike-in transcripts and endogenous mouse genes.
     For each feature, counts were averaged across all wells on each plate.}}
 \end{figure}
 
