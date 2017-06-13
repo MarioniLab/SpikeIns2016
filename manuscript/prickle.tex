@@ -15,6 +15,8 @@
 \newcommand{\suppfigorder}{3}
 \newcommand{\suppfigbiophys}{4}
 \newcommand{\suppfignoise}{5}
+\newcommand{\suppfigspikeconc}{6}
+\newcommand{\suppfigspikeave}{7}
 
 \newcommand{\suppsecmath}{1}
 \newcommand{\suppsecnoise}{2}
@@ -166,7 +168,7 @@ This is not straightforward to achieve on, say, the Fluidigm C1 chip where the a
 Our focus on data from plate-based protocols reflects their widespread use in single-cell studies \citep{segerstople2016single,islam2011characterization,wilson2015combined,scialdone2016resolving}.
 Obviously, the procedure we describe here can be adapted to any protocol where the spike-in addition can be easily modified, e.g., plate-based CEL-seq \citep{hashimshony2016celseq2} or STRT-seq \citep{islam2011characterization}.
 
-\subsection*{Estimating the variance of volume addition}
+\subsection*{Mathematical framework for variance decomposition}
 Denote the log$_2$-transformed total read count for well $i$ and spike-in set $s$ as
 \[
 T_{is} = \log_2 \left[ L_i l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right] + \varepsilon_{is}
@@ -223,7 +225,8 @@ To obtain an estimate of the variance of the volume addition step, simple arithm
 \]
 It should be stressed that this variance estimate is relevant to all experiments using the same protocol for spike-in addition, even if the identity or concentration of the spike-in set is different.
 
-With this mathematical framework, we estimated the variance components using the data from our mixture experiments.
+\subsection*{Estimating the variance of volume addition}
+Uing our mathematical framework, we estimated the variance components using the data from our mixture experiments.
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplementary Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
 Linear models are particularly useful as they allow blocking on additional structure in the experimental design (Methods).
@@ -435,6 +438,12 @@ Reads with mapping qualities greater than or equal to 10 were assigned to exonic
 Genes were defined using Ensembl v82 annotation for the GRCm38 mouse assembly and annotation for the ERCC and SIRV transcripts.
 This yielded a count for each endogenous gene and spike-in transcript in each well.
 Mapping and counting statistics for each batch of libraries are summarized in Supplementary Table~\supptabstats{}.
+
+\revised{To evaluate spike-in quality, we verified that the total spike-in count in each well comprised 1-10\% of the total library size (Supplementary Figure~\suppfigtotals{}).
+This corresponds to the amount of spike-in RNA that we aimed to add to each well, and was consistent across wells within each plate.
+The coverage of each ERCC transcript was also directly proportional to its theoretical concentration in the spike-in mixture (Supplementary Figure~\suppfigspikeconc{}).
+The distribution of average read counts across spike-in transcripts or endogenous genes was also consistent across plates (Supplementary Figure~\suppfigspikeave{}).
+These diagnostics indicate that the spike-in transcripts were successfully sequenced and processed into counts.}
 
 Variance components were estimated from the libraries generated from a single plate.
 In each well, the sum of counts across all transcripts in each spike-in set was computed, and the log$_2$-ratio between the ERCC and SIRV sums was calculated.

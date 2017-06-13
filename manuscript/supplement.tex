@@ -2,6 +2,7 @@
 \usepackage{graphicx}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage[labelfont=bf]{caption}
+\usepackage{subcaption}
 \usepackage{color}
 \usepackage{amsmath}
 \usepackage{natbib}
@@ -217,19 +218,34 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
 
 \begin{figure}[btp]
     \begin{center}
-        \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/total_ercc.pdf}
-        \includegraphics[width=0.49\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/total_sirv.pdf}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/total_ercc.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/total_sirv.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/prop_ercc.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../real/pics/prop_sirv.pdf}
+            \caption{}
+        \end{subfigure}
     \end{center}
-    \caption{Distribution of the total number of reads assigned to transcripts in the ERCC (left) or SIRV spike-in set (right) across wells.
+    \caption{\revised{Distribution of the coverage of the (a, c) ERCC or (b, d) SIRV spike-in set across wells, 
+        shown as the total number of reads assigned to the spike-in transcripts (a, b) or as a proportion of the total number of reads in the corresponding library (c, d).}
         For each plate, separate boxplots are shown for wells in which spike-ins were added separately or premixed before addition.
-        Dots represent wells with total counts that are more than 1.5 interquartile ranges from the first or third quartile of the corresponding distribution.
+        Dots represent wells that are more than 1.5 interquartile ranges from the first or third quartile of the corresponding distribution.
     }
     \label{fig:totals}
 \end{figure}
 
 \begin{figure}[btp]
     \begin{center}
-        \includegraphics[width=0.7\textwidth,trim=0mm 10mm 0mm 10mm,clip]{../real/pics/variance_order.pdf}
+        \includegraphics[width=0.7\textwidth,trim=0mm 10mm 0mm 5mm,clip]{../real/pics/variance_order.pdf}
     \end{center}
     \caption{Estimated variance of the log-ratio of total counts between spike-in sets, computed across wells in which the ERCC spike-in set was added before the SIRV set or vice versa.
         This exploits the presence of a number of wells in each plate for which the order of spike-in addition was reversed.
@@ -285,6 +301,29 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
 % summary(totals, digits=100)
 % summary(mapped)
 % summary(counted)
+
+\begin{figure}[btp]
+    \begin{center}
+       \includegraphics[scale=0.5,page=1,trim=0mm 25mm 10mm 5mm,clip]{../real/pics/against_theoretical.pdf}
+       \includegraphics[scale=0.5,page=2,trim=10mm 25mm 10mm 5mm,clip]{../real/pics/against_theoretical.pdf}
+       \includegraphics[scale=0.5,page=3,trim=0mm 5mm 10mm 5mm,clip]{../real/pics/against_theoretical.pdf}
+       \includegraphics[scale=0.5,page=4,trim=10mm 5mm 10mm 5mm,clip]{../real/pics/against_theoretical.pdf}
+       \caption{\revised{Observed average read count for each transcript in the ERCC spike-in set, plotted against the theoretical concentrations (obtained as Mix A in ``ERCC Controls Analysis: ERCC RNA Spike-In Control Mixes (English)'' at https://www.thermofisher.com/order/catalog/product/4456740).
+        Each point represents a spike-in transcript, with counts averaged across all wells in a plate.
+        The red line represents a line of best fit with gradient 1.
+        Equivalent plots for the SIRVs are not shown as the relationship between the observed count and the theoretical molar concentration is not straightforward in the presence of isoforms.
+       }}
+    \end{center}
+\end{figure}
+
+\begin{figure}[btp]
+    \begin{center}
+        \includegraphics[width=0.5\textwidth]{../real/pics/feature_abundances.pdf}
+    \end{center}
+    \caption{\revised{Distribution of average counts across the ERCC and SIRV spike-in transcripts and endogenous genes.
+    For each feature, counts were averaged across all wells on each plate.}}
+\end{figure}
+
 
 \end{document}
 
