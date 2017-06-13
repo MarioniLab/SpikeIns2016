@@ -366,7 +366,7 @@ Thus, spike-in variability does not appear to affect the visual interpretation o
         (b) Clusters were identified from the original data by hierarchical clustering with Ward's criterion, followed by a tree cut with $k$ of 2, 5 or 10.
         This was repeated at each simulation iteration, and the maximum Jaccard index between each original cluster and any of the simulated clusters at the same $k$ was computed.
         Each value represents the mean of 20 simulation iterations, and the error bars represent standard errors.
-        (c) The maximum Jaccard index for each original cluster generated with Ward's criterion compared to the clusters generated from complete-linkage clustering of the original data.
+        (c) The maximum Jaccard index for each original cluster generated with Ward's criterion compared to clusters generated from complete-linkage clustering of the original data.
     }
     \label{fig:dimclust}
 \end{figure}
@@ -405,7 +405,16 @@ The term $\variance(F_i)$ represents the variability in the difference in behavi
 However, arguably a more relevant quantity is the variability in the difference $P_{is}$ between synthetic spike-in and endogenous RNA, as this affects the accuracy of normalization.
 It may be possible to obtain a rough estimate of $\variance(P_{is})$ by using pooled cellular RNA from another organism as one of the spike-in sets \citep{brennecke2013accounting}, so that $\variance(\theta^*_i)$ provides an upper bound on the variance in the differences in behaviour between synthetic and endogenous RNA.
 We chose not to do so because of the difficulty in reproducibly using the same pool of cellular RNA across batches, and in calibrating the concentration of RNA to be added to each well.
-Use of UMI counts may also provide a tighter bound on $\variance(F_i)$ or $\variance(P_{is})$ by reducing the contribution of amplification noise to $\variance(\theta^*_i)$.
+Use of UMI counts may also provide a tighter bound on $\variance(F_i)$ or $\variance(P_{is})$ by reducing the contribution of amplification noise to $\sigma^2_{lib(s)}$ and $\variance(\theta^*_i)$.
+\revised{Another consideration with endogenous RNA is the variability of lysis between cells, which we neglect to consider in our framework -- this is inherently difficult to assess with external spike-in RNA and may require other methods to quantify.}
+
+\revised{One interesting question is how to choose between spike-in normalization and approaches that assume a non-DE majority of genes.
+This choice depends on whether total RNA content in each cell is of interest \citep{lun2016stepbystep}.
+Spike-in normalization will preserve changes in total RNA content between cells, whereas non-DE methods will treat such changes as bias (as a majority of genes are affected) and remove them.
+This suggests that spike-in normalization is preferable in applications where changes in total RNA content can be easily associated with a biological process, e.g., T cell activation,   cell cycling.
+In contrast, non-DE normalization may be more suitable for comparisons between distinct cell types, where the up- or downregulation of specific genes (conditional on the total RNA content of the cell) is more informative.
+Obviously, this choice is subject to the experimental context.
+If a non-DE majority cannot be assumed, spike-in normalization should be used; conversely, spike-in RNA cannot be easily added in droplet-based techniques, thus requiring non-DE methods.}
 
 We stress that our study only examines the reliability of spike-ins for ``relative'' normalization, i.e., to make counts comparable across cells.
 We do not consider the reliability of spike-ins for absolute quantification, i.e., to determine the number of molecules of each transcript in each cell.
