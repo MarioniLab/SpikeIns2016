@@ -19,10 +19,12 @@
 \newcommand{\suppfiglostsim}{7}
 \newcommand{\suppfigspikeconc}{8}
 \newcommand{\suppfigspikeave}{9}
+\newcommand{\suppfigindex}{10}
 
 \newcommand{\suppsecmath}{1}
 \newcommand{\suppsecnoise}{2}
-\newcommand{\suppsecsim}{3}
+\newcommand{\suppsecindex}{3}
+\newcommand{\suppsecsim}{4}
 
 \newcommand{\supptabstats}{1}
 
@@ -476,7 +478,8 @@ Mapping and counting statistics for each batch of libraries are summarized in Su
 This corresponds to the amount of spike-in RNA that we aimed to add to each well, and was consistent across wells within each plate.
 The coverage of each ERCC transcript was also directly proportional to its theoretical concentration in the spike-in mixture (Supplementary Figure~\suppfigspikeconc{}).
 The distribution of average read counts across spike-in transcripts or endogenous genes was also consistent across plates (Supplementary Figure~\suppfigspikeave{}).
-These diagnostics indicate that the spike-in transcripts were successfully sequenced and processed into counts.}
+These diagnostics indicate that the spike-in transcripts were successfully sequenced and processed into counts.
+In addition, we examined the effect of index switching \citep{sinha2017index} in each data set generated on the HiSeq 4000, and found it to be negligible (Supplementary Note~\suppsecindex{}, Supplementary Figure~\suppfigindex{}).}
 
 Variance components were estimated from the libraries generated from a single plate.
 In each well, the sum of counts across all transcripts in each spike-in set was computed, and the log$_2$-ratio between the ERCC and SIRV sums was calculated.
@@ -616,7 +619,7 @@ LHV was supported by an EMBL Interdisciplinary Postdoctoral fellowship.
 Work in the G\"ottgens group was supported by Cancer Research UK, Bloodwise, the National Institute of Diabetes and Digestive and Kidney Diseases, the Leukemia and Lymphoma Society and core infrastructure grants from the Wellcome Trust and the Medical Research Council to the Cambridge Stem Cell Institute.
 
 \section*{Supplementary materials}
-The Supplementary Materials is a single PDF file that consists of Sections~1-\suppsecsim{} and contains Supplementary Figures~1-\suppfigspikeave{} and Supplementary Table~1.
+The Supplementary Materials is a single PDF file that consists of Sections~1-\suppsecsim{} and contains Supplementary Figures~1-\suppfigindex{} and Supplementary Table~1.
 
 {\small
 \bibliography{refnorm}

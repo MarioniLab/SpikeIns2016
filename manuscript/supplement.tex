@@ -111,8 +111,9 @@ In this manner, simulated counts were obtained for each spike-in transcript in e
 The aim is to compute the variance of the log-ratios of the total counts between spike-in sets from the simulated data.
 By forcing the offsets \revised{of all wells} to be equal, \revised{we remove differences in the log-ratios between wells due to cell-specific capture efficiency and sequencing depth.
 This means that any variance in the simulated log-ratios across wells} must be due to stochastic sampling noise, i.e.,  $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
-We also downscaled the fitted values to determine the effect of reducing coverage of the spike-in transcripts, e.g., due to addition of less spike-in RNA.
-\revised{To preserve the mean-variance relationship, we fitted a loess curve of degree 1 to the log-transformed NB dispersions against the log-mean count.
+We also downscaled the fitted values to determine the effect of reducing coverage of the spike-in transcripts \revised{on the sampling noise.
+We downscaled to 1-100\% of the original coverage to mimic the addition of less spike-in RNA to each well.}
+\revised{To preserve the mean-variance relationship during downscaling, we fitted a loess curve of degree 1 to the log-transformed NB dispersions against the log-mean count.
 We used this trend to determine the new NB dispersion for each feature after downscaling its mean, and used this value during count sampling.}
 
 We do not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
@@ -122,6 +123,32 @@ Similarly, the process of capturing a transcript molecule is unrelated to the nu
 Thus, the true values of $\sigma^2_{vol}$ or $\variance(F_i)$ should generally be unaffected by the depth of coverage.
 In contrast, sampling noise during sequencing depends on the coverage and will contribute to the true value of $\sigma^2_{lib(s)}$.
 This means that we need to test the effect of reducing coverage on $\sigma^2_{lib(s)}$.
+
+\begin{color}{red}
+\section{Examining index switching on the HiSeq 4000}
+Cells from three of our plates were multiplexed and sequenced on the Illumina HiSeq 4000 machine using the ExAmp chemistry.
+A recent study showed that the indices primers used for barcoding each sample could switch between samples \citep{sinha2017index}, thereby contaminating one sample with DNA from other samples.
+We examined the effect of index switching on our 416B data, exploiting the fact that the first plate was generated on the HiSeq 2500 while the second was generated on the HiSeq 4000.
+The variance estimates were very similar between the two plates (Figure~2), suggesting that index switching has minimal effect on our conclusions.
+We also made use of the presence of the \textit{CBFB-MYH11} oncogene, the expression of which was upregulated in half the cells on each plate.
+We observed similar log-fold changes between induced and control cells for both plates (Supplementary Figure~\ref{fig:switching}a, b) whereas we would have expected that the log-fold change for the second plate would be closer to zero if samples were homogenized due to index switching.
+
+For the TSC data set, each plate contained a negative control well where no cell was added.
+Any counts for endogenous mouse genes in those control wells could be attributed to index switching (or to other sources of contamination, e.g., cell-free RNA).
+In each plate, the total count across all mouse genes for each negative control well was around 2-3 orders of magnitude lower than the total mouse counts in the majority of wells (Supplementary Figure~\ref{fig:switching}c, d).
+This suggests that, at worst, index switching would result in 1\% of the library size for each well being attributable to contamination from other wells.
+To put this result into context, the coefficients of variation for the total ERCC count in the first and second plate are 0.29 and 0.26, respectively.
+This means the coverage routinely varies by 26-29\% across wells due to cell-specific biases.
+By comparison, the 1\% (maximum) rate of contamination due to index switching is likely to have negligible effects.
+\end{color}
+
+% x <- loadin1$counts[loadin1$genes$spike1,]
+% x <- colSums(loadin1$counts[loadin1$genes$spike1,])
+% sqrt(var(x)/mean(x)^2)
+% x <- loadin2$counts[loadin2$genes$spike1,]
+% x <- colSums(loadin2$counts[loadin2$genes$spike1,])
+% sqrt(var(x)/mean(x)^2)
+
 
 \section{Implementation details for the downstream analyses}
 
@@ -378,6 +405,32 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
     For each feature, counts were averaged across all wells on each plate.}}
 \end{figure}
 
+\begin{figure}[btp]
+    \begin{center}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 10mm 0mm 0mm,clip,page=1]{../real/index_swapping/Calero_check.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 10mm 0mm 0mm,clip,page=2]{../real/index_swapping/Calero_check.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 0mm,clip,page=1]{../real/index_swapping/Liora_check.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 0mm,clip,page=2]{../real/index_swapping/Liora_check.pdf}
+            \caption{}
+        \end{subfigure}
+    \end{center}
+    \caption{\revised{Effect of index switching in each data set for the mixture experiments.
+        (a, b) Log-fold change of \textit{CBFB-MYH11} oncogene expression in control and induced 416B cells on each plate, generated using the HiSeq 2500 (plate I) or 4000 (II).
+        (c, d) Distribution of log-total counts for mouse genes for all wells on each TSC plate.
+        The negative control well on each plate is marked by the red triangle.
+    }}
+    \label{fig:switching}
+\end{figure}
 
 \end{document}
 
