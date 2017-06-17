@@ -85,12 +85,14 @@ If not, $L_i$ will be constant across wells, with its exact value depending on t
 However, if quantification was performed, $L_i$ will theoretically depend on the other variables that contribute to $T_{is}$.
 Specifically,
 \[
-    L_i = D_i \left[ \sum_{s} \left( l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right) \right]^{-1}
+    L_i = D_i \left[ \sum_{s \in \{1, 2\}} \left( l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right) \revised{+ l_0 R_{i0} \sum_g r_g N_{ig}} \right]^{-1}
 \]
-where $D_i$ is the total sequencing depth for well $i$ (in reads) and the outer sum is taken over the spike-in sets $s\in \{1, 2\}$ as well as the set of endogenous transcripts $s=g$.
+where $D_i$ is \revised{a random variable representing} the total sequencing depth for well $i$ (in reads);
+\revised{$N_{ig}$ is a random variable specifying the number of transcripts for each endogenous gene $g$ in $i$;
+and $l_0$, $R_{i0}$ and $r_g$ are the equivalents to $l_s$, $R_{is}$ and $r_{t_s}$ for endogenous genes.}
 In practice, $L_i$ is effectively independent of $V_{is}$ and $R_{is}$ for any particular spike-in set $s$.
-This is because the denominator of the above expression is dominated by the vastly larger number of cDNA fragments from the set of endogenous transcripts.
-Any correlation between $L_i$ and the other terms would be negligible compared to the biological variance of expression.
+This is because the denominator of the above expression is dominated by the vastly larger number of cDNA fragments from the set of endogenous genes.
+Any correlation between $L_i$ and the other terms would be negligible compared to the biological variance of expression\revised{, i.e., $\variance{(N_{ig})}$}.
 
 The error term $\varepsilon_{is}$ denotes the variability due to sequencing noise in the counts for spike-in set $s$.
 We defined its variance as $\sigma^2_{lib(s)}$, which implicitly assumes that there is no relationship between the variance and the mean of $T_{is}$.

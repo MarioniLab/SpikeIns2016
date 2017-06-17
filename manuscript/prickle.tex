@@ -184,8 +184,8 @@ The other terms are defined as follows:
     \item $r_{t_s}$, a constant specifying the optimal transcript molecule-to-cDNA fragment capture rate for $t_s$.
     \item $R_{is}$, a random variable representing the average capture efficiency in $i$ for all transcripts in $s$.
     \item $V_{is}$, a random variable representing the volume of solution of $s$ added to $i$.
-    \item $L_i$, a random variable representing the cDNA fragment-to-read conversion rate for $i$.
-    \item $l_s$, a constant representing the ``sequenceability'' of transcripts in $s$.
+    \item $L_i$, a random variable representing the \revised{baseline} cDNA fragment-to-read conversion rate for $i$.
+    \item $l_s$, a constant \revised{that scales $L_i$ depending} on the ``sequenceability'' of transcripts in $s$.
 \end{itemize}
 The product of all of these terms defines the expected number of reads for each $t_s$ in well $i$, and the sum of the products across all $t_s$ is the expected total count of set $s$ in $i$.
 In addition, $\varepsilon_{is}$ represents the effect of sequencing noise on the log-total count, where $E(\varepsilon_{is})=0$ and $\variance(\varepsilon_{is})= \sigma^2_{lib(s)}$.
