@@ -129,10 +129,12 @@ This suggests that $\sigma^2_{lib(s)}$ will not change between $\variance(\theta
 
 \section{Computing the contribution of stochastic noise}
 We performed simulations to obtain a rough estimate of the contribution of $\sigma^2_{lib(s)}$ to the variance of $\theta^*_i$.
-For each data set (416B or TSC), we extracted the spike-in count data for the premixed wells.
+For \revised{each plate in} each data set (416B or TSC), we extracted the spike-in count data for the premixed wells.
 For each spike-in set (SIRV or ERCC), the log-transformed sum of counts across all transcripts in that set was used as the GLM offset. 
-The NB dispersion was estimated for each spike-in transcript using the estimateDisp function from edgeR, using a design matrix that accounted for the \revised{plate} of origin for each well (and other factors, e.g., induction status for the 416B cells).
-Fitted values of the GLM were also \revised{recalculated} for each transcript after setting the offsets of all cells to be equal to the mean offset.
+The NB dispersion was estimated for each spike-in transcript using the estimateDisp function from edgeR.
+\revised{We fitted a GLM to the counts for each transcript using a design matrix with a one-way layout.
+This was set up using two groups of induced or control cells for each 416B plate, and with one group containing all cells for each TSC plate.
+To simulate counts, we recalculated the fitted values of the GLM} after setting the offsets of all cells to be equal to the mean offset.
 The cell- and transcript-specific fitted values and the transcript-specific dispersion were used as the parameters for a NB distribution from which counts were resampled.
 In this manner, simulated counts were obtained for each spike-in transcript in each cell.
 
@@ -346,12 +348,21 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
 
 \begin{figure}[btp]
     \begin{center}
-        \includegraphics[width=0.49\textwidth,page=2]{../simulations/depth/depth_effect.pdf}
-        \includegraphics[width=0.49\textwidth,page=1]{../simulations/depth/depth_effect.pdf}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,page=1]{../simulations/depth/depth_effect.pdf}
+            \caption{}
+        \end{subfigure}
+        \begin{subfigure}{0.49\textwidth}
+            \includegraphics[width=\textwidth,page=2]{../simulations/depth/depth_effect.pdf}
+            \caption{}
+        \end{subfigure}
     \end{center}
-    \caption{Effect of spike-in coverage on the variance of the log-ratios of the ERCC and SIRV total counts, using simulations based on the 416B (left) or TSC data sets (right).
+    \caption{Effect of spike-in coverage on the variance of the log-ratios of the ERCC and SIRV total counts, using simulations based on the (a) 416B or (b) TSC data sets.
         Simulations were performed where the only source of variation between cells was the stochastic sampling of counts from a NB distribution with parameters estimated from real data.
-        This was repeated after scaling the NB means for each spike-in transcript to 1-100\% of the original coverage. 
+        This was repeated after scaling the mean count for each spike-in transcript to 1-100\% of the original coverage. 
+        \revised{The last point of each line represents the variance at 100\% coverage on the corresponding plate.
+        The total count of both spike-in sets was computed as an average across all cells on the plate, and is used here to quantify overall coverage of the spike-ins after scaling. 
+        (See Supplemental Figure~\ref{fig:totals} for the original total count of each set.)}
         Each point represents the mean variance from 20 simulation iterations, with error bars representing standard errors of the variance estimates.
     }
     \label{fig:sampledepth}

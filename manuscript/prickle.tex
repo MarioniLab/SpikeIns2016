@@ -320,15 +320,15 @@ This suggests that $F_i$ will include some of the differences in behaviour betwe
 \subsection*{Quantifying the effect of stochastic noise during sequencing}
 We also performed simulations to gauge the contribution of $\sigma^2_{lib(s)}$ to $\variance(\theta^*_i)$ (see Section~\suppsecnoise{} of the Supplemental Materials).
 Counts for spike-in transcripts were simulated such that any variability in the log-ratios was only caused by stochastic sampling noise i.e., $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
-Our results suggest that most of the estimated variance of $\theta^*_i$ in Figure~\ref{fig:varestimates} is driven by sampling noise (Supplemental Figure~\suppfignoise{}).
-\revised{Specifically, we estimated sampling variance at 0.008-0.011 with the original spike-in coverage, compared to approximately 0.015 for $\variance(\theta^*_i)$ in Figure~\ref{fig:varestimates}.
-If $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ is the major contributor to $\variance(\theta^*_i)$, it suggests that $\variance(F_i)$ and the impact of differences in behaviour is relatively small.}
+Our results suggest that much of the estimated variance of $\theta^*_i$ in Figure~\ref{fig:varestimates} is driven by sampling noise (Supplemental Figure~\suppfignoise{}).
+\revised{Specifically, we estimated the variance due to sampling noise to be 0.005-0.013 (using the original spike-in coverage for each plate), compared to estimated values of 0.010-0.015 for $\variance(\theta^*_i)$ in Figure~\ref{fig:varestimates}.
+Both $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ and  $\variance(F_i)$ contribute to  $\variance(\theta^*_i)$, so these results suggest that the contribution of sampling noise is comparable to or greater than the impact of differences in spike-in behaviour.}
 
 We also observed that the variance \revised{due to sampling noise} was robust to moderate decreases in the coverage of the spike-in transcripts in this simulation.
-In typical experiments, spike-in transcripts take up \revised{1}-10\% of the library size for each cell (\revised{10,000-100,000} reads in our data).
-\revised{As the coverage decreases, the value of $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ increases due to the elevated effect of noise at low counts.
-However, even at 40-50\% coverage, the variance due to sequencing noise (Supplemental Figure~\suppfignoise{}) is still an order of magnitude lower than the variance due to cell-specific biases (Figure~\ref{fig:varestimates}) or biological variability (Supplemental Figure~\suppfigcell{}).
-These results suggest} that spike-in normalization is still reliable when lower amounts of spike-in RNA are added or sequenced.
+In typical experiments, spike-in transcripts take up 5-10\% of the library size for each cell (\revised{50,000-100,000} reads in our data).
+\revised{Upon decreasing coverage \textit{in silico}, we observed an increase in $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ due to the elevated effect of noise at low counts (Supplemental Figure~\suppfignoise{}).
+However, even at 40-50\% coverage, the variance due to noise was still an order of magnitude lower than the variance due to cell-specific biases (Figure~\ref{fig:varestimates}b) or biological variability (Supplemental Figure~\suppfigcell{}).
+These results suggest} that spike-in normalization is still reliable when lower amounts of spike-in RNA are added.
 This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
 
 \revised{At this point, it is worth mentioning another common criticism of the use of spike-in RNA -- namely, that the optimal concentration (in order to reach the suggested 1-10\% of total library size) depends on the amount of endogenous RNA in each cell.

@@ -32,78 +32,97 @@ getRescalingFunction <- function(d, design) {
 
 pdf("depth_effect.pdf")
 par(mar=c(5.1, 5.1, 4.1, 2.1))
-for (person in c("Liora", "Calero")) { 
-
-    if (person=="Liora") {
-        loadin1 <- readRDS("../../real/Liora/test_20160906/analysis/object.rds")
-        loadin2 <- readRDS("../../real/Liora/test_20170201/analysis/object.rds")
-        keep1 <- loadin1$samples$premixed
-        keep2 <- loadin2$samples$premixed
-        my.counts <- cbind(loadin1$counts[,keep1], loadin2$counts[,keep2])
-        batch <- factor(rep(1:2, c(sum(keep1), sum(keep2))))
-        design <- model.matrix(~batch)
-        top <- "TSC"
-
-    } else if (person=="Calero") {
-        loadin1 <- readRDS("../../real/Calero/trial_20160113/analysis/object.rds")
-        loadin2 <- readRDS("../../real/Calero/trial_20160325/analysis/object.rds")
-        keep1 <- loadin1$samples$premixed
-        keep2 <- loadin2$samples$premixed
-        my.counts <- cbind(loadin1$counts[,keep1], loadin2$counts[,keep2])
-        batch <- factor(rep(1:2, c(sum(keep1), sum(keep2))))
-        induction <- factor(c(loadin1$samples$induced[keep1], loadin2$samples$induced[keep2]))
-        design <- model.matrix(~batch+induction)
-        top <- "416B"
-
+for (operator in c("Calero", "Liora")) {
+    if (operator=="Calero") {
+        datasets <- c("trial_20160113", "trial_20160325")
+    } else if (operator=="Liora") {
+        datasets <- c("test_20160906", "test_20170201")
     }
 
-    library(edgeR)
-    ercc.only <- DGEList(my.counts[grepl("ERCC", rownames(my.counts)),])
-    ercc.FUN <- getRescalingFunction(ercc.only, design)
-    
-    sirv.only <- DGEList(my.counts[grepl("SIRV", rownames(my.counts)),])
-    sirv.FUN <- getRescalingFunction(sirv.only, design)
-    
-    # Simulating to estimate the effect of depth on the variability of ratios.
-    # Note that we assume the offsets are true when estimating the dispersions.
-    # This means dispersions may be underestimated for high-abundance genes (and overestimated for low-abundance genes). 
-    
-    set.seed(100)
-    collected <- list()
+    collected.cov <- collected.est <- collected.se <- list()
     all.props <- c(0.01, 0.02, 0.05, 0.1, 0.2, 0.4, 0.6, 0.8, 1)
-    for (p in seq_along(all.props)) { 
-        prop <- all.props[p]
-        to.collect <- list()
     
-        for (it in seq_len(20)) { 
-            new.ercc <- ercc.FUN(prop)
-            sim.ercc <- matrix(rnbinom(length(new.ercc$fitted), mu=new.ercc$fitted, size=1/new.ercc$disp),
-                               nrow=nrow(ercc.only), ncol=ncol(ercc.only))
+    for (dataset in datasets) {
+        loadin <- readRDS(file.path("../../real", operator, dataset, "analysis/object.rds"))
+        keep <- loadin$samples$premixed
+        my.counts <- loadin$counts[,keep]
 
-            new.sirv <- sirv.FUN(prop)
-            sim.sirv <- matrix(rnbinom(length(new.sirv$fitted), mu=new.sirv$fitted, size=1/new.sirv$disp),
-                               nrow=nrow(sirv.only), ncol=ncol(sirv.only))
-    
-            ratios <- log2(colSums(sim.ercc)/colSums(sim.sirv))
-            to.collect[[it]] <- estimateVariance(ratios=ratios, design=design)
+        if (operator=="Liora") {
+            design <- matrix(1, nrow=ncol(my.counts))
+            top <- "TSC"
+        } else {
+            induction <- factor(loadin$samples$induced[keep])
+            design <- model.matrix(~induction)
+            top <- "416B"
         }
+
+        library(edgeR)
+        ercc.only <- DGEList(my.counts[grepl("ERCC", rownames(my.counts)),])
+        ercc.FUN <- getRescalingFunction(ercc.only, design)
+        
+        sirv.only <- DGEList(my.counts[grepl("SIRV", rownames(my.counts)),])
+        sirv.FUN <- getRescalingFunction(sirv.only, design)
+        
+        # Simulating to estimate the effect of depth on the variability of ratios.
+        # Note that we assume the offsets are true when estimating the dispersions.
+        # This means dispersions may be underestimated for high-abundance genes (and overestimated for low-abundance genes). 
+        
+        set.seed(100)
+        collected <- list()
+        for (p in seq_along(all.props)) { 
+            prop <- all.props[p]
+            to.collect <- list()
+        
+            for (it in seq_len(20)) { 
+                new.ercc <- ercc.FUN(prop)
+                sim.ercc <- matrix(rnbinom(length(new.ercc$fitted), mu=new.ercc$fitted, size=1/new.ercc$disp),
+                                   nrow=nrow(ercc.only), ncol=ncol(ercc.only))
     
-        to.collect <- unlist(to.collect)
-        collected[[p]] <- to.collect
+                new.sirv <- sirv.FUN(prop)
+                sim.sirv <- matrix(rnbinom(length(new.sirv$fitted), mu=new.sirv$fitted, size=1/new.sirv$disp),
+                                   nrow=nrow(sirv.only), ncol=ncol(sirv.only))
+        
+                ratios <- log2(colSums(sim.ercc)/colSums(sim.sirv))
+                to.collect[[it]] <- estimateVariance(ratios=ratios, design=design)
+            }
+        
+            to.collect <- unlist(to.collect)
+            collected[[p]] <- to.collect
+        }
+
+        collected.cov[[dataset]] <- mean(colSums(ercc.only$counts)) + mean(colSums(sirv.only$counts)) 
+        collected.est[[dataset]] <- sapply(collected, mean)
+        collected.se[[dataset]] <- sapply(collected, sd)/sqrt(lengths(collected))
     }
-    
-    var.est <- sapply(collected, mean)
-    var.sd <- sapply(collected, sd)/sqrt(lengths(collected))
-    depth <- all.props*100
-    upper <- var.est + var.sd
-    
-    plot(depth, var.est, xlab="Percentage of spike-in coverage",
+
+    upper <- mapply("+", collected.est, collected.se, SIMPLIFY=FALSE)
+    ylow <- min(sapply(collected.est, min))
+    yhigh <- max(sapply(upper, max))
+    xlow <- min(sapply(collected.cov, min))
+    xhigh <- max(sapply(collected.cov, max))
+    collected.cov <- lapply(collected.cov, FUN=function(x) { x * all.props/1000 })
+
+    # Making a plot.   
+    cols <- c("black", "grey70")
+    plot(collected.cov[[1]], collected.est[[1]], xlab=expression("Total spike-in counts, ERCC + SIRV ("*10^3*")"),
          ylab=expression("Variance of"~log[2]~"[ERCC/SIRV]"),
-         ylim=c(min(var.est), max(upper)), pch=16, log="y", 
-         main=top, cex.axis=1.2, cex.lab=1.4, cex.main=1.5)
-    lines(depth, var.est)
-    segments(depth, var.est, y1=upper)
-    segments(depth-1, upper, depth+1, upper)
+         ylim=c(ylow, yhigh), pch=16, log="y", col=cols[1],
+         cex.axis=1.2, cex.lab=1.4)
+    points(collected.cov[[2]], collected.est[[2]], pch=17, col=cols[2])
+
+    for (x in seq_along(collected.est)) {
+        lines(collected.cov[[x]], collected.est[[x]], col=cols[x])
+        segments(collected.cov[[x]], collected.est[[x]], y1=upper[[x]], col=cols[x])
+        segments(collected.cov[[x]]-1, upper[[x]], collected.cov[[x]]+1, upper[[x]], col=cols[x])
+    }
+    legend("topright", col=cols, lwd=2, pch=16:17, sprintf("%s (%s)", top, c("I", "II")), cex=1.2)
+
+    # Saving results somewhere.
+    for (x in seq_along(datasets)) {
+        write.table(file=paste0(operator, "_", datasets[x], ".txt"),
+                    data.frame(Coverage=collected.cov[[x]], Variance=collected.est[[x]], SE=collected.se[[x]]),
+                    sep="\t", quote=FALSE, row.names=FALSE)
+    }
 }
   
 dev.off()
