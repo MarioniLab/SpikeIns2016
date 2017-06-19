@@ -190,6 +190,10 @@ This ensures that there is no well-to-well variability in the relative quantitie
 The variance of the log-ratio across these premixed-addition wells provides a baseline level of variability in the protocol (e.g., due to sequencing noise).
 The variance of volume addition was then estimated as the difference in the variance estimates from the premixed-addition wells and from the wells with separate addition of spike-ins.
 
+\revised{We stress that the use of two different spike-in sets in each well is critical to this experiment.
+Any well-specific biases should cancel out when the log-ratio is computed between sets in the same well.
+This allows the contribution of the variance of volume addition to be quantified separately from other factors such as the variability of capture efficiency and sequencing depth across wells.}
+
 We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects \autocite{hicks2015widespread,tung2016batch}.
 For the separate-addition experiment, we also reversed the order of addition of the two spike-in sets to determine if this affected the variance estimate.
 Finally, we generated data from replicate plates to ensure our results were reproducible.
@@ -627,8 +631,8 @@ This value represents the extent to which the membership of the original cluster
 We also compared the original clusters to those generated from complete-linkage clustering of the original HVG log-expression values.
 
 \section*{Data access}
-Data are available on ArrayExpress using the accession E-MAT-5522.
-Code used for the statistical analysis and simulations are available at https://github.com/MarioniLab/SpikeIns2016.
+Data are available \revised{from the ArrayExpress database (\url{https://www.ebi.ac.uk/arrayexpress/})} using the accession E-MAT-5522.
+The R code used for the statistical analysis and simulations are available \revised{in the Supplemental Code,} or at \url{https://github.com/MarioniLab/SpikeIns2016}.
 
 \section*{Acknowledgements}
 We thank Jennifer Nichols and Liliana Antunes for supplying the TSCs.
@@ -652,6 +656,7 @@ Work in the G\"ottgens group was supported by Cancer Research UK, Bloodwise, the
 
 \section*{Supplemental materials}
 The Supplemental Materials is a single PDF file that consists of Sections~1-\suppsecsim{} and contains Supplemental Figures~1-\suppfigindex{} and Supplemental Table~1.
+\revised{The Supplemental Code is a compressed TAR file that contains the code and instructions required to reproduce the results in this paper.}
 
 \printbibliography
 
