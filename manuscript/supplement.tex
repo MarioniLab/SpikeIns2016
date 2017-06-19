@@ -3,29 +3,57 @@
 \usepackage[margin=2.5cm]{geometry}
 \usepackage[labelfont=bf]{caption}
 \usepackage{subcaption}
-\usepackage{color}
 \usepackage{amsmath}
-\usepackage{natbib}
 \usepackage{textcomp}
 
+% Biblatex customizations to hack into GR style.
+\usepackage[terseinits=true,style=authoryear,firstinits=true,maxnames=10,maxcitenames=2,mincitenames=1,minbibnames=10,natbib,dashed=false]{biblatex}
+\renewbibmacro{in:}{}
+\DeclareFieldFormat[article, inbook, incollection, inproceedings, misc, thesis, unpublished]
+{title}{#1}
+\DeclareFieldFormat[article]
+{pages}{#1}
+\DeclareFieldFormat[article]
+{volume}{\textbf{#1}}
+\DeclareFieldFormat[article, inbook, incollection, inproceedings, misc, thesis, unpublished]
+{number}{\mkbibparens{#1}} 
+\renewbibmacro*{volume+number+eid}{
+    \iffieldundef{volume}
+    {}{\printfield{volume}\printfield{number}\printunit{\addcolon}}
+}
+\renewbibmacro*{date+extrayear}{
+  \printunit{\addperiod\space}\printfield{year}
+}
+\renewcommand*{\revsdnamepunct}{} 
+\renewcommand*{\finalnamedelim}{\addcomma\space}
+\DeclareNameAlias{sortname}{last-first}
+
+\bibliography{refnorm}
+
+% Pushing all floats to the bottom.
 \renewcommand{\textfraction}{1.0}
 \renewcommand{\floatpagefraction}{.9}
-\newcommand\revised[1]{\textcolor{red}{#1}}
 \renewcommand{\topfraction}{0.9}    % max fraction of floats at top
 \renewcommand{\bottomfraction}{0.8} % max fraction of floats at bottom
 \renewcommand{\textfraction}{0.07}  % allow minimal text w. figs
 
+% Renaming float captions.
 \makeatletter 
 \renewcommand{\fnum@figure}{Supplemental \figurename~\thefigure}
 \renewcommand{\fnum@table}{Supplemental \tablename~\thetable}
 \makeatother
 
-%\renewcommand{\thefigure}{\@arabic\c@figure} 
-%\renewcommand{\thetable}{\@arabic\c@table} 
-\newcommand{\figvarestimates}{2}
-
+% URL linking.
 \usepackage{url}
 \urlstyle{same}
+
+% Revision commands
+\usepackage{color}
+\newcommand\revised[1]{\textcolor{red}{#1}}
+
+% Other convenience commands.
+\newcommand{\figvarestimates}{2}
+\newcommand\variance{\mbox{var}}
 
 \begin{document}
 
@@ -69,8 +97,6 @@ $^4$Wellcome Trust Sanger Institute, Wellcome Genome Campus, Hinxton, Cambridge 
 \vspace*{\fill}
 \end{center}
 \end{titlepage}
-
-\newcommand\variance{\mbox{var}}
 
 \section{Further interpretation of the mathematical terms}
 $R_{is}$ was introduced as the average capture efficiency in well $i$ for all transcripts in set $s$.
@@ -131,7 +157,7 @@ This means that we need to test the effect of reducing coverage on $\sigma^2_{li
 Cells from three of our plates were multiplexed and sequenced on the Illumina HiSeq 4000 machine using the ExAmp chemistry.
 A recent study showed that the indices primers used for barcoding each sample could switch between samples \citep{sinha2017index}, thereby contaminating one sample with DNA from other samples.
 We examined the effect of index switching on our 416B data, exploiting the fact that the first plate was generated on the HiSeq 2500 while the second was generated on the HiSeq 4000.
-The variance estimates were very similar between the two plates (Figure~2), suggesting that index switching has minimal effect on our conclusions.
+The variance estimates were very similar between the two plates (Figure~\figvarestimates{}), suggesting that index switching has minimal effect on our conclusions.
 We also made use of the presence of the \textit{CBFB-MYH11} oncogene, the expression of which was upregulated in half the cells on each plate.
 We observed similar log-fold changes between induced and control cells for both plates (Supplementary Figure~\ref{fig:switching}a, b) whereas we would have expected that the log-fold change for the second plate would be closer to zero if samples were homogenized due to index switching.
 
@@ -228,8 +254,7 @@ Note that, for the data set used in this simulation, we removed cells that were 
 No additional outlier-based quality control was performed.
 Moreover, we only used the cells extracted from a single individual (HP1502401, healthy male) for simplicity.
 
-\bibliography{refnorm}
-\bibliographystyle{plainnat}
+\printbibliography
 
 \newpage
 \begin{figure}[btp]

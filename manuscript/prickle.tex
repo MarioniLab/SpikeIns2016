@@ -13,7 +13,7 @@
 \usepackage{setspace}
 \spacing{1.5}
 
-% Biblatex customizations.
+% Biblatex customizations to hack into GR style.
 \usepackage[terseinits=true,style=authoryear,firstinits=true,maxnames=10,maxcitenames=2,mincitenames=1,minbibnames=10,natbib,dashed=false]{biblatex}
 \renewbibmacro{in:}{}
 \DeclareFieldFormat[article, inbook, incollection, inproceedings, misc, thesis, unpublished]
@@ -25,7 +25,8 @@
 \DeclareFieldFormat[article, inbook, incollection, inproceedings, misc, thesis, unpublished]
 {number}{\mkbibparens{#1}} 
 \renewbibmacro*{volume+number+eid}{
-    \printfield{volume}\printfield{number}\printunit{\addcolon}
+    \iffieldundef{volume}
+    {}{\printfield{volume}\printfield{number}\printunit{\addcolon}}
 }
 \renewbibmacro*{date+extrayear}{
   \printunit{\addperiod\space}\printfield{year}
@@ -33,7 +34,6 @@
 \renewcommand*{\revsdnamepunct}{} 
 \renewcommand*{\finalnamedelim}{\addcomma\space}
 \DeclareNameAlias{sortname}{last-first}
-
 
 \bibliography{refnorm}
 
