@@ -325,20 +325,11 @@ Our results suggest that much of the estimated variance of $\theta^*_i$ in Figur
 Both $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ and  $\variance(F_i)$ contribute to  $\variance(\theta^*_i)$, so these results suggest that the contribution of sampling noise is comparable to or greater than the impact of differences in spike-in behaviour.}
 
 We also observed that the variance \revised{due to sampling noise} was robust to moderate decreases in the coverage of the spike-in transcripts in this simulation.
-In typical experiments, spike-in transcripts take up 5-10\% of the library size for each cell (\revised{50,000-100,000} reads in our data).
+In ideal experiments, spike-in transcripts would take up 5-10\% of the library size for each cell (\revised{50,000-100,000} reads in our data).
 \revised{Upon decreasing coverage \textit{in silico}, we observed an increase in $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ due to the elevated effect of noise at low counts (Supplemental Figure~\suppfignoise{}).
 However, even at 40-50\% coverage, the variance due to noise was still an order of magnitude lower than the variance due to cell-specific biases (Figure~\ref{fig:varestimates}b) or biological variability (Supplemental Figure~\suppfigcell{}).
 These results suggest} that spike-in normalization is still reliable when lower amounts of spike-in RNA are added.
 This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
-
-\revised{At this point, it is worth mentioning another common criticism of the use of spike-in RNA -- namely, that the optimal concentration (in order to reach the suggested 1-10\% of total library size) depends on the amount of endogenous RNA in each cell.
-This is not straightforward to gauge for biological systems that are not well studied.
-However, we do not consider this to be a matter of reliability.
-It is hardly surprising that suboptimal performance is obtained when inappropriate concentrations of reagents are used, and spike-in RNA is no exception.
-Pilot experiments can be easily performed to identify the most suitable spike-in concentration to use for a given biological system, just like they would be used to determine the optimal dissociation conditions, lysis buffer, amplification cycles, etc.
-Once the optimal concentration is determined, it can be used for all experiments on that system and the choice of concentration ceases to be an issue.
-In contrast, the variability of volume addition and of spike-in behaviour cannot be easily controlled even if all other parameters are optimized. 
-}
 
 \subsection*{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
@@ -363,7 +354,7 @@ For HVG detection, we used methods based on the coefficient of variation \autoci
 Again, only minor changes were observed in most data sets (Figure~\ref{fig:setchange}b), for both the set of significant HVGs and for the top 200 HVGs with the smallest $p$-values.
 These results suggest that the detection and ranking of DEGs and HVGs are largely robust to variability in spike-in volume or behaviour.
 \revised{Indeed, genes that were not consistently detected across simulation iterations tended to have weak log-fold changes for DEGs, or small biological components for HVGs (Supplemental Figure~\suppfiglostsim{}).
-This is expected as genes on the borderline of significance are more susceptible to random fluctuations in the normalization process.}
+This is expected as genes on the borderline of significance are more susceptible to random fluctuations in the size factors.}
 
 \begin{figure}[bt]
     \begin{center}
@@ -430,6 +421,16 @@ For example, should spike-in RNA be added at a constant ratio with respect to th
 If the endogenous RNA concentration or the number of cells determines the amount of spike-in RNA to be added, these will need to be experimentally quantified for each sample.
 In that case, how accurate is the quantification, and what effect do errors have on the downstream analysis?
 These questions are not relevant to single-cell experiments where the obvious approach is to add the same amount of spike-in RNA to each individual cell.
+
+\revised{It is worth mentioning another common criticism of the use of spike-in RNA -- namely, that the optimal concentration (to reach the suggested 5-10\% of total library size) depends on the amount of endogenous RNA in each cell.
+This is not straightforward to gauge for biological systems that are not well studied.
+If insufficient spike-ins are added, sampling noise will increase and the precision of spike-in normalization will deteriorate.
+However, we do not consider this to be a matter of reliability.
+It is hardly surprising that suboptimal performance is obtained when inappropriate concentrations of reagents are used, and spike-in RNA is no exception.
+Pilot experiments can be easily performed to identify the most suitable spike-in concentration to use for a given biological system, just like they would be used to determine the optimal dissociation conditions, lysis buffer, amplification cycles, etc.
+Once the optimal concentration is determined, it can be used for all experiments on that system and the choice of concentration ceases to be an issue.
+In contrast, the variability of volume addition and of spike-in behaviour cannot be easily controlled even if all other parameters are optimized. 
+}
 
 We have used the Smart-seq2 protocol in our study to reflect its widespread use in the scRNA-seq literature.
 However, our estimate of $\sigma^2_{vol}$ is agnostic to how reverse transcription, amplification and sequencing were performed, as these steps are represented by other mathematical terms.
