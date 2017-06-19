@@ -106,17 +106,17 @@ We performed simulations to obtain a rough estimate of the contribution of $\sig
 For each data set (416B or TSC), we extracted the spike-in count data for the premixed wells.
 For each spike-in set (SIRV or ERCC), the log-transformed sum of counts across all transcripts in that set was used as the GLM offset. 
 The NB dispersion was estimated for each spike-in transcript using the estimateDisp function from edgeR, using a design matrix that accounted for the \revised{plate} of origin for each well (and other factors, e.g., induction status for the 416B cells).
-Fitted values of the GLM were also calculated for each transcript after setting the offsets of all cells to be equal to the mean offset.
+Fitted values of the GLM were also \revised{recalculated} for each transcript after setting the offsets of all cells to be equal to the mean offset.
 The cell- and transcript-specific fitted values and the transcript-specific dispersion were used as the parameters for a NB distribution from which counts were resampled.
 In this manner, simulated counts were obtained for each spike-in transcript in each cell.
 
 The aim is to compute the variance of the log-ratios of the total counts between spike-in sets from the simulated data.
-By forcing the offsets \revised{of all wells} to be equal, \revised{we remove differences in the log-ratios between wells due to cell-specific capture efficiency and sequencing depth.
+By forcing the offsets \revised{of all wells} to be equal, \revised{we removed differences in the log-ratios between wells due to cell-specific capture efficiency and sequencing depth.
 This means that any variance in the simulated log-ratios across wells} must be due to stochastic sampling noise, i.e.,  $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
-We also downscaled the fitted values to determine the effect of reducing coverage of the spike-in transcripts \revised{on the sampling noise.
-We downscaled to 1-100\% of the original coverage to mimic the addition of less spike-in RNA to each well.}
-\revised{To preserve the mean-variance relationship during downscaling, we fitted a loess curve of degree 1 to the log-transformed NB dispersions against the log-mean count.
-We used this trend to determine the new NB dispersion for each feature after downscaling its mean, and used this value during count sampling.}
+We also downscaled the fitted values to determine the effect of \revised{reducing spike-in coverage on the sampling noise.
+We scaled down to 1\% of the original coverage to mimic the addition of less spike-in RNA to each well.
+To preserve the mean-variance relationship during downscaling, we fitted a loess curve of degree 1 to the original log-transformed NB dispersions against the log-mean of the fitted values across all cells.
+We used this trend to determine the new NB dispersion for each transcript, which we then used during count sampling.}
 
 We do not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
 Both of these terms refer to experimental processes that should be independent of the concentration of spike-in RNA.
@@ -206,7 +206,7 @@ The procedure above was repeated at each simulation iteration with new spike-in 
 Coordinates of all cells in each simulated PCA plot were mapped onto the original plot, after scaling and rotating the coordaintes to eliminate differences between plots that were not relevant to interpretation.
 Specifically:
 \begin{itemize}
-    \item For each cell, the simulated coordinates was right-multiplied by a 2-by-2 transformation matrix
+    \item For each cell, the simulated coordinates were right-multiplied by a 2-by-2 transformation matrix
         \[
             \left[\begin{array}{cc}
                     b_x \cos(\psi) & - b_y \sin(\psi) \\
@@ -214,7 +214,7 @@ Specifically:
                 \end{array}
             \right]
         \]
-        where $\psi$ is the angle around the origin and $b_x$ and $b_y$ scale the $x$- and $y$-coordinates respectively.
+        where $\psi$ is the angle around the origin and $b_x$ and $b_y$ scale the $x$- and $y$-coordinates, respectively.
     \item The squared Euclidean distance from the (scaled and rotated) simulated coordinates to the original coordinates was computed for each cell, and summed across all cells.
     \item The scaling and rotation parameters of the matrix were identified that minimized the sum of squared distances across all cells, using the optim function from the stats package.
 \end{itemize}
@@ -222,7 +222,7 @@ The more obvious approach to remapping is to directly project the simulated log-
 However, we do not do this as it does not capture the variability in the identification of the PCs across iterations.
 Upon completion of the simulation, each cell will have one original location and one remapped location per iteration. 
 For each cell, the smallest circle centered at its original location was drawn that contained the 95\% of the remapped locations.
-(This avoids inflated circles due to outliers.)
+This avoids inflated circles due to outliers.
 
 Note that, for the data set used in this simulation, we removed cells that were already annotated as low quality in the associated metadata.
 No additional outlier-based quality control was performed.
