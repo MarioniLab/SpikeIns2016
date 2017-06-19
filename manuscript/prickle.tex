@@ -2,14 +2,42 @@
 \usepackage[margin=3cm]{geometry}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{amsmath}
-\usepackage[round]{natbib}
+\usepackage{amsmath} 
+\usepackage{textgreek}
+
+% Hypperef settings.
 \usepackage[hidelinks]{hyperref}
 \urlstyle{same}
 
-\usepackage{textgreek}
-\usepackage{color}
+% Line space settings.
+\usepackage{setspace}
+\spacing{1.5}
 
+% Biblatex customizations.
+\usepackage[terseinits=true,style=authoryear,firstinits=true,maxnames=10,maxcitenames=2,mincitenames=1,minbibnames=10,natbib,dashed=false]{biblatex}
+\renewbibmacro{in:}{}
+\DeclareFieldFormat[article, inbook, incollection, inproceedings, misc, thesis, unpublished]
+{title}{#1}
+\DeclareFieldFormat[article]
+{pages}{#1}
+\DeclareFieldFormat[article]
+{volume}{\textbf{#1}}
+\DeclareFieldFormat[article, inbook, incollection, inproceedings, misc, thesis, unpublished]
+{number}{\mkbibparens{#1}} 
+\renewbibmacro*{volume+number+eid}{
+    \printfield{volume}\printfield{number}\printunit{\addcolon}
+}
+\renewbibmacro*{date+extrayear}{
+  \printunit{\addperiod\space}\printfield{year}
+}
+\renewcommand*{\revsdnamepunct}{} 
+\renewcommand*{\finalnamedelim}{\addcomma\space}
+\DeclareNameAlias{sortname}{last-first}
+
+
+\bibliography{refnorm}
+
+% References to supplementary files.
 \newcommand{\suppfignorm}{1}
 \newcommand{\suppfigtotals}{2}
 \newcommand{\suppfigorder}{3}
@@ -28,6 +56,14 @@
 
 \newcommand{\supptabstats}{1}
 
+% Revision commands. 
+\usepackage{color}
+\newcommand{\revised}[1]{\textcolor{red}{#1}}
+
+% Convenience function for writing variance in math mode.
+\newcommand\variance{\mbox{var}}
+
+% Title information.
 \title{Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data}
 \author{Aaron T. L. Lun$^1$, Fernando J. Calero-Nieto$^2$, Liora Haim-Vilmovsky$^{3,4}$, \\ Berthold G\"ottgens$^2$, John C. Marioni$^{1,3,4,*}$}
 \date{
@@ -44,12 +80,6 @@
     \end{minipage}\\[0.2in]
     \today{}
 }
-
-\usepackage{setspace}
-\spacing{1.5}
-
-\newcommand{\revised}[1]{\textcolor{red}{#1}}
-\newcommand\variance{\mbox{var}}
 
 \begin{document}
 
@@ -69,38 +99,38 @@ Our results suggest that spike-in normalization is reliable enough for routine u
 
 \section*{Introduction}
 Single-cell RNA sequencing (scRNA-seq) is a powerful technique for studying transcriptional activity in individual cells.
-Briefly, RNA is isolated from single cells, reverse transcribed into cDNA and sequenced using massively parallel sequencing technologies \citep{shapiro2013singlecell}.
-This can be performed using microfluidics platforms like the Fluidigm C1 \citep{pollen2014lowcoverage}; 
-    with protocols such as Smart-seq2 \citep{picelli2014full} that use microtiter plates;
-    or with droplet-based technologies \citep{klein2015droplet,macosko2015highly} that can profile thousands of cells.
+Briefly, RNA is isolated from single cells, reverse transcribed into cDNA and sequenced using massively parallel sequencing technologies \autocite{shapiro2013singlecell}.
+This can be performed using microfluidics platforms like the Fluidigm C1 \autocite{pollen2014lowcoverage}; 
+    with protocols such as Smart-seq2 \autocite{picelli2014full} that use microtiter plates;
+    or with droplet-based technologies \autocite{klein2015droplet,macosko2015highly} that can profile thousands of cells.
 Gene expression is quantified by mapping read sequences to a reference genome and counting the number of reads mapped to each annotated gene.
-To avoid amplification biases, individual transcript molecules can also be tagged with unique molecular identifiers (UMIs) \citep{islam2014quantitative}, such that sequencing to saturation and counting UMIs will yield the number of transcripts of each gene in a cell.
-Regardless of whether reads or UMIs are used, not all transcript molecules will be captured and sequenced due to cell-specific inefficiencies in reverse transcription \citep{stegle2015computational}.
+To avoid amplification biases, individual transcript molecules can also be tagged with unique molecular identifiers (UMIs) \autocite{islam2014quantitative}, such that sequencing to saturation and counting UMIs will yield the number of transcripts of each gene in a cell.
+Regardless of whether reads or UMIs are used, not all transcript molecules will be captured and sequenced due to cell-specific inefficiencies in reverse transcription \autocite{stegle2015computational}.
 The presence of these cell-specific biases compromises the direct use of the read/UMI count as a quantitative measure of gene expression.
 Normalization is required to remove these biases before the gene counts can be meaningfully compared between cells in downstream analyses.
 
 A common normalization strategy for RNA-seq data uses a set of genes that have constant expression across cells.
-This set can consist of pre-defined ``house-keeping'' genes, or it can be empirically defined under the assumption that most genes are not differentially expressed (DE) between cells \citep{lun2016pooling,anders2010differential,robinson2010tmm}.
-Any systematic differences in expression between cells for this non-DE set of genes must, therefore, be technical in origin, e.g., due to differences in library size or composition bias \citep{robinson2010tmm}.
+This set can consist of pre-defined ``house-keeping'' genes, or it can be empirically defined under the assumption that most genes are not differentially expressed (DE) between cells \autocite{lun2016pooling,anders2010differential,robinson2010tmm}.
+Any systematic differences in expression between cells for this non-DE set of genes must, therefore, be technical in origin, e.g., due to differences in library size or composition bias \autocite{robinson2010tmm}.
 Counts are scaled to eliminate these differences, yielding normalized expression values for downstream analyses.
 This gene-based approach works well for bulk sequencing experiments where the population-wide gene expression profile is stable.
 However, it may not be suitable for single-cell experiments where strong biological heterogeneity complicates the identification of a reliable non-DE set. 
 For example, house-keeping genes may be turned on or off by transcriptional bursting, while processes like the cell cycle may trigger large-scale changes in the expression profile that preclude a non-DE majority.
 
-An alternative normalization approach is to use spike-in RNA for which the identity and quantity of all transcripts is known \citep{stegle2015computational,bacher2016design}.
+An alternative normalization approach is to use spike-in RNA for which the identity and quantity of all transcripts is known \autocite{stegle2015computational,bacher2016design}.
 The same amount of spike-in RNA is added to each cell's lysate, and the spike-in transcripts are processed in parallel with their endogenous counterparts to generate a sequencing library.
 This yields a set of read (or UMI) counts for both endogenous and spike-in transcripts in each cell.
-Normalization is performed by scaling the counts for each cell such that the counts for the spike-in genes are, on average, the same between cells \citep{katayama2013samstrt}.
+Normalization is performed by scaling the counts for each cell such that the counts for the spike-in genes are, on average, the same between cells \autocite{katayama2013samstrt}.
 The central assumptions of this approach are that (i) the same amount of spike-in RNA is added to each cell, and (ii) the spike-in and endogenous transcripts are similarly affected by cell-to-cell fluctuations in capture efficiency.
 Under these assumptions, any differences in the coverage of the spike-in transcripts between cells must be artifactual in origin and should be removed by scaling.
 One particular advantage of this strategy is that it does not make any assumptions about the endogenous expression profile, unlike the non-DE approach described above.
-This means that spike-in normalization can be applied in situations where large-scale changes in expression (e.g., related to changes in total RNA content, or involving highly heterogeneous populations containing many cell types) are expected and of interest \citep{lun2016stepbystep,nestorowa2016single}.
+This means that spike-in normalization can be applied in situations where large-scale changes in expression (e.g., related to changes in total RNA content, or involving highly heterogeneous populations containing many cell types) are expected and of interest \autocite{lun2016stepbystep,nestorowa2016single}.
 
 There are two common criticisms of spike-in normalization that challenge the validity of its central assumptions.
-The first is that the same quantity of spike-in RNA may not be consistently added to each sample \citep{robinson2010tmm}, and the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \citep{grun2015design} (i.e., unequal capture efficiencies, caused by differences in the biophysical properties of the transcripts).
-Any differences in spike-in quantity or behaviour across cells will compromise the accuracy of spike-in normalization \citep{risso2014normalization}.
+The first is that the same quantity of spike-in RNA may not be consistently added to each sample \autocite{robinson2010tmm}, and the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \autocite{grun2015design} (i.e., unequal capture efficiencies, caused by differences in the biophysical properties of the transcripts).
+Any differences in spike-in quantity or behaviour across cells will compromise the accuracy of spike-in normalization \autocite{risso2014normalization}.
 In some cases, it may also be difficult to gauge how much spike-in RNA should be added, especially if the quantity of endogenous RNA per cell is unknown, resulting in insufficient spike-in coverage for normalization.
-These criticisms may contribute to the limited use of this normalization strategy in the scRNA-seq literature \citep{bacher2016design}.
+These criticisms may contribute to the limited use of this normalization strategy in the scRNA-seq literature \autocite{bacher2016design}.
 However, if one were to dismiss the use of spike-in normalization, there would be no general alternative for removing cell-specific biases in scRNA-seq data sets where a non-DE majority of genes cannot be assumed.
 Thus, it is of particular interest whether or not the aforementioned criticisms of spike-in normalization are relevant to real scRNA-seq experiments.
 To our knowledge, this has yet to be rigorously studied.
@@ -160,7 +190,7 @@ This ensures that there is no well-to-well variability in the relative quantitie
 The variance of the log-ratio across these premixed-addition wells provides a baseline level of variability in the protocol (e.g., due to sequencing noise).
 The variance of volume addition was then estimated as the difference in the variance estimates from the premixed-addition wells and from the wells with separate addition of spike-ins.
 
-We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects \citep{hicks2015widespread,tung2016batch}.
+We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects \autocite{hicks2015widespread,tung2016batch}.
 For the separate-addition experiment, we also reversed the order of addition of the two spike-in sets to determine if this affected the variance estimate.
 Finally, we generated data from replicate plates to ensure our results were reproducible.
 This was done in a range of conditions, i.e., using different cell types, by different operators and with sequencing at different locations.
@@ -169,8 +199,8 @@ We used a protocol based on microtiter plates rather than microfluidics as it is
 Our experimental design requires two separate additions of spike-in RNA to each reaction (see Methods).
 This is not straightforward to achieve on, say, the Fluidigm C1 chip where the added volume for each reagent depends on the design on the reaction chamber.
 %Plate-based protocols also tend to be cheaper and are compatible with existing laboratory techniques such as indexed fluorescently-activated cell sorting (FACS).
-Our focus on data from plate-based protocols reflects their widespread use in single-cell studies \citep{segerstople2016single,islam2011characterization,wilson2015combined,scialdone2016resolving}.
-Obviously, the procedure we describe here can be adapted to any protocol where the spike-in addition can be easily modified, e.g., plate-based CEL-seq \citep{hashimshony2016celseq2} or STRT-seq \citep{islam2011characterization}.
+Our focus on data from plate-based protocols reflects their widespread use in single-cell studies \autocite{segerstople2016single,islam2011characterization,wilson2015combined,scialdone2016resolving}.
+Obviously, the procedure we describe here can be adapted to any protocol where the spike-in addition can be easily modified, e.g., plate-based CEL-seq \autocite{hashimshony2016celseq2} or STRT-seq \autocite{islam2011characterization}.
 
 \subsection*{Mathematical framework for variance decomposition}
 Denote the log$_2$-transformed total read count for well $i$ and spike-in set $s$ as
@@ -309,7 +339,7 @@ In contrast, the variability of volume addition and of spike-in behaviour cannot
 \subsection*{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
-This included public data sets \citep{segerstople2016single,islam2011characterization} as well as our 416B and TSC data.
+This included public data sets \autocite{segerstople2016single,islam2011characterization} as well as our 416B and TSC data.
 We then performed analyses such as detection of differentially expressed genes (DEGs) and highly variable genes (HVGs), as well as dimensionality reduction and clustering of cells.
 This was done without any modification of the data to obtain a set of ``original results''.
 
@@ -321,11 +351,11 @@ Any differences indicate that the analysis is sensitive to spike-in variability 
 The advantage of this simulation design is that only the spike-in counts are modified.
 Counts for the endogenous transcripts were used directly without any modification, preserving the realistic nature of the data in each simulation.
 
-For DEG detection, we applied edgeR \citep{robinson2010edgeR} and MAST \citep{finak2015mast} to the original and simulated data after spike-in normalization.
+For DEG detection, we applied edgeR \autocite{robinson2010edgeR} and MAST \autocite{finak2015mast} to the original and simulated data after spike-in normalization.
 edgeR represents methods designed for DE analyses of bulk RNA-seq data, while MAST represents bespoke single-cell methods.
 In both cases, we observed only minor ($<$ 5\%) changes to the set of significant DEGs upon introducing spike-in variability in each data set (Figure~\ref{fig:setchange}a). 
 Similar results were also observed in the top 200 DEGs with the smallest $p$-values, with fewer than 10\% of the genes in the set changing across iterations in all scenarios.
-For HVG detection, we used methods based on the coefficient of variation \citep{brennecke2013accounting} or the variance of log-expression values \citep{lun2016stepbystep}.
+For HVG detection, we used methods based on the coefficient of variation \autocite{brennecke2013accounting} or the variance of log-expression values \autocite{lun2016stepbystep}.
 Again, only minor changes were observed in most data sets (Figure~\ref{fig:setchange}b), for both the set of significant HVGs and for the top 200 HVGs with the smallest $p$-values.
 These results suggest that the detection and ranking of DEGs and HVGs are largely robust to variability in spike-in volume or behaviour.
 \revised{Indeed, genes that were not consistently detected across simulation iterations tended to have weak log-fold changes for DEGs, or small biological components for HVGs (Supplemental Figure~\suppfiglostsim{}).
@@ -339,7 +369,7 @@ This is expected as genes on the borderline of significance are more susceptible
         (a) The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
         This was also calculated for the top set of 200 DEGs with the smallest $p$-values.
         Simulations were based on our 416B data set, to detect DEGs after inducing expression of a \textit{CBFB-MYH11} oncogene compared to a mCherry control (see Methods);
-        or on the data from \cite{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
+        or on the data from \citet{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
         using the Brennecke \textit{et al.} method based on the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
         This was also calculated for the top set of 200 HVGs with the smallest $p$-values.
@@ -350,7 +380,7 @@ This is expected as genes on the borderline of significance are more susceptible
 \end{figure}
 
 For dimensionality reduction, we restricted ourselves to principal components analysis (PCA) on the normalized expression profiles of all cells. 
-While $t$-distributed stochastic neighbour embedding \citep{van2008visualizing} is commonly used, its robustness is difficult to evaluate due to its randomness.
+While $t$-distributed stochastic neighbour embedding \autocite{van2008visualizing} is commonly used, its robustness is difficult to evaluate due to its randomness.
 We generated PCA plots of the first three principal components using both the original and simulated data.
 At each simulation iteration, coordinates of all cells in the simulated plots were mapped onto the corresponding original plots to determine the sensitivity of the original locations to spike-in variability.
 Figure~\ref{fig:dimclust}a indicates that changes in the location of each cell across simulation iterations were generally minor.
@@ -362,7 +392,7 @@ Thus, spike-in variability does not appear to affect the visual interpretation o
         \includegraphics[width=\textwidth]{../simulations/clustering/clust_effect.pdf}
     \end{center}
     \caption{Effect of spike-in variability on dimensionality reduction and clustering in simulated data,
-        based on real scRNA-seq data for cells extracted from a healthy human pancreas \citep{segerstople2016single}.
+        based on real scRNA-seq data for cells extracted from a healthy human pancreas \autocite{segerstople2016single}.
         (a) PCA plots of the first three principal components, where each cell is coloured according to its annotated cell type from the original study. 
         The circle around each cell contains 95\% of remapped locations across the simulation iterations, and represents the deviation in location due to spike-in variability.
         (b) Clusters were identified from the original data by hierarchical clustering with Ward's criterion, followed by a tree cut with $k$ of 2, 5 or 10.
@@ -390,7 +420,7 @@ This was supported by simulations where the introduction of realistic levels of 
 Our results indicate that spike-in normalization is reliable enough for routine use in scRNA-seq data analyses.
 The common criticisms of using spike-in RNA for normalization are only weakly relevant, if at all, to single-cell transcriptome studies, and can generally be ignored.
 
-Our conclusions differ from those of \cite{risso2014normalization}, where spike-in normalization is not considered reliable enough for analyses of bulk RNA-seq data.
+Our conclusions differ from those of \citet{risso2014normalization}, where spike-in normalization is not considered reliable enough for analyses of bulk RNA-seq data.
 We speculate that this difference may be due to the difficulty of adding an appropriate amount of spike-in RNA at the population level.
 For example, should spike-in RNA be added at a constant ratio with respect to the concentration of endogenous RNA, or to the number of cells in the sample?
 If the endogenous RNA concentration or the number of cells determines the amount of spike-in RNA to be added, these will need to be experimentally quantified for each sample.
@@ -405,13 +435,13 @@ Our experimental framework may also be useful for evaluating the precision of sp
 
 The term $\variance(F_i)$ represents the variability in the difference in behaviour between the SIRV and ERCC spike-in sets across wells.
 However, arguably a more relevant quantity is the variability in the difference $P_{is}$ between synthetic spike-in and endogenous RNA, as this affects the accuracy of normalization.
-It may be possible to obtain a rough estimate of $\variance(P_{is})$ by using pooled cellular RNA from another organism as one of the spike-in sets \citep{brennecke2013accounting}, so that $\variance(\theta^*_i)$ provides an upper bound on the variance in the differences in behaviour between synthetic and endogenous RNA.
+It may be possible to obtain a rough estimate of $\variance(P_{is})$ by using pooled cellular RNA from another organism as one of the spike-in sets \autocite{brennecke2013accounting}, so that $\variance(\theta^*_i)$ provides an upper bound on the variance in the differences in behaviour between synthetic and endogenous RNA.
 We chose not to do so because of the difficulty in reproducibly using the same pool of cellular RNA across batches, and in calibrating the concentration of RNA to be added to each well.
 Use of UMI counts may also provide a tighter bound on $\variance(F_i)$ or $\variance(P_{is})$ by reducing the contribution of amplification noise to $\sigma^2_{lib(s)}$ and $\variance(\theta^*_i)$.
 \revised{Another consideration with endogenous RNA is the variability of lysis between cells, which we neglect to consider in our framework -- this is inherently difficult to assess with external spike-in RNA and may require other methods to quantify.}
 
 \revised{One interesting question is how to choose between spike-in normalization and approaches that assume a non-DE majority of genes.
-This choice depends on whether total RNA content in each cell is of interest \citep{lun2016stepbystep}.
+This choice depends on whether total RNA content in each cell is of interest \autocite{lun2016stepbystep}.
 Spike-in normalization will preserve changes in total RNA content between cells, whereas non-DE methods will treat such changes as bias (as a majority of genes are affected) and remove them.
 This suggests that spike-in normalization is preferable in applications where changes in total RNA content can be easily associated with a biological process, e.g., T cell activation,   cell cycling.
 In contrast, non-DE normalization may be more suitable for comparisons between distinct cell types, where the up- or downregulation of specific genes (conditional on the total RNA content of the cell) is more informative.
@@ -428,7 +458,7 @@ Nonetheless, our conclusions are still relevant as absolute quantification depen
 
 \subsection*{Obtaining and culturing 416B cells and TSCs}
 
-The murine multipotent myeloid progenitor cell line 416B \citep{dexter1979isolation} was stably transduced with a TetOn construct of the \textit{CBFB-MYH11} (CM) oncogene (type A cDNA), using an in-frame F2A-mCherry protein as a reporter. 
+The murine multipotent myeloid progenitor cell line 416B \autocite{dexter1979isolation} was stably transduced with a TetOn construct of the \textit{CBFB-MYH11} (CM) oncogene (type A cDNA), using an in-frame F2A-mCherry protein as a reporter. 
 As a control, cells were alternatively transduced with a version of the construct lacking the CM cDNA. 
 Cells were maintained in RPMI medium, supplemented with 10\% fetal calf serum and antibiotics.
 Expression of the CM oncogene or the mCherry control was induced by treatment with 1 \textmu{}g/ml of doxycycline, and induction was confirmed after 24 hours by measurement of mCherry levels by fluorescence activated cell sorting (BD Fortessa).
@@ -442,7 +472,7 @@ The supernatant containing TSCs was used for sorting.
 % Mention cutting up of plate, especially for the two conditions.
 % No effect of different cell treatments.
 
-Single-cell RNA sequencing was performed using an adaptation of the previously described Smart-seq2 protocol \citep{picelli2014full}.
+Single-cell RNA sequencing was performed using an adaptation of the previously described Smart-seq2 protocol \autocite{picelli2014full}.
 Single 416B cells or TSCs were sorted into individual wells of a 96-well microtiter plate.
 Each well contained 2.3~\textmu{}l of lysis buffer with RNAse inhibitor (Ambion) in a 0.2\% (v/v) Triton X-100 solution. 
 Reverse transcription (RT) was performed in a final volume of 13.2~\textmu{}l per well, containing 1~\textmu{}M of oligo-dT (Sigma-Aldrich), 1.04~mM of each dNTP (ThermoFisher), 100~U of SuperScript II retrotranscriptase (Invitrogen/ThermoFisher), 5~U of RNase inhibitor (Ambion), 5~mM of DTT, 1~M of Betaine (Sigma-Alrich), 6~mM of MgCl$_2$ (Ambion) and 1~\textmu{}M of TSO primer (Exiqon).
@@ -467,9 +497,9 @@ Both batches were sequenced on an Illumina HiSeq 4000 machine generating 75 bp p
 \subsection*{Data analysis for the mixture experiments}
 Reads were mapped to the mm10 build of the mouse genome, including sequences of transcripts in the ERCC (\url{https://tools.thermofisher.com/content/sfs/manuals/ERCC92.zip}) and SIRV (\url{https://www.lexogen.com/wp-content/uploads/2015/11/SIRV_Sequences_151124.zip}) spike-in sets.
 (The sequence of the \textit{CBFB-MYH11} oncogene was also included in the reference when aligning data from 416B cells.)
-Mapping was performed using the subread aligner v1.5.1 \citep{liao2013subread} in RNA-seq mode with unique alignment.
+Mapping was performed using the subread aligner v1.5.1 \autocite{liao2013subread} in RNA-seq mode with unique alignment.
 The 416B data were aligned in single-end mode while the TSC data were aligned in paired-end mode.
-Reads with mapping qualities greater than or equal to 10 were assigned to exonic regions of genes using the featureCounts function in the Rsubread package v1.24.1 \citep{liao2014featurecounts}.
+Reads with mapping qualities greater than or equal to 10 were assigned to exonic regions of genes using the featureCounts function in the Rsubread package v1.24.1 \autocite{liao2014featurecounts}.
 Genes were defined using Ensembl v82 annotation for the GRCm38 mouse assembly and annotation for the ERCC and SIRV transcripts.
 This yielded a count for each endogenous gene and spike-in transcript in each well.
 Mapping and counting statistics for each batch of libraries are summarized in Supplemental Table~\supptabstats{}.
@@ -479,7 +509,7 @@ This corresponds to the amount of spike-in RNA that we aimed to add to each well
 The coverage of each ERCC transcript was also directly proportional to its theoretical concentration in the spike-in mixture (Supplemental Figure~\suppfigspikeconc{}).
 The distribution of average read counts across spike-in transcripts or endogenous genes was also consistent across plates (Supplemental Figure~\suppfigspikeave{}).
 These diagnostics indicate that the spike-in transcripts were successfully sequenced and processed into counts.
-In addition, we examined the effect of index switching \citep{sinha2017index} in each data set generated on the HiSeq 4000, and found it to be negligible (see Section~\suppsecindex{} of the Supplemental Materials, Supplemental Figure~\suppfigindex{}).}
+In addition, we examined the effect of index switching \autocite{sinha2017index} in each data set generated on the HiSeq 4000, and found it to be negligible (see Section~\suppsecindex{} of the Supplemental Materials, Supplemental Figure~\suppfigindex{}).}
 
 Variance components were estimated from the libraries generated from a single plate.
 In each well, the sum of counts across all transcripts in each spike-in set was computed, and the log$_2$-ratio between the ERCC and SIRV sums was calculated.
@@ -541,11 +571,11 @@ In contrast, if $X_i$ were directly added to $T_{is}$, the variance of $T^*_{is}
 
 Counts for the library generated from each well were rescaled to reflect the new, simulated log-total.
 A quantile adjustment approach was used to preserve the empirical mean-variance relationship.
-Briefly, a negative binomial generalized linear model (NB GLM) was fitted to the counts across all wells for each spike-in transcript, using the mglmOneGroup function in edgeR \citep{mccarthy2012differential, robinson2010edgeR} with an all-intercept design matrix and $T_{is}$ (converted to base $e$) as the offset for well $i$.
+Briefly, a negative binomial generalized linear model (NB GLM) was fitted to the counts across all wells for each spike-in transcript, using the mglmOneGroup function in edgeR \autocite{mccarthy2012differential, robinson2010edgeR} with an all-intercept design matrix and $T_{is}$ (converted to base $e$) as the offset for well $i$.
 An abundance-dependent trend was also fitted to the NB dispersions across all spike-in transcripts using the estimateDisp function.
 For each transcript $t$, we assumed that the count $y_{ti}$ for well $i$ was sampled from a NB distribution with mean equal to the corresponding fitted value of the GLM and dispersion equal to the fitted value of the mean-dispersion trend.
 We scaled the NB mean by $2^{T^*_{is} - T_{is}}$ to obtain a modified NB distribution.
-Using the q2qnbinom function \citep{robinson2008small}, we calculated the lower tail probability of $y_{ti}$ in the original distribution and identified the corresponding quantile with the same tail probability in the modified distribution.
+Using the q2qnbinom function \autocite{robinson2008small}, we calculated the lower tail probability of $y_{ti}$ in the original distribution and identified the corresponding quantile with the same tail probability in the modified distribution.
 This new quantile was used as the simulated count for transcript $t$ in $i$.
 
 % The estimation of the true parameters conditions on the observed spike-in totals, and doesn't make the assumption that spike-in totals are constant.
@@ -556,7 +586,7 @@ This new quantile was used as the simulated count for transcript $t$ in $i$.
 Two data sets were used to test the effect of spike-in variability on DEG detection.
 The first was the 416B data generated previously, where DEGs were detected between control and oncogene-induced cells in both plates.
 Here, we used an additive model with a treatment term and a blocking factor for the plate.
-The second data set was obtained from the NCBI Gene Expression Omnibus (GEO) with the accession number GSE29087, and compared mouse embryonic stem cells and fibroblasts \citep{islam2011characterization}.
+The second data set was obtained from the NCBI Gene Expression Omnibus (GEO) with the accession number GSE29087, and compared mouse embryonic stem cells and fibroblasts \autocite{islam2011characterization}.
 
 In both studies, DEGs were detected between conditions using edgeR and MAST.
 Implementation details of each method are provided in Section~\suppsecsim{} in the Supplemental Materials. 
@@ -574,13 +604,13 @@ Similarly, blocking was performed on the plate of origin for each cell in the TS
 In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-in counts 
 (See Section~\suppsecsim{} in the Supplemental Materials for implementation details of each method.)
 The first approach is based on the method of \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
-The second approach is based on the variance of the log-normalized expression values \citep{lun2016stepbystep}, which provides some more robustness against outlier expression patterns.
+The second approach is based on the variance of the log-normalized expression values \autocite{lun2016stepbystep}, which provides some more robustness against outlier expression patterns.
 Each method was applied on the original and simulated data, and a set of significant HVGs was detected at a FDR of 5\%.
 The proportion of HVGs common to both the original and simulated sets was computed, along with the common proportion among the top 200 genes with the lowest $p$-values.
 This was repeated for 20 simulation iterations and the average proportion across iterations was reported for each method.
 
 \subsection*{Evaluating dimensionality reduction and clustering}
-Count data from a study of pancreatic islet cells \citep{segerstople2016single} were obtained from ArrayExpress with the acession E-MTAB-5061.
+Count data from a study of pancreatic islet cells \autocite{segerstople2016single} were obtained from ArrayExpress with the acession E-MTAB-5061.
 Spike-in normalization was performed and a set of HVGs was defined using the variance-of-log-expression method.
 PCA plots of the first three components were constructed from the matrix of log-expression values for the HVGs.
 This process -- including HVG detection -- was repeated with the simulated data after introducing spike-in variability.
@@ -623,9 +653,6 @@ Work in the G\"ottgens group was supported by Cancer Research UK, Bloodwise, the
 \section*{Supplemental materials}
 The Supplemental Materials is a single PDF file that consists of Sections~1-\suppsecsim{} and contains Supplemental Figures~1-\suppfigindex{} and Supplemental Table~1.
 
-{\small
-\bibliography{refnorm}
-\bibliographystyle{plainnat}
-}
+\printbibliography
 
 \end{document}

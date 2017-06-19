@@ -3,7 +3,7 @@ all: Supplemental_Materials.pdf prickle.pdf
 prickle.pdf: prickle.tex refnorm.bib \
 	pics/plate_setup.pdf ../real/pics/variance_exp.pdf ../simulations/pics/setplot.pdf ../simulations/clustering/clust_effect.pdf
 	pdflatex prickle.tex
-	bibtex prickle
+	biber prickle
 	pdflatex prickle.tex
 	pdflatex prickle.tex
 
