@@ -33,7 +33,8 @@ resampleSpikes <- function(param, var.log)
     new.log.lib <- (log.lib - mean(log.lib)) * sqrt(max(0, 1 - var.log/cur.var)) + mean(log.lib)
 	new.lib.size <- 2^new.log.lib
 
-	# Adding spike-in variability back in, randomly.
+	# Adding spike-in variability back in, randomly. Note that new.fitted is equivalent to
+    # param$fitted * new.lib.size/param$lib.size, which is how we parameterized it in the paper.
 	fc <- 2^rnorm(length(new.lib.size), 0, sd=sqrt(var.log))
 	new.fitted <- outer(param$mean, fc*new.lib.size)
 	new.counts <- edgeR::q2qnbinom(param$counts, input=param$fitted, output=new.fitted, dispersion=param$dispersion)

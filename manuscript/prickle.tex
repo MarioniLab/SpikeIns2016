@@ -603,9 +603,9 @@ This was repeated for 20 simulation iterations and the average proportion across
 
 \subsection*{Evaluating the robustness of HVG detection}
 Our 416B and TSC data sets were used to assess the effect of spike-in variability on detection of HVGs.
-\revised{For each data set, data from both plates were combined for a single round of HVG detection.}
+\revised{For each data set, data from both plates were combined into a single analysis with blocking factors to account for uninteresting factors of variation.}
 In the \revised{416B data set}, blocking was performed to remove plate- and treatment-specific effects on mean expression, i.e., HVGs were detected within treatment conditions on each plate.
-Similarly, blocking was performed on the plate of origin for each cell in the TSC data set to remove plate effects.
+\revised{In the TSC data set}, blocking was performed to remove plate effects.
 
 In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-in counts 
 (See Section~\suppsecsim{} in the Supplemental Materials for implementation details of each method.)
