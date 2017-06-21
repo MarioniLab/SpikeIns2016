@@ -37,7 +37,13 @@ chosen <- metadata[,"Characteristics[individual]"]=="HP1502401" & metadata[,"Cha
 cell.type <- metadata[chosen,"Characteristics[cell type]"]
 source.name <- metadata[chosen,"Source Name"]
 
+# The count matrix actually contains two extra fields; gene name and transcript IDs.
+# After these two fields, the first 'ncell' columns contain RPKMs while the next 'ncell' contain counts.
 keep <- rep(list(NULL), nrow(metadata) * 2 + 2)
+
+# The two extra fields are characters, while the counts need to be pulled out as integers.
+# We note that 'headers' contains one extra field at the start, which is followed by the names of the cells.
+# Technically, the integers should be (length(headers)-1 + which(headers %in% source.name)-1 + 2), but the extras just cancel out.
 keep[length(headers) + which(headers %in% source.name)] <- list("integer")
 keep[1] <- "character"
 keep[2] <- "character"
