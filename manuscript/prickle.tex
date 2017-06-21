@@ -278,7 +278,7 @@ This indicates that variability of spike-in volume addition is a minor contribut
 To put these estimates into context, consider that $T_{is}$ represents the log$_2$-transformed ``size factor'' for the library generated from well $i$.
 Spike-in normalization is performed by scaling all counts in this library by the size factor, i.e., $2^{-T_{is}}$.
 This eliminates differences in the coverage of spike-in set $s$ between cells and corrects for well/cell-specific technical biases.
-The variance of the log-size factors is approximately one order of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b), \revised{indicating that the variance in sequencing depth and capture efficiency across wells (i.e., $\variance{(\log_2 L_{i})}$ and $\variance{(\log_2 R_{is})}$) is more important than that of volume addition.
+The variance of the log-size factors is \revised{at least} one order of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b), \revised{indicating that the variance in sequencing depth and capture efficiency across wells (i.e., $\variance{(\log_2 L_{i})}$ and $\variance{(\log_2 R_{is})}$) is more important than that of volume addition.
 We also computed the cell-to-cell variance of the log-ratio of total counts for the mouse genes against one of the spike-in sets.
 This represents the biological fluctuations in total RNA content across cells and was, again, an order of magnitude larger than $\sigma^2_{vol}$ (Supplemental Figure~\suppfigcell{}).
 In this context, our results suggest that variability due to volume addition} will not have a major effect on spike-in normalization.
@@ -303,19 +303,23 @@ In this context, our results suggest that variability due to volume addition} wi
 The variance of $F_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
 Even when the average capture efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in efficiency is the same in all wells}.
 Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
-This scales up the counts for the spike-in transcripts in all libraries by the same amount, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
+This scales up the counts for the spike-in transcripts in all libraries by the same \revised{factor}, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
 This is because specific changes in efficiency for the spike-in transcripts are confounded with general changes in efficiency for all transcripts in the well.
 Differences in the coverage of spike-in transcripts may not represent technical biases affecting other transcripts, precluding their use for normalizing all counts.
 
+\revised{The variance of $F_i$} quantifies the extent to which \revised{spike-in} normalization is affected by \revised{well-to-well} differences in efficiency between the spike-in sets.
 In our mathematical framework, the variance of $\theta^*_i$ provides an upper bound for the variance of $F_i$.
-This quantifies the extent to which normalization is affected by differences in efficiency between two transcript sets.
-Our estimate of $\variance(\theta^*_i)$ is an order of magnitude lower than the estimated variance of the log-size factors in each plate (Figure~\ref{fig:varestimates}).
-This indicates that the potential variance in differential behaviour across wells, while greater than $\sigma^2_{vol}$, is still relatively small compared to other biases in the system, e.g., differences in cellular RNA content, well-to-well variability in capture efficiency for all transcripts.
-Here, $F_i$ is computed between two spike-in sets whereas the differences between synthetic spike-in and endogenous transcripts are likely to be greater.
-Nonetheless, the SIRV and ERCC spike-ins do vary in their biophysical properties (Supplemental Figure~\suppfigbiophys{}).
+Our estimate of $\variance(\theta^*_i)$ is an order of magnitude lower than the estimated variances of the log-size factors in each plate (Figure~\ref{fig:varestimates}) \revised{and of cellular RNA content (Supplemental Figure~\suppfigcell{}).}
+This indicates that the potential variance in \revised{the differences in spike-in} behaviour, while greater than $\sigma^2_{vol}$, is still relatively small compared to other biases in the system, e.g., \revised{fluctuations} in cellular RNA content, well-to-well variability in \revised{global} capture efficiency.
+
+\revised{Here,} $F_i$ is only computed between two spike-in sets.
+\revised{In practice, the more relevant} differences \revised{are those} between synthetic spike-in and endogenous transcripts.
+\revised{The variance of such differences is} likely to be \revised{larger than $\variance(F_i)$, given the greater variability in sequence composition and length of endogenous transcripts.}
+Nonetheless, the SIRV and ERCC spike-ins do \revised{exhibit some variability} in their biophysical properties (Supplemental Figure~\suppfigbiophys{}).
 For example, the SIRV transcripts have more variable length and lower GC content compared to the ERCC transcripts.
-This suggests that $F_i$ will include some of the differences in behaviour between synthetic and endogenous RNA, such that $\variance(F_i)$ can be used as a rough estimate of the magnitude of the associated variability.
+This suggests that $F_i$ will include \revised{at least} some of the differences in behaviour between synthetic and endogenous RNA, such that $\variance(F_i)$ can be used as a rough estimate of the magnitude of the associated variability.
+
 
 \subsection*{Quantifying the effect of stochastic noise during sequencing}
 We also performed simulations to gauge the contribution of $\sigma^2_{lib(s)}$ to $\variance(\theta^*_i)$ (see Section~\suppsecnoise{} of the Supplemental Materials).
