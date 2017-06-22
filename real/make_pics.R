@@ -221,7 +221,7 @@ dev.off()
 pdf("pics/dist_separate.pdf")
 xrange <- range(sapply(separate, range)) * 1.5
 plot(0,0,type="n", xlim=xrange, ylim=c(0, 6), main="Separate addition", cex.main=1.4, 
-     xlab=expression("Log"[2]*"-ratio [ERCC/SIRV]"), ylab="Density", cex.axis=1.2, cex.lab=1.4)
+     xlab=expression("Residual log"[2]*"-ratio [ERCC/SIRV]"), ylab="Density", cex.axis=1.2, cex.lab=1.4)
 for (index in seq_along(separate)) {
     d <- density(separate[[index]], adjust=2)
     lines(d$x, d$y, col=batch.cols[index], lwd=2)
@@ -231,7 +231,7 @@ dev.off()
 pdf("pics/dist_premixed.pdf")
 xrange <- range(sapply(premixed, range)) * 1.5
 plot(0,0,type="n", xlim=xrange, ylim=c(0, 6), main="Premixed addition", cex.main=1.4, 
-     xlab=expression("Log"[2]*"-ratio [ERCC/SIRV]"), ylab="Density", cex.axis=1.2, cex.lab=1.4)
+     xlab=expression("Residual log"[2]*"-ratio [ERCC/SIRV]"), ylab="Density", cex.axis=1.2, cex.lab=1.4)
 for (index in seq_along(premixed)) {
     d <- density(premixed[[index]], adjust=2)
     lines(d$x, d$y, col=batch.cols[index], lwd=2)

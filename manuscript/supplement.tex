@@ -143,7 +143,7 @@ By forcing the offsets \revised{of all wells} to be equal, \revised{we removed d
 This means that any variance in the simulated log-ratios across wells} must be due to stochastic sampling noise, i.e.,  $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
 We also downscaled the fitted values to determine the effect of \revised{reducing spike-in coverage on the sampling noise.
 We scaled down to 1\% of the original coverage to mimic the addition of less spike-in RNA to each well.
-To preserve the mean-variance relationship during downscaling, we fitted a loess curve of degree 1 to the original log-transformed NB dispersions against the log-mean of the fitted values across all cells.
+To preserve the mean-variance relationship during downscaling, we fitted a loess curve of degree 1 to the original log-transformed NB dispersion against the log-mean of the fitted values across all cells.
 We used this trend to determine the new NB dispersion for each transcript, which we then used during count sampling.}
 
 We do not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
