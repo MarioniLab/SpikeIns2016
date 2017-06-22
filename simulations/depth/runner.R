@@ -2,11 +2,15 @@
 
 library(simpaler)
 getRescalingFunction <- function(d, design) {
-    d <- estimateDisp(d, design, prior.df=0)
+    # Estimating the NB dispersion, fitting a GLM.
+    d <- estimateDisp(d, design, prior.df=0, trend.method="none")
     fit <- glmFit(d, design)
+
+    # Calculating new fitted values with a common offset for all cells.
     fitted <- exp(fit$unshrunk.coefficients %*% t(design) + mean(fit$offset))
     fitted[is.na(fitted)] <- 0
 
+    # Obtaining non-NA log-means and log-dispersions for trend fitting.
     means <- rowMeans(fitted)
     disp <- fit$dispersion
     lmean <- log(means)
@@ -16,19 +20,34 @@ getRescalingFunction <- function(d, design) {
     ldisp <- ldisp[keep]
     
     trend <- loess(ldisp ~ lmean, degree=1)
+
+    # Returning a function to compute statistics given a downscaling factor.
     function(scale) {
         new.fitted <- fitted*scale
         new.means <- rowMeans(new.fitted)
         lnew.means <- log(new.means)[keep]
         
-        new.disp <- disp
+        new.disp <- rep(NA_real_, length(disp))
         new.disp[keep] <- exp(predict(trend, data.frame(lmean = lnew.means)) + residuals(trend))
-        upper.bound <- exp(max(fitted(trend))) # Setting to the upper bound at low counts.
+
+        # Defining the upper bound as the largest observed variance
+        # (or the left edge of the trend, whichever is largest).
+        upper.bound <- exp(max(c(ldisp, fitted(trend)))) 
         new.disp <- pmin(upper.bound, new.disp)
+        
+        # predict.loess doesn't extrapolate, so we set NA values to the upper bound.
         new.disp[is.na(new.disp)] <- upper.bound
         return(list(fitted=new.fitted, disp=new.disp))
     }
 }
+
+# pdf("diagnostic.pdf")
+# plot(lmean, ldisp, xlab="Log-mean", ylab="Log-Dispersion")
+# o <- order(lmean)
+# lines(lmean[o], fitted(trend)[o], col="red")
+# out <- FUN(0.1)
+# points(log(rowMeans(out$fitted)), log(out$disp), col="blue", pch=16, cex=0.5)
+# dev.off()
 
 pdf("depth_effect.pdf")
 par(mar=c(5.1, 5.1, 4.1, 2.1))
@@ -40,7 +59,7 @@ for (operator in c("Calero", "Liora")) {
     }
 
     collected.cov <- collected.est <- collected.se <- list()
-    all.props <- c(0.01, 0.02, 0.05, 0.1, 0.2, 0.4, 0.6, 0.8, 1)
+    all.props <- c(1, 0.8, 0.6, 0.4, 0.2, 0.1, 0.05, 0.02, 0.01)
     
     for (dataset in datasets) {
         loadin <- readRDS(file.path("../../real", operator, dataset, "analysis/object.rds"))
@@ -57,32 +76,45 @@ for (operator in c("Calero", "Liora")) {
         }
 
         library(edgeR)
-        ercc.only <- DGEList(my.counts[grepl("ERCC", rownames(my.counts)),])
-        ercc.FUN <- getRescalingFunction(ercc.only, design)
-        
-        sirv.only <- DGEList(my.counts[grepl("SIRV", rownames(my.counts)),])
-        sirv.FUN <- getRescalingFunction(sirv.only, design)
-        
+        d <- DGEList(my.counts[grepl("ERCC|SIRV", rownames(my.counts)),])
+
+        # Setting offsets for each transcript, based on the set of origin.
+        is.ercc <- grepl("ERCC", rownames(d))
+        is.sirv <- !is.ercc
+        totals <- list(colSums(d$counts[is.ercc,,drop=FALSE]), colSums(d$counts[is.sirv,,drop=FALSE]))
+        offsets <- do.call(rbind, totals[1 + is.sirv])
+        d <- scaleOffset(d, log(offsets))
+
+        FUN <- getRescalingFunction(d, design)
+      
         # Simulating to estimate the effect of depth on the variability of ratios.
         # Note that we assume the offsets are true when estimating the dispersions.
         # This means dispersions may be underestimated for high-abundance genes (and overestimated for low-abundance genes). 
         
-        set.seed(100)
+        set.seed(1000)
         collected <- list()
         for (p in seq_along(all.props)) { 
             prop <- all.props[p]
             to.collect <- list()
         
             for (it in seq_len(20)) { 
-                new.ercc <- ercc.FUN(prop)
-                sim.ercc <- matrix(rnbinom(length(new.ercc$fitted), mu=new.ercc$fitted, size=1/new.ercc$disp),
-                                   nrow=nrow(ercc.only), ncol=ncol(ercc.only))
+                new.spikes <- FUN(prop)
+
+                ercc.fitted <- new.spikes$fitted[is.ercc,,drop=FALSE]
+                ercc.disp <- new.spikes$disp[is.ercc]
+                sim.ercc <- matrix(rnbinom(length(ercc.fitted), mu=ercc.fitted, size=1/ercc.disp),
+                                   nrow=nrow(ercc.fitted), ncol=ncol(ercc.fitted))
     
-                new.sirv <- sirv.FUN(prop)
-                sim.sirv <- matrix(rnbinom(length(new.sirv$fitted), mu=new.sirv$fitted, size=1/new.sirv$disp),
-                                   nrow=nrow(sirv.only), ncol=ncol(sirv.only))
+                sirv.fitted <- new.spikes$fitted[is.sirv,,drop=FALSE]
+                sirv.disp <- new.spikes$disp[is.sirv]
+                sim.sirv <- matrix(rnbinom(length(sirv.fitted), mu=sirv.fitted, size=1/sirv.disp),
+                                   nrow=nrow(sirv.fitted), ncol=ncol(sirv.fitted))
         
                 ratios <- log2(colSums(sim.ercc)/colSums(sim.sirv))
+                if (any(!is.finite(ratios))) {
+                    warning("skipping iteration with non-finite ratios")
+                    next
+                }
                 to.collect[[it]] <- estimateVariance(ratios=ratios, design=design)
             }
         
@@ -90,7 +122,7 @@ for (operator in c("Calero", "Liora")) {
             collected[[p]] <- to.collect
         }
 
-        collected.cov[[dataset]] <- mean(colSums(ercc.only$counts)) + mean(colSums(sirv.only$counts)) 
+        collected.cov[[dataset]] <- mean(colSums(d$counts))
         collected.est[[dataset]] <- sapply(collected, mean)
         collected.se[[dataset]] <- sapply(collected, sd)/sqrt(lengths(collected))
     }
