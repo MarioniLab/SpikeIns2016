@@ -169,7 +169,7 @@ In each plate, the total count across all mouse genes for each negative control 
 This suggests that, at worst, index switching would result in 1\% of the library size for each well being attributable to contamination from other wells.
 To put this result into context, the coefficients of variation for the total ERCC count in the first and second plate are 0.29 and 0.26, respectively.
 This means the coverage routinely varies by 26-29\% across wells due to cell-specific biases.
-By comparison, the 1\% (maximum) rate of contamination due to index switching is likely to have negligible effects.
+By comparison, the 1\% (maximum) rate of contamination due to index switching is likely to have negligible effect.
 \end{color}
 
 % x <- loadin1$counts[loadin1$genes$spike1,]
@@ -193,26 +193,27 @@ For our data sets, only the ERCC spike-in transcripts were used in downstream an
 All SIRV transcripts were discarded for simplicity.
 
 \subsection{Methods for detecting differentially expressed genes}
-For DEG detection with edgeR v3.16.3, a NB GLM was fitted to the counts for each gene \citep{mccarthy2012differential} using a suitable design matrix.
+For DEG detection with edgeR \revised{v3.18.1}, a NB GLM was fitted to the counts for each gene \citep{mccarthy2012differential} using a suitable design matrix.
 The log-transformed total count for the spike-in transcripts was used as the offset for each library.
 This is equivalent to spike-in normalization as each count is effectively downscaled by the spike-in total.
 An abundance-dependent trend was fitted to the NB dispersions of all genes using the estimateDisp function.
 For each gene, empirical Bayes shrinkage was performed towards the trend to obtain a shrunken NB dispersion, and the likelihood ratio test was applied to test for significant differences in expression between conditions.
 The Benjamini-Hochberg correction was applied to control the FDR.
 
-For MAST v1.0.5, an effective library size was defined by multiplying the total spike-in count by a constant value $C$ for each library.
+For MAST \revised{v1.2.1}, an effective library size was defined by multiplying the total spike-in count by a constant value $C$ for each library.
 We set $C$ to the ratio of the average total count for the endogenous genes to the average total count for the spike-in transcripts, where each average was computed across all libraries.
 This procedure recapitulates the effect of spike-in normalization by ensuring that the fold-differences in the effective library sizes are equal to the fold-differences in the spike-in totals between cells.
 Counts were converted to count-per-million (CPM) values using the effective library sizes, which were further log-transformed after adding a pseudo-count of 1.
-For each gene, a hurdle model was fitted to the log-CPMs across all cells using the zlm.SingleCellAssay function with default parameters.
-Along with the experimental factors, the proportion of genes with non-zero counts in each library was included as a covariate \citep{finak2015mast} in the model.
+For each gene, a hurdle model was fitted to the log-CPMs across all cells using the zlm function with default parameters.
+\revised{This was parameterized as an additive model for all experimental factors}, with the proportion of genes with non-zero counts in each library included as a covariate \citep{finak2015mast}.
 Putative DE genes between the relevant conditions were identified using the lrTest function.
 
 \subsection{Methods for detecting highly variable genes}
-The first HVG detection method was based on the approach described by \cite{brennecke2013accounting}, with some modifications to the size factors to perform spike-in normalization.
-Specifically, the spike-in totals were rescaled such that their mean across all libraries was equal to unity, and the size factor for each library was defined as its rescaled spike-in total.
+The first HVG detection method was based on the approach described by \citet{brennecke2013accounting}, with some modifications to the size factors to perform spike-in normalization.
+Specifically, the spike-in totals were scaled so that their mean across all libraries was equal to unity.
+The size factor for each library was defined as its scaled spike-in total.
 We did \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
-The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package with min.bio.disp set to zero.
+The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package \revised{(v1.4.4)} with min.bio.disp set to zero.
 If blocking factors were present, they were regressed out by log-transforming the counts; applying the removeBatchEffect function from the limma package \citep{ritchie2015limma} to the log-counts; and converting the corrected log-values back to the count scale, prior to using technicalCV2.
 
 The second approach to detect HVGs was based on computing the variance of log-expression values \citep{lun2016stepbystep}.

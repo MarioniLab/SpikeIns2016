@@ -513,11 +513,13 @@ Genes were defined using Ensembl v82 annotation for the GRCm38 mouse assembly an
 This yielded a count for each endogenous gene and spike-in transcript in each well.
 Mapping and counting statistics for each batch of libraries are summarized in Supplemental Table~\supptabstats{}.
 
-\revised{To evaluate spike-in quality, we verified that the total spike-in count in each well comprised 1-10\% of the total library size (Supplemental Figure~\suppfigtotals{}).
+\revised{To evaluate spike-in quality, we verified that the total spike-in count (ERCC + SIRV) in each well comprised 5-10\% of the total library size (Supplemental Figure~\suppfigtotals{}).
 This corresponds to the amount of spike-in RNA that we aimed to add to each well, and was consistent across wells within each plate.
-The coverage of each ERCC transcript was also directly proportional to its theoretical concentration in the spike-in mixture (Supplemental Figure~\suppfigspikeconc{}).
+The coverage of each ERCC transcript was directly proportional to its theoretical concentration in the spike-in mixture (Supplemental Figure~\suppfigspikeconc{}).
 The distribution of average read counts across spike-in transcripts or endogenous genes was also consistent across plates (Supplemental Figure~\suppfigspikeave{}).
 These diagnostics indicate that the spike-in transcripts were successfully sequenced and processed into counts.
+Nonetheless, we removed any wells where the total count for either spike-in set or for the endogenous genes was more than three median absolute deviations below the median. 
+It is likely that capture or sequencing failed for these wells, so they were not used for variance estimation.
 In addition, we examined the effect of index switching \autocite{sinha2017index} in each data set generated on the HiSeq 4000, and found it to be negligible (see Section~\suppsecindex{} of the Supplemental Materials, Supplemental Figure~\suppfigindex{}).}
 
 Variance components were estimated from the libraries generated from a single plate.
@@ -580,9 +582,10 @@ In contrast, if $X_i$ were directly added to $T_{is}$, the variance of $T^*_{is}
 
 Counts for the library generated from each well were rescaled to reflect the new, simulated log-total.
 A quantile adjustment approach was used to preserve the empirical mean-variance relationship.
-Briefly, a negative binomial generalized linear model (NB GLM) was fitted to the counts across all wells for each spike-in transcript, using the mglmOneGroup function in edgeR \autocite{mccarthy2012differential, robinson2010edgeR} with an all-intercept design matrix and $T_{is}$ (converted to base $e$) as the offset for well $i$.
-An abundance-dependent trend was also fitted to the NB dispersions across all spike-in transcripts using the estimateDisp function.
-For each transcript $t$, we assumed that the count $y_{ti}$ for well $i$ was sampled from a NB distribution with mean equal to the corresponding fitted value of the GLM and dispersion equal to the fitted value of the mean-dispersion trend.
+Briefly, a negative binomial generalized linear model (NB GLM) was fitted to the counts across all wells for each spike-in transcript, using the glmFit function in edgeR \autocite{mccarthy2012differential, robinson2010edgeR} with a \revised{design matrix containing all experimental factors in the current data set.
+The value of $T_{is}/\log_2(e)$ was used as the offset for well $i$ during GLM fitting.
+The NB dispersion was also estimated for each transcript using the estimateDisp function without empirical Bayes shrinkage.}
+For each transcript $t$, we assumed that the count $y_{ti}$ for well $i$ was sampled from a NB distribution with mean equal to the corresponding fitted value of the GLM and dispersion equal to the estimated transcript-specific value.
 We scaled the NB mean by $2^{T^*_{is} - T_{is}}$ to obtain a modified NB distribution.
 Using the q2qnbinom function \autocite{robinson2008small}, we calculated the lower tail probability of $y_{ti}$ in the original distribution and identified the corresponding quantile with the same tail probability in the modified distribution.
 This new quantile was used as the simulated count for transcript $t$ in $i$.
