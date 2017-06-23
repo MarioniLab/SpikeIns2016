@@ -185,10 +185,10 @@ Some minor deviation at the tails, perhaps -- but all in all, normality is proba
 
 ```{r, fig.width=10, fig.height=5}
 keep <- spike.data$samples$separate
-sep.fit <- estimateVariance(spike.data[,keep], design[keep,], getfit=TRUE)
+sep.fit <- lm.fit(spike.data$samples$ratio[keep], x=design[keep,])
 sep.resids <- residuals(sep.fit)
 keep <- spike.data$samples$premixed
-premix.fit <- estimateVariance(spike.data[,keep], design[keep,], getfit=TRUE)
+premix.fit <- lm.fit(spike.data$samples$ratio[keep], x=design[keep,])
 premix.resids <- residuals(premix.fit)
 par(mfrow=c(1,2))
 qqnorm(sep.resids)
@@ -216,7 +216,7 @@ There's no increase here (at all, let alone one that is significant).
 
 The decomposition can be done simply using the `decomposeVariances` function.
 We can examine the variance of the added (log-)volume, by subtracting the variance of the log-ratios in the premixed experiment from the variance of separate additions.
-We also test this difference for significance using a standard chi-squared test.
+We also test this difference for significance using a F-test for the equality of variances.
 
 ```{r}
 out <- decomposeVariance(spike.data, design)
