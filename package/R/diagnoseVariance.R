@@ -10,6 +10,7 @@ diagnoseVariance <- function(y, groups, design)
     ratios <- y$samples$ratio
     all.index <- split(seq_len(length(ratios)), groups)
     all.var <- vector("list", length(all.index))
+    names(all.var) <- names(all.index)
 
     for (g in names(all.index)) {
         current <- all.index[[g]]
