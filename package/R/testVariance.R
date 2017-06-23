@@ -13,11 +13,11 @@ testVariance <- function(var1, var2, type=c("one-sided", "two-sided"))
     var.ratio <- var1/var2
     attributes(var.ratio) <- NULL
 
-    upper.tail <- pf(var.ratio, df1, df2, lower=FALSE)
+    upper.tail <- pf(var.ratio, df1, df2, lower.tail=FALSE)
     if (type=="one-sided") {
         return(upper.tail)
     } else {
-        lower.tail <- pf(var.ratio, df1, df2, lower=TRUE)
+        lower.tail <- pf(var.ratio, df1, df2, lower.tail=TRUE)
         return(2*pmin(lower.tail, upper.tail)) # effectively Bonferroni correction.
     }
 }

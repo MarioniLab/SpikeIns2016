@@ -1,5 +1,6 @@
 # Importing packages.
-import(edgeR, limma, AnnotationDbi)
+import(edgeR)
+importFrom("stats", "lm.fit", "pf", "rnorm", "var")
 
 # Exporting everything that's not hidden.
 exportPattern("^[^\\.]")

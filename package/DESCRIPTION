@@ -1,14 +1,14 @@
 Package: simpaler 
-Version: 0.99.0
-Date: 2015/10/30
+Version: 0.99.1
+Date: 2017-06-23
 Title: Simulator for spike-ins in single-cell RNA-seq data
 Author: Aaron Lun <alun@wehi.edu.au>
 Maintainer: Aaron Lun <alun@wehi.edu.au>
-Depends: R (>= 3.2.0), edgeR, limma
-Imports: AnnotationDbi 
-Suggests: TxDb.Mmusculus.UCSC.mm10.knownGene
+Depends: R (>= 3.2.0), edgeR 
+Imports: stats 
 biocViews: RNASeq 
 Description: Simulates spike-in variability in single-cell RNA-seq data.
-	Also provides some other functions for quality control.
+	Also provides functions to estimate variance of log-ratios from 
+    experiments using mixtures of two different spike-in sets.
 License: GPL-3
 NeedsCompilation: yes
