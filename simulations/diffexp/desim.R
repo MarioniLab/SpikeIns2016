@@ -26,8 +26,8 @@ for (datatype in c("calero", "islam")) {
 		spike.in <- grepl("SPIKE", rownames(incoming))
 		grouping <- rep(c("ESC", "MEF", "Neg"), c(48, 44, 4))
 		
-		# Quality control on individual cells.
-		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
+        is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
+        
         expvar <- data.frame(Group=grouping, stringsAsFactors=FALSE)
 		
 	} else if (datatype=="calero") {
@@ -60,7 +60,8 @@ for (datatype in c("calero", "islam")) {
     expvar <- expvar[okay.libs,,drop=FALSE]
 
 	filter.keep <- rowMeans(incoming) >= 1
-    spike.param <- spikeParam(incoming[spike.in & filter.keep,])
+    block <- do.call(paste, c(expvar, sep="."))
+    spike.param <- spikeParam(incoming[spike.in & filter.keep,], design=model.matrix(~block))
     cell.counts <- incoming[!spike.in & filter.keep,]
 
 	#################################################################################

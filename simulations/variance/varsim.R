@@ -39,9 +39,10 @@ for (datatype in c("wilson", "calero", "liora")) {
             incoming.1 <- incoming.1[,is.na(incoming.1$samples$control.well)]
             incoming.2 <- readRDS("../../real/Liora/test_20170201/analysis/full.rds")
             incoming.2 <- incoming.2[,is.na(incoming.2$samples$control.well)]
+            stopifnot(identical(rownames(incoming.1), rownames(incoming.2)))
+
             incoming <- cbind(incoming.1$counts, incoming.2$counts)
             gdata <- incoming.1$genes
-            block <- NULL
             block <- rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2)))
         }
 
@@ -61,10 +62,17 @@ for (datatype in c("wilson", "calero", "liora")) {
                  !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
 	incoming <- incoming[,okay.libs]
 
+    # Setting up the design matrix.
+    if (is.null(block)) { 
+        design <- NULL 
+    } else { 
+        design <- model.matrix(~block[okay.libs]) 
+    }
+
     # Filtering out crappy spikes.
     high.ab <- rowMeans(incoming) >= 1
 	countsCell <- as.matrix(incoming[high.ab & !spike.in,])
-	spike.param <- spikeParam(incoming[high.ab & spike.in,])
+	spike.param <- spikeParam(incoming[high.ab & spike.in,], design=design)
 
     #########################################################################
     # Running through our various methods.
@@ -86,8 +94,6 @@ for (datatype in c("wilson", "calero", "liora")) {
                 sce <- normalize(sce)
                 
                 if (method=="VarLog"){ 
-                    if (is.null(block)) { design <- NULL }
-                    else { design <- model.matrix(~block[okay.libs]) }
 
                     # Fitting the trend to the spike-in variances.
                     out <- trendVar(sce, trend="semiloess", design=design)
