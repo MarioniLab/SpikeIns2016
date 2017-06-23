@@ -30,6 +30,10 @@ A DGEList object containing the count matrix and the metadata for each gene and 
 Aaron Lun
 }
 
+\seealso{
+\code{\link{DGEList}}
+}
+
 \examples{
 x <- matrix(rpois(100000, lambda=5), ncol=100)
 spike1 <- 1:10

@@ -21,6 +21,10 @@ By default, a one-sided test is performed against the null hypothesis that \code
 If \code{type="two-sided"}, a two-sided test will be performed for any difference between \code{var1} and \code{var2}.
 }
 
+\value{
+A numeric scalar containing the p-value.
+}
+
 \author{
 Aaron Lun
 }

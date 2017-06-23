@@ -1,4 +1,4 @@
-testVariance <- function(var1, var2, type=c("one-sided", "two-sided"), ...) 
+testVariance <- function(var1, var2, type=c("one-sided", "two-sided")) 
 # Tests if the first variance is significantly larger than the second.
 # If two-sided, it tests whether there are any significance differences between the variances.
 #

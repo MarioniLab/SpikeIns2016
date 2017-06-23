@@ -9,10 +9,10 @@ estimateVariance(y, design, ..., ratios, getfit=FALSE)
 }
 
 \arguments{
-\item{y}{A DGEList object containing the log-ratios as a \code{ratio} field in the \code{samples} table.}
-\item{design}{A design matrix. If not supplied, it defaults to an all-intercept matrix.}
+\item{y}{A DGEList object produced by \code{\link{setupSpikes}}, containing the log-ratios as a \code{ratio} field in the \code{samples} table.}
+\item{design}{A design matrix containing uninteresting factors of variation. If not supplied, it defaults to an all-intercept matrix.}
 \item{...}{Other arguments to pass to \code{\link{lm.fit}}.}
-\item{ratios}{A numeric vector of log-ratios. If supplied, it is used instead of \code{y$samples$ratio.}
+\item{ratios}{A numeric vector of log-ratios. If supplied, it is used instead of \code{y$samples$ratio}.}
 \item{getfit}{A logical scalar indicating whether the output of \code{\link{lm.fit}} should be directly returned.}
 }
 
@@ -29,9 +29,15 @@ A numeric scalar containing the variance estimate, along with the attributes \co
 Aaron Lun
 }
 
+\seealso{
+\code{\link{setupSpikes}},
+\code{\link{lm.fit}}
+}
+
 \examples{
 example(setupSpikes)
-estimateVariance(y)
+estimateVariance(y[,y$samples$separate])
+estimateVariance(y[,y$samples$premixed])
 }
 
 % Checking the standard error calculation under normality:
