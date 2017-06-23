@@ -1,4 +1,4 @@
-decomposeVariance <- function(y, design) 
+decomposeVariance <- function(y, design=NULL) 
 # This decomposes the variances to their relevant components, given the count matrix in 'counts'.
 # We need an indication of which genes are in each spike-in set (spike1, spike2).
 # We also need to know which samples correspond to premixed and separate additions.
@@ -10,7 +10,7 @@ decomposeVariance <- function(y, design)
     ratios <- y$samples$ratio
     separate <- y$samples$separate
     premixed <- y$samples$premixed
-    if (missing(design)) { design <- .make_intercept(length(ratios)) }
+    if (is.null(design)) { design <- .make_intercept(length(ratios)) }
 
     separate.design <- .restore_rank(design[separate,,drop=FALSE])
     premixed.design <- .restore_rank(design[premixed,,drop=FALSE])

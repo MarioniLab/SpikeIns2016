@@ -1,4 +1,4 @@
-diagnoseVariance <- function(y, groups, design) 
+diagnoseVariance <- function(y, groups, design=NULL) 
 # This estimates the variance for each level of 'groups'.
 # It then does pairwise comparisons between groups to check for significant differences.
 #
@@ -6,7 +6,7 @@ diagnoseVariance <- function(y, groups, design)
 # created 26 January 2016
 # last modified 23 June 2017
 {
-    if (missing(design)) { design <- .make_intercept(length(groups)) }
+    if (is.null(design)) { design <- .make_intercept(length(groups)) }
     ratios <- y$samples$ratio
     all.index <- split(seq_len(length(ratios)), groups)
     all.var <- vector("list", length(all.index))

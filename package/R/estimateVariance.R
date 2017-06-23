@@ -1,15 +1,14 @@
-estimateVariance <- function(y, design, ..., ratios, getfit=FALSE) 
+estimateVariance <- function(y, design=NULL, ..., ratios)
 # Estimates the variance of the ratios, given the design matrix.
 #
 # written by Aaron Lun
 # created 26 January 2016
-# last modified 8 February 2017
+# last modified 23 June 2017
 {
     if (missing(ratios)) { ratios <- y$samples$ratio }
-    if (missing(design)) { design <- .make_intercept(length(ratios)) }
+    if (is.null(design)) { design <- .make_intercept(length(ratios)) }
     else { design <- .restore_rank(design) }
     fit <- lm.fit(y=ratios, x=design, ...)
-    if (getfit) { return(fit) }
 
     var.est <- sum(fit$effects[-seq_len(fit$rank)]^2)/fit$df.residual
     df <- nrow(design) - ncol(design)

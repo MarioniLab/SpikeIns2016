@@ -5,12 +5,13 @@
 \description{Decompose the variance of the separate and premixed addition experiments to their components.}
 
 \usage{
-decomposeVariance(y, design) 
+decomposeVariance(y, design=NULL) 
 }
 
 \arguments{
 \item{y}{A DGEList object produced by \code{\link{setupSpikes}}, containing the log-ratios as a \code{ratio} field in the \code{samples} table.}
-\item{design}{A design matrix containing uninteresting factors of variation. If not supplied, it defaults to an all-intercept matrix.}
+\item{design}{A design matrix containing uninteresting factors of variation. 
+If not supplied, it defaults to an all-intercept matrix.}
 }
 
 \details{

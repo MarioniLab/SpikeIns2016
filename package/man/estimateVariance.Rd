@@ -5,15 +5,16 @@
 \description{Estimates the sample variance of the log-ratios between spike-in sets.} 
 
 \usage{
-estimateVariance(y, design, ..., ratios, getfit=FALSE) 
+estimateVariance(y, design=NULL, ..., ratios)
 }
 
 \arguments{
 \item{y}{A DGEList object produced by \code{\link{setupSpikes}}, containing the log-ratios as a \code{ratio} field in the \code{samples} table.}
-\item{design}{A design matrix containing uninteresting factors of variation. If not supplied, it defaults to an all-intercept matrix.}
+\item{design}{A design matrix containing uninteresting factors of variation. 
+If not supplied, it defaults to an all-intercept matrix.}
 \item{...}{Other arguments to pass to \code{\link{lm.fit}}.}
-\item{ratios}{A numeric vector of log-ratios. If supplied, it is used instead of \code{y$samples$ratio}.}
-\item{getfit}{A logical scalar indicating whether the output of \code{\link{lm.fit}} should be directly returned.}
+\item{ratios}{A numeric vector of log-ratios. 
+If supplied, it is used instead of \code{y$samples$ratio}.}
 }
 
 \details{

@@ -5,12 +5,13 @@
 \description{Estimates spike-in parameters for simulation of spike-in counts.}
 
 \usage{
-spikeParam(spike.counts, design) 
+spikeParam(spike.counts, design=NULL) 
 }
 
 \arguments{
 \item{spike.counts}{A count matrix containing only rows for spike-in transcripts.}
-\item{design}{A design matrix containing uninteresting factors of variation. If not supplied, it defaults to an all-intercept matrix.}
+\item{design}{A design matrix containing uninteresting factors of variation. 
+If not supplied, it defaults to an all-intercept matrix.}
 }
 
 \details{

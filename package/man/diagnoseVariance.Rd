@@ -5,13 +5,14 @@
 \description{Test for differences in the variance of the log-ratios between groups of cells.}
 
 \usage{
-diagnoseVariance(y, groups, design) 
+diagnoseVariance(y, groups, design=NULL) 
 }
 
 \arguments{
 \item{y}{A DGEList object produced by \code{\link{setupSpikes}}, containing the log-ratios as a \code{ratio} field in the \code{samples} table.}
 \item{groups}{A factor specifying the assigned group for each cell in \code{y}.}
-\item{design}{A design matrix containing uninteresting factors of variation. If not supplied, it defaults to an all-intercept matrix.}
+\item{design}{A design matrix containing uninteresting factors of variation. 
+If not supplied, it defaults to an all-intercept matrix.}
 }
 
 \details{

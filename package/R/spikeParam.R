@@ -1,4 +1,4 @@
-spikeParam <- function(spike.counts, design) 
+spikeParam <- function(spike.counts, design=NULL) 
 # This computes the parameters of the spike-in counts, including the
 # fitted values and the dispersions used for rescaling later.
 #
@@ -7,7 +7,7 @@ spikeParam <- function(spike.counts, design)
 # last modified 23 June 2017
 {
 	spike.counts <- as.matrix(spike.counts)
-    if (missing(design)) { design <- .make_intercept(ncol(spike.counts)) }
+    if (is.null(design)) { design <- .make_intercept(ncol(spike.counts)) }
 	totals <- colSums(spike.counts)
     offsets <- log(totals)
 
