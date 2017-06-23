@@ -515,10 +515,10 @@ Mapping and counting statistics for each batch of libraries are summarized in Su
 
 \revised{To evaluate spike-in quality, we verified that the total spike-in count (ERCC + SIRV) in each well comprised 5-10\% of the total library size (Supplemental Figure~\suppfigtotals{}).
 This corresponds to the amount of spike-in RNA that we aimed to add to each well, and was consistent across wells within each plate.
-The coverage of each ERCC transcript was directly proportional to its theoretical concentration in the spike-in mixture (Supplemental Figure~\suppfigspikeconc{}).
-The distribution of average read counts across spike-in transcripts or endogenous genes was also consistent across plates (Supplemental Figure~\suppfigspikeave{}).
-These diagnostics indicate that the spike-in transcripts were successfully sequenced and processed into counts.
-Nonetheless, we removed any wells where the total count for either spike-in set or for the endogenous genes was more than three median absolute deviations below the median. 
+The coverage of each ERCC transcript was directly proportional to its theoretical concentration in the spike-in mixture (Supplemental Figure~\suppfigspikeconc{}),
+and the distribution of average read counts across spike-in transcripts or endogenous genes was consistent across plates (Supplemental Figure~\suppfigspikeave{}).
+These diagnostics indicate that the spike-in transcripts were successfully captured, sequenced and processed into counts for most wells.
+We removed any wells where the total count for either spike-in set or for the endogenous genes was more than three median absolute deviations below the median value for each plate. 
 It is likely that capture or sequencing failed for these wells, so they were not used for variance estimation.
 In addition, we examined the effect of index switching \autocite{sinha2017index} in each data set generated on the HiSeq 4000, and found it to be negligible (see Section~\suppsecindex{} of the Supplemental Materials, Supplemental Figure~\suppfigindex{}).}
 

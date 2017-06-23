@@ -130,7 +130,7 @@ for (i in seq(0,20)) {
         all.out.clust[[as.character(k)]] <- split(names(out.clust), out.clust)
     }
    
-    # Comparison of bootstrap support.
+    # Calculation of Jaccard indices. Also computing clusters with a different algorithm.
     if (!i) { 
         alt.tree <- hclust(dist(t(cur.data)))
         alt.clust <- list()

@@ -42,3 +42,17 @@ Aaron Lun
 example(spikeParam)
 new.counts <- resampleSpikes(y, 0.01)
 }
+
+% # Testing, testing!
+% a <- matrix(rnbinom(10000, mu=1000, size=2), nrow=10)
+% p <- spikeParam(a)
+% output <- numeric(20)
+% for (i in seq_len(20)) {
+%     sim <- resampleSpikes(p, 0.1)
+%     output[i] <- var(log2(colSums(sim)))
+% } 
+%
+% # Estimates should be quite similar:
+% print(mean(output)) 
+% var(log2(colSums(a)))
+
