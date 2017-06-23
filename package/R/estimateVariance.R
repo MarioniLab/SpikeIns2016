@@ -25,43 +25,6 @@ estimateVariance <- function(y, design, ..., ratios, getfit=FALSE)
     X[,QR$pivot[seq_len(QR$rank)],drop=FALSE]
 }
 
-testVariance <- function(var1, var2, df1, df2, ratios1, ratios2, design1, design2, type=c("one-sided", "two-sided"), ...) 
-# Tests if the first variance is significantly larger than the second.
-# If two-sided, it tests whether there are any significance differences between the variances.
-#
-# written by Aaron Lun
-# created 26 January 2016
-{
-    if (missing(var1)) { 
-        if (missing(design1)) { design1 <- .make_intercept(length(ratios1)) }
-        var1 <- estimateVariance(ratios=ratios1, design=design1, ...) 
-    } 
-    if (missing(var2)) { 
-        if (missing(design2)) { design2 <- .make_intercept(length(ratios2)) }
-        var2 <- estimateVariance(ratios=ratios2, design=design2, ...) 
-    }
-
-    if (missing(df1)) { 
-        if (missing(design1)) { design1 <- .make_intercept(length(ratios1)) }
-        df1 <- nrow(design1) - ncol(design1) 
-    }
-    if (missing(df2)) { 
-        if (missing(design2)) { design2 <- .make_intercept(length(ratios2)) }
-        df2 <- nrow(design2) - ncol(design2) 
-    }
-    type <- match.arg(type)
-    var.ratio <- var1/var2
-    attributes(var.ratio) <- NULL
-
-    upper.tail <- pf(var.ratio, df1, df2, lower=FALSE)
-    if (type=="one-sided") {
-        return(upper.tail)
-    } else {
-        lower.tail <- pf(var.ratio, df1, df2, lower=TRUE)
-        return(2*pmin(lower.tail, upper.tail)) # effectively Bonferroni correction.
-    }
-}
-
 splitSpikes <- function(spike.counts) 
 # Function to partition spike-in transcripts into two halves with roughly similar abundance distributions.
 #
