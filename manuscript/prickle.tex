@@ -325,9 +325,9 @@ This suggests that $F_i$ will include \revised{at least} some of the differences
 
 \subsection*{Quantifying the effect of stochastic noise during sequencing}
 We also performed simulations to gauge the contribution of $\sigma^2_{lib(s)}$ to $\variance(\theta^*_i)$ (see Section~\suppsecnoise{} of the Supplemental Materials).
-Counts for spike-in transcripts were simulated such that any variability in the log-ratios was only caused by stochastic sampling noise i.e., $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
+Counts for spike-in transcripts were simulated such that any variability in the log-ratios was only caused by stochastic sampling noise, i.e., $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
 Our results suggest that much of the estimated variance of $\theta^*_i$ in Figure~\ref{fig:varestimates} is driven by sampling noise (Supplemental Figure~\suppfignoise{}).
-\revised{Specifically, we estimated the variance due to sampling noise to be 0.005-0.012 (using the original spike-in coverage for each plate), compared to estimated values of 0.010-0.015 for $\variance(\theta^*_i)$ in Figure~\ref{fig:varestimates}.
+\revised{Specifically, we estimated the variance due to sampling noise to be 0.005-0.012 (using the original spike-in coverage for each plate), compared to estimates of 0.010-0.015 for $\variance(\theta^*_i)$ in Figure~\ref{fig:varestimates}.
 Both $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ and  $\variance(F_i)$ contribute to  $\variance(\theta^*_i)$, so these results suggest that the contribution of sampling noise is comparable to or greater than the impact of differences in spike-in behaviour.}
 
 We also observed that the variance \revised{due to sampling noise} was robust to moderate decreases in the coverage of the spike-in transcripts in this simulation.
@@ -338,7 +338,7 @@ These results suggest} that spike-in normalization is still reliable when lower 
 This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
 
 \subsection*{Assessing the downstream effect of variability with simulations}
-We assessed whether the results of downstream analyses using spike-in normalization were sensitive to variability in spike-in addition or behaviour.
+We assessed whether the results of downstream analyses using spike-in normalization were sensitive \revised{to fluctuations in the total spike-in counts due to variability in spike-in addition, behaviour or sequencing noise}.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
 This included public data sets \autocite{segerstople2016single,islam2011characterization} as well as our 416B and TSC data.
 We then performed analyses such as detection of differentially expressed genes (DEGs) and highly variable genes (HVGs), as well as dimensionality reduction and clustering of cells.
@@ -570,10 +570,10 @@ i.e., the variance of $T_{is}$ is a sum of the variances of its component terms.
 % The independence assumption means that we do not have to rescale the cellular counts to reflect variable undersampling.
 % Doing so would be problematic, as direct scaling of the counts would distort the empirical mean-variance relationship of the count data.
 
-Let us denote $x^2 = \sigma^2_{vol} + \variance(F_i)$, representing the total variance attributable to spike-in addition and capture efficiency.
+Let us denote $x^2 = \sigma^2_{vol} + \variance(F_i) \revised{+ \sigma^2_{lib(s)}}$, representing the total variance \revised{in the log$_2$-total count of one spike-in set $s$ due to variable addition, capture efficiency and sequencing noise.}
 We also denote $\hat\sigma^2_s$ as the estimate of $\variance(T_{is})$ across wells, and $\hat\mu_s$ as the estimate of $E(T_{is})$.
 We use the estimated $\variance(\theta^*_i) \approx 0.015$ in Figure~\ref{fig:varestimates}a as our estimate $\hat{x}^2$ of the upper bound of $x^2$.
-This is based on the fact that the estimated $\variance(\theta^*_i)$ provides an upper bound on $\variance(F_i)$, while $\sigma^2_{vol}$ is near-zero in Figure~\ref{fig:varestimates}a.
+This is based on the fact that $\sigma^2_{vol}$ is near-zero in Figure~\ref{fig:varestimates}a, while \revised{$\variance(\theta^*_i) = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(F_i)$ and thus provides an upper bound on $\variance(F_i) + \sigma^2_{lib(s)}$ for any $s$.}
 For each well $i$, we compute a simulated log$_2$-total $T^*_{is}$ as
 \[
     T^*_{is} = (T_{is} - \hat\mu_s)\sqrt{1-\frac{ \hat{x}^2}{\hat\sigma^2_s}} + \hat\mu_s + X_i
