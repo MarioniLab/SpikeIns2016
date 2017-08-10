@@ -190,9 +190,9 @@ This ensures that there is no well-to-well variability in the relative quantitie
 The variance of the log-ratio across these premixed-addition wells provides a baseline level of variability in the protocol (e.g., due to sequencing noise).
 The variance of volume addition was then estimated as the difference in the variance estimates from the premixed-addition wells and from the wells with separate addition of spike-ins.
 
-\revised{We stress that the use of two different spike-in sets in each well is critical to this experiment.
+We stress that the use of two different spike-in sets in each well is critical to this experiment.
 Any well-specific biases should cancel out when the log-ratio is computed between sets in the same well.
-This allows the contribution of the variance of volume addition to be quantified separately from other factors such as the variability of capture efficiency and sequencing depth across wells.}
+This allows the contribution of the variance of volume addition to be quantified separately from other factors such as the variability of capture efficiency and sequencing depth across wells.
 
 We performed both the premixed and separate-addition experiments on the same plate to avoid plate effects \autocite{hicks2015widespread,tung2016batch}.
 For the separate-addition experiment, we also reversed the order of addition of the two spike-in sets to determine if this affected the variance estimate.
@@ -218,20 +218,20 @@ The other terms are defined as follows:
     \item $r_{t_s}$, a constant specifying the optimal transcript molecule-to-cDNA fragment capture rate for $t_s$.
     \item $R_{is}$, a random variable representing the average capture efficiency in $i$ for all transcripts in $s$.
     \item $V_{is}$, a random variable representing the volume of solution of $s$ added to $i$.
-    \item $L_i$, a random variable representing the \revised{baseline} cDNA fragment-to-read conversion rate for $i$.
-    \item $l_s$, a constant \revised{that scales $L_i$ depending} on the ``sequenceability'' of transcripts in $s$.
+    \item $L_i$, a random variable representing the baseline cDNA fragment-to-read conversion rate for $i$.
+    \item $l_s$, a constant that scales $L_i$ depending on the ``sequenceability'' of transcripts in $s$.
 \end{itemize}
 The product of all of these terms defines the expected number of reads for each $t_s$ in well $i$, and the sum of the products across all $t_s$ is the expected total count of set $s$ in $i$.
 In addition, $\varepsilon_{is}$ represents the effect of sequencing noise on the log-total count, where $E(\varepsilon_{is})=0$ and $\variance(\varepsilon_{is})= \sigma^2_{lib(s)}$.
 
 We assume that $R_{is}$, $V_{is}$ and $\varepsilon_{is}$ are mutually independent of each other, as they describe separate steps in the protocol.
-We also assume that \revised{$V_{i1}$} and \revised{$V_{i2}$} are independent for sets \revised{$s=1$} and \revised{2}, as each spike-in set is added separately to each well.
-Similarly, \revised{$\varepsilon_{i1}$} and \revised{$\varepsilon_{i2}$} are assumed to be independent as sequencing noise for each transcript should be unaffected by that of other transcripts.
-(However, \revised{$R_{i1}$} and \revised{$R_{i2}$} are not independent due to well-specific factors affecting capture efficiency for all transcripts).
+We also assume that $V_{i1}$ and $V_{i2}$ are independent for sets $s=1$ and 2, as each spike-in set is added separately to each well.
+Similarly, $\varepsilon_{i1}$ and $\varepsilon_{i2}$ are assumed to be independent as sequencing noise for each transcript should be unaffected by that of other transcripts.
+(However, $R_{i1}$ and $R_{i2}$ are not independent due to well-specific factors affecting capture efficiency for all transcripts).
 Further details on these variables are provided in Section~\suppsecmath{} of the Supplemental Materials.
 
 Let $s=1$ represent the ERCC spike-in set and $s=2$ represent the SIRV spike-in set.
-\revised{The log$_2$-total count across all spike-in transcripts in the ERCC and SIRV set is $T_{i1}$ and $T_{i2}$, respectively.}
+The log$_2$-total count across all spike-in transcripts in the ERCC and SIRV set is $T_{i1}$ and $T_{i2}$, respectively.
 In the experiment where each spike-in set is added separately to each well, we denote the log$_2$-ratio of the total counts between the two sets as $\theta_i = T_{i1} - T_{i2}$ for well $i$.
 This can also be written as
 \[
@@ -268,29 +268,29 @@ It should be stressed that this variance estimate is relevant to all experiments
 Using our mathematical framework, we estimated the variance components using the data from our mixture experiments.
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplemental Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
-Linear models are particularly useful as they allow blocking on additional structure in the experimental design \revised{-- we used a one-way layout to account for shifts in the mean due to addition order or oncogene induction (see} Methods).
-The \revised{value} of $T_{is}$ was also similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplemental Figure~\suppfigtotals{}, Section~\suppsecmath{} of the Supplemental Materials for details).
+Linear models are particularly useful as they allow blocking on additional structure in the experimental design -- we used a one-way layout to account for shifts in the mean due to addition order or oncogene induction (see Methods).
+The value of $T_{is}$ was also similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplemental Figure~\suppfigtotals{}, Section~\suppsecmath{} of the Supplemental Materials for details).
 Finally, the order of spike-in addition did not significantly affect the variance estimates for the separate-addition wells in most plates (Supplemental Figure~\suppfigorder{}).
 
-Our results indicate that $\sigma^2_{vol}$ is consistently smaller than \revised{$\variance(\theta^*_i)$}, i.e., the variance in the rest of the protocol (Figure~\ref{fig:varestimates}a).
+Our results indicate that $\sigma^2_{vol}$ is consistently smaller than $\variance(\theta^*_i)$, i.e., the variance in the rest of the protocol (Figure~\ref{fig:varestimates}a).
 Indeed, no significant difference was detected between the estimated $\variance(\theta_i)$ and $\variance(\theta^*_i)$ of each plate.
 This indicates that variability of spike-in volume addition is a minor contributor to the technical variability of the spike-in counts.
 To put these estimates into context, consider that $T_{is}$ represents the log$_2$-transformed ``size factor'' for the library generated from well $i$.
 Spike-in normalization is performed by scaling all counts in this library by $2^{-T_{is}}$.
 This eliminates differences in the coverage of spike-in set $s$ between cells and corrects for well/cell-specific technical biases.
-The variance of the log-size factors is \revised{at least} one order of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b), \revised{indicating that the variances in sequencing depth and capture efficiency across wells (i.e., $\variance{(\log_2 L_{i})}$ and $\variance{(\log_2 R_{is})}$) are more important than the variance of volume addition.
+The variance of the log-size factors is at least one order of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b), indicating that the variances in sequencing depth and capture efficiency across wells (i.e., $\variance{(\log_2 L_{i})}$ and $\variance{(\log_2 R_{is})}$) are more important than the variance of volume addition.
 We also computed the variance of the log$_2$-ratio of total counts for the mouse genes against one of the spike-in sets.
 This represents the biological fluctuations in total RNA content across cells and was, again, at least an order of magnitude larger than $\sigma^2_{vol}$ (Supplemental Figure~\suppfigcell{}).
-When compared to the other technical and biological components of variability in a scRNA-seq experiment, the variance of volume addition is relatively small and thus is unlikely to} have a major effect on spike-in normalization.
+When compared to the other technical and biological components of variability in a scRNA-seq experiment, the variance of volume addition is relatively small and thus is unlikely to have a major effect on spike-in normalization.
 
 \begin{figure}[btp]
     \begin{center}
         \includegraphics[width=\textwidth,trim=0mm 15mm 0mm 0mm,clip]{../real/pics/variance_exp.pdf}
     \end{center}
     \caption{Variance estimates of (a) the log$_2$-ratio between the ERCC and SIRV total counts across wells, or (b) the log$_2$-size factors computed from those totals.
-        \revised{For the separate/premixed experiments, each estimate is the residual variance of a linear model fitted to the log-ratios across the corresponding wells on each plate.
+        For the separate/premixed experiments, each estimate is the residual variance of a linear model fitted to the log-ratios across the corresponding wells on each plate.
         The variance of volume addition is $\sigma^2_{vol}$ in our framework.
-        For the log-size factors, each estimate is the residual variance of a linear model fitted to all cells on each plate.}
+        For the log-size factors, each estimate is the residual variance of a linear model fitted to all cells on each plate.
         Results are shown for experiments with 416B cells or TSCs, with two replicate plates for each cell type.
         Error bars represent the standard errors of the estimates, assuming log-values are normally distributed.
         Numbers represent the residual degrees of freedom used for each estimate -- for (b), this was the same for each spike-in set.
@@ -303,42 +303,42 @@ When compared to the other technical and biological components of variability in
 The variance of $F_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
 Even when the average capture efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in efficiency is the same in all wells}.
 Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
-This scales up the counts for the spike-in transcripts in all libraries by the same \revised{factor}, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
+This scales up the counts for the spike-in transcripts in all libraries by the same factor, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
 This is because specific changes in efficiency for the spike-in transcripts are confounded with general changes in efficiency for all transcripts in the well.
 Differences in the coverage of spike-in transcripts may not represent technical biases affecting other transcripts, precluding their use for normalizing all counts.
 
-\revised{The variance of $F_i$} quantifies the extent to which \revised{spike-in} normalization is affected by \revised{well-to-well} differences in efficiency between the spike-in sets.
+The variance of $F_i$ quantifies the extent to which spike-in normalization is affected by well-to-well differences in efficiency between the spike-in sets.
 In our mathematical framework, the variance of $\theta^*_i$ provides an upper bound for the variance of $F_i$.
-Our estimate of $\variance(\theta^*_i)$ is an order of magnitude lower than the estimated variances of the log-size factors in each plate (Figure~\ref{fig:varestimates}) \revised{and of cellular RNA content (Supplemental Figure~\suppfigcell{}).}
-This indicates that the potential variance in \revised{the differences in spike-in} behaviour, while greater than $\sigma^2_{vol}$, is still relatively small compared to other biases in the system, e.g., \revised{fluctuations} in cellular RNA content, well-to-well variability in \revised{global} capture efficiency.
-\revised{To elaborate, consider that the maximum $\variance(F_i)$ corresponds to an error of $2^{\sqrt{0.015}} \approx 8$\% in the size factor estimates.
+Our estimate of $\variance(\theta^*_i)$ is an order of magnitude lower than the estimated variances of the log-size factors in each plate (Figure~\ref{fig:varestimates}) and of cellular RNA content (Supplemental Figure~\suppfigcell{}).
+This indicates that the potential variance in the differences in spike-in behaviour, while greater than $\sigma^2_{vol}$, is still relatively small compared to other biases in the system, e.g., fluctuations in cellular RNA content, well-to-well variability in global capture efficiency.
+To elaborate, consider that the maximum $\variance(F_i)$ corresponds to an error of $2^{\sqrt{0.015}} \approx 8$\% in the size factor estimates.
 This is minor when we consider that spike-in normalization -- even in a homogeneous population of cells -- involves scaling the counts for each cell by at least $2^{\sqrt{0.15}} \approx 30$\%.
-More drastic scaling is likely in heterogeneous data sets with greater differences in total RNA content between subpopulations, further reducing the relevance of any small errors in size factor estimation.}
+More drastic scaling is likely in heterogeneous data sets with greater differences in total RNA content between subpopulations, further reducing the relevance of any small errors in size factor estimation.
 
-\revised{Here,} $F_i$ is only computed between two spike-in sets.
-\revised{In practice, the more relevant} differences \revised{are those} between synthetic spike-in and endogenous transcripts.
-\revised{The variance of such differences is} likely to be \revised{larger than $\variance(F_i)$, given the greater variability in sequence composition and length of endogenous transcripts.}
-Nonetheless, the SIRV and ERCC spike-ins do \revised{exhibit some variability} in their biophysical properties (Supplemental Figure~\suppfigbiophys{}).
+Here, $F_i$ is only computed between two spike-in sets.
+In practice, the more relevant differences are those between synthetic spike-in and endogenous transcripts.
+The variance of such differences is likely to be larger than $\variance(F_i)$, given the greater variability in sequence composition and length of endogenous transcripts.
+Nonetheless, the SIRV and ERCC spike-ins do exhibit some variability in their biophysical properties (Supplemental Figure~\suppfigbiophys{}).
 For example, the SIRV transcripts have more variable length and lower GC content compared to the ERCC transcripts.
-This suggests that $F_i$ will include \revised{at least} some of the differences in behaviour between synthetic and endogenous RNA, such that $\variance(F_i)$ can be used as a rough estimate of the magnitude of the associated variability.
+This suggests that $F_i$ will include at least some of the differences in behaviour between synthetic and endogenous RNA, such that $\variance(F_i)$ can be used as a rough estimate of the magnitude of the associated variability.
 
 \subsection*{Quantifying the effect of stochastic noise during sequencing}
 We also performed simulations to gauge the contribution of $\sigma^2_{lib(s)}$ to $\variance(\theta^*_i)$ (see Section~\suppsecnoise{} of the Supplemental Materials).
 Counts for spike-in transcripts were simulated such that any variability in the log-ratios was only caused by stochastic sampling noise, i.e., $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
 Our results suggest that much of the estimated variance of $\theta^*_i$ in Figure~\ref{fig:varestimates} is driven by sampling noise (Supplemental Figure~\suppfignoise{}).
-\revised{Specifically, we estimated the variance due to sampling noise to be 0.005-0.012 (using the original spike-in coverage for each plate), compared to estimates of 0.010-0.015 for $\variance(\theta^*_i)$ in Figure~\ref{fig:varestimates}.
-Both $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ and  $\variance(F_i)$ contribute to  $\variance(\theta^*_i)$, so these results suggest that the contribution of sampling noise is comparable to or greater than the impact of differences in spike-in behaviour.}
+Specifically, we estimated the variance due to sampling noise to be 0.005-0.012 (using the original spike-in coverage for each plate), compared to estimates of 0.010-0.015 for $\variance(\theta^*_i)$ in Figure~\ref{fig:varestimates}.
+Both $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ and  $\variance(F_i)$ contribute to  $\variance(\theta^*_i)$, so these results suggest that the contribution of sampling noise is comparable to or greater than the impact of differences in spike-in behaviour.
 
-We also observed that the variance \revised{due to sampling noise} was robust to moderate decreases in the coverage of the spike-in transcripts in this simulation.
-In ideal experiments, spike-in transcripts would take up 5-10\% of the library size for each cell (\revised{50,000-100,000} reads in our data).
-\revised{Upon decreasing coverage \textit{in silico}, we observed an increase in $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ due to the elevated effect of noise at low counts (Supplemental Figure~\suppfignoise{}).
+We also observed that the variance due to sampling noise was robust to moderate decreases in the coverage of the spike-in transcripts in this simulation.
+In ideal experiments, spike-in transcripts would take up 5-10\% of the library size for each cell (50,000-100,000 reads in our data).
+Upon decreasing coverage \textit{in silico}, we observed an increase in $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ due to the elevated effect of noise at low counts (Supplemental Figure~\suppfignoise{}).
 However, even at 40-50\% coverage, the variance due to noise was still an order of magnitude lower than the variance due to cell-specific biases (Figure~\ref{fig:varestimates}b) or biological variability (Supplemental Figure~\suppfigcell{}).
-These results suggest} that spike-in normalization is still reliable when lower amounts of spike-in RNA are added.
+These results suggest that spike-in normalization is still reliable when lower amounts of spike-in RNA are added.
 This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
 
 \subsection*{Assessing the downstream effect of variability with simulations}
-We assessed whether the results of downstream analyses using spike-in normalization were sensitive \revised{to fluctuations in the total spike-in counts due to variability in spike-in addition, behaviour or sequencing noise}.
+We assessed whether the results of downstream analyses using spike-in normalization were sensitive to fluctuations in the total spike-in counts due to variability in spike-in addition, behaviour or sequencing noise.
 First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
 This included public data sets \autocite{segerstople2016single,islam2011characterization} as well as our 416B and TSC data.
 We then performed analyses such as detection of differentially expressed genes (DEGs) and highly variable genes (HVGs), as well as dimensionality reduction and clustering of cells.
@@ -359,8 +359,8 @@ Similar results were also observed in the top 200 DEGs with the smallest $p$-val
 For HVG detection, we used methods based on the coefficient of variation \autocite{brennecke2013accounting} or the variance of log-expression values \autocite{lun2016stepbystep}.
 Again, only minor changes were observed in most data sets (Figure~\ref{fig:setchange}b), for both the set of significant HVGs and for the top 200 HVGs with the smallest $p$-values.
 These results suggest that the detection and ranking of DEGs and HVGs are largely robust to variability in spike-in volume or behaviour.
-\revised{Indeed, genes that were not consistently detected across simulation iterations tended to have weak log-fold changes for DEGs, or small biological components for HVGs (Supplemental Figure~\suppfiglostsim{}).
-This is expected as genes on the borderline of significance are more susceptible to random fluctuations in the size factors.}
+Indeed, genes that were not consistently detected across simulation iterations tended to have weak log-fold changes for DEGs, or small biological components for HVGs (Supplemental Figure~\suppfiglostsim{}).
+This is expected as genes on the borderline of significance are more susceptible to random fluctuations in the size factors.
 
 \begin{figure}[bt]
     \begin{center}
@@ -428,7 +428,7 @@ If the endogenous RNA concentration or the number of cells determines the amount
 In that case, how accurate is the quantification, and what effect do errors have on the downstream analysis?
 These questions are not relevant to single-cell experiments where the obvious approach is to add the same amount of spike-in RNA to each individual cell.
 
-\revised{It is worth mentioning another common criticism of the use of spike-in RNA -- namely, that the optimal concentration (to reach the suggested 5-10\% of total library size) depends on the amount of endogenous RNA in each cell.
+It is worth mentioning another common criticism of the use of spike-in RNA -- namely, that the optimal concentration (to reach the suggested 5-10\% of total library size) depends on the amount of endogenous RNA in each cell.
 This is not straightforward to gauge for biological systems that are not well studied.
 If insufficient spike-ins are added, sampling noise will increase and the precision of spike-in normalization will deteriorate.
 However, we do not consider this to be a matter of reliability.
@@ -436,7 +436,6 @@ It is hardly surprising that suboptimal performance is obtained when inappropria
 Pilot experiments can be easily performed to identify the most suitable spike-in concentration to use for a given biological system, just like they would be used to determine the optimal dissociation conditions, lysis buffer, amplification cycles, etc.
 Once the optimal concentration is determined, it can be used for all experiments on that system and the choice of concentration ceases to be an issue.
 In contrast, the variability of volume addition and of spike-in behaviour cannot be easily controlled even if all other parameters are optimized. 
-}
 
 We have used the Smart-seq2 protocol in our study to reflect its widespread use in the scRNA-seq literature.
 However, our estimate of $\sigma^2_{vol}$ is agnostic to how reverse transcription, amplification and sequencing were performed, as these steps are represented by other mathematical terms.
@@ -449,15 +448,15 @@ However, arguably a more relevant quantity is the variability in the difference 
 It may be possible to obtain a rough estimate of $\variance(P_{is})$ by using pooled cellular RNA from another organism as one of the spike-in sets \autocite{brennecke2013accounting}, so that $\variance(\theta^*_i)$ provides an upper bound on the variance in the differences in behaviour between synthetic and endogenous RNA.
 We chose not to do so because of the difficulty in reproducibly using the same pool of cellular RNA across batches, and in calibrating the concentration of RNA to be added to each well.
 Use of UMI counts may also provide a tighter bound on $\variance(F_i)$ or $\variance(P_{is})$ by reducing the contribution of amplification noise to $\sigma^2_{lib(s)}$ and $\variance(\theta^*_i)$.
-\revised{Another consideration with endogenous RNA is the variability of lysis between cells, which we neglect to consider in our framework -- this is inherently difficult to assess with external spike-in RNA and may require other methods to quantify.}
+Another consideration with endogenous RNA is the variability of lysis between cells, which we neglect to consider in our framework -- this is inherently difficult to assess with external spike-in RNA and may require other methods to quantify.
 
-\revised{One interesting question is how to choose between spike-in normalization and approaches that assume a non-DE majority of genes.
+One interesting question is how to choose between spike-in normalization and approaches that assume a non-DE majority of genes.
 This choice depends on whether total RNA content in each cell is of interest \autocite{lun2016stepbystep}.
 Spike-in normalization will preserve changes in total RNA content between cells, whereas non-DE methods will treat such changes as bias (as a majority of genes are affected) and remove them.
 This suggests that spike-in normalization is preferable in applications where changes in total RNA content can be easily associated with a biological process, e.g., T cell activation,   cell cycling.
 In contrast, non-DE normalization may be more suitable for comparisons between distinct cell types, where the up- or downregulation of specific genes (conditional on the total RNA content of the cell) is more informative.
 Obviously, this choice is subject to the experimental context.
-If a non-DE majority cannot be assumed, spike-in normalization should be used; conversely, spike-in RNA cannot be easily added in droplet-based techniques, thus requiring non-DE methods.}
+If a non-DE majority cannot be assumed, spike-in normalization should be used; conversely, spike-in RNA cannot be easily added in droplet-based techniques, thus requiring non-DE methods.
 
 We stress that our study only examines the reliability of spike-ins for ``relative'' normalization, i.e., to make counts comparable across cells.
 We do not consider the reliability of spike-ins for absolute quantification, i.e., to determine the number of molecules of each transcript in each cell.
@@ -515,14 +514,14 @@ Genes were defined using Ensembl v82 annotation for the GRCm38 mouse assembly an
 This yielded a count for each endogenous gene and spike-in transcript in each well.
 Mapping and counting statistics for each batch of libraries are summarized in Supplemental Table~\supptabstats{}.
 
-\revised{To evaluate spike-in quality, we verified that the total spike-in count (ERCC + SIRV) in each well comprised 5-10\% of the total library size (Supplemental Figure~\suppfigtotals{}).
+To evaluate spike-in quality, we verified that the total spike-in count (ERCC + SIRV) in each well comprised 5-10\% of the total library size (Supplemental Figure~\suppfigtotals{}).
 This corresponds to the amount of spike-in RNA that we aimed to add to each well, and was consistent across wells within each plate.
 The coverage of each ERCC transcript was directly proportional to its theoretical concentration in the spike-in mixture (Supplemental Figure~\suppfigspikeconc{}),
 and the distribution of average read counts across spike-in transcripts or endogenous genes was consistent across plates (Supplemental Figure~\suppfigspikeave{}).
 These diagnostics indicate that the spike-in transcripts were successfully captured, sequenced and processed into counts for most wells.
 We removed any wells where the total count for either spike-in set or for the endogenous genes was more than three median absolute deviations below the median value for each plate. 
 It is likely that capture or sequencing failed for these wells, so they were not used for variance estimation.
-In addition, we examined the effect of index switching \autocite{sinha2017index} in each data set generated on the HiSeq 4000, and found it to be negligible (see Section~\suppsecindex{} of the Supplemental Materials, Supplemental Figure~\suppfigindex{}).}
+In addition, we examined the effect of index switching \autocite{sinha2017index} in each data set generated on the HiSeq 4000, and found it to be negligible (see Section~\suppsecindex{} of the Supplemental Materials, Supplemental Figure~\suppfigindex{}).
 
 Variance components were estimated from the libraries generated from a single plate.
 In each well, the sum of counts across all transcripts in each spike-in set was computed, and the log$_2$-ratio between the ERCC and SIRV sums was calculated.
@@ -554,15 +553,15 @@ The variance of $T_{is}$ is
 \]
 where the approximation assumes that $L_i$ is independent of the other random variables that contribute to $T_{is}$.
 (This is discussed in more detail in Section~\suppsecmath{} of the Supplemental Materials.)
-Let $R_{is} = R_{i0}P_{is}$, where $R_{i0}$ \revised{is a random variable representing} the well-specific average capture efficiency of endogenous transcripts and $P_{is}$ is the fold change in average efficiency of the transcripts in $s$ over their endogenous counterparts.
+Let $R_{is} = R_{i0}P_{is}$, where $R_{i0}$ is a random variable representing the well-specific average capture efficiency of endogenous transcripts and $P_{is}$ is the fold change in average efficiency of the transcripts in $s$ over their endogenous counterparts.
 We assume that $R_{i0}$ and $P_{is}$ are independent for each well, and that $\variance(\log_2 P_{is})$ can be approximated with $\variance(F_i)$,
 i.e., the well-to-well variability in relative capture efficiency between the two spike-in sets is similar to that between spike-ins and endogenous transcripts.
-This \revised{means that}
+This means that
 \[
-    \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(F_i) + \variance(\revised{\log_2} R_{i0}) + \variance(\log_2 L_i) \;,
+    \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(F_i) + \variance(\log_2 R_{i0}) + \variance(\log_2 L_i) \;,
 \]
 i.e., the variance of $T_{is}$ is a sum of the variances of its component terms.
-\revised{The above approximation allows us to account for the measured values of $ \sigma^2_{vol}$ and $\variance(F_i)$ when simulating new values for $T_{is}$.}
+The above approximation allows us to account for the measured values of $ \sigma^2_{vol}$ and $\variance(F_i)$ when simulating new values for $T_{is}$.
 
 % If library quantification has been performed, then L_i will be more likely to be correlated with volume because everything competes against each other.
 % At least it won't be correlated with global capture efficiency, as this should cancel out.
@@ -570,10 +569,10 @@ i.e., the variance of $T_{is}$ is a sum of the variances of its component terms.
 % The independence assumption means that we do not have to rescale the cellular counts to reflect variable undersampling.
 % Doing so would be problematic, as direct scaling of the counts would distort the empirical mean-variance relationship of the count data.
 
-Let us denote $x^2 = \sigma^2_{vol} + \variance(F_i) \revised{+ \sigma^2_{lib(s)}}$, representing the total variance \revised{in the log$_2$-total count of one spike-in set $s$ due to variable addition, capture efficiency and sequencing noise.}
+Let us denote $x^2 = \sigma^2_{vol} + \variance(F_i) + \sigma^2_{lib(s)}$, representing the total variance in the log$_2$-total count of one spike-in set $s$ due to variable addition, capture efficiency and sequencing noise.
 We also denote $\hat\sigma^2_s$ as the estimate of $\variance(T_{is})$ across wells, and $\hat\mu_s$ as the estimate of $E(T_{is})$.
 We use the estimated $\variance(\theta^*_i) \approx 0.015$ in Figure~\ref{fig:varestimates}a as our estimate $\hat{x}^2$ of the upper bound of $x^2$.
-This is based on the fact that $\sigma^2_{vol}$ is near-zero in Figure~\ref{fig:varestimates}a, while \revised{$\variance(\theta^*_i) = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(F_i)$ and thus provides an upper bound on $\variance(F_i) + \sigma^2_{lib(s)}$ for any $s$.}
+This is based on the fact that $\sigma^2_{vol}$ is near-zero in Figure~\ref{fig:varestimates}a, while $\variance(\theta^*_i) = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(F_i)$ and thus provides an upper bound on $\variance(F_i) + \sigma^2_{lib(s)}$ for any $s$.
 For each well $i$, we compute a simulated log$_2$-total $T^*_{is}$ as
 \[
     T^*_{is} = (T_{is} - \hat\mu_s)\sqrt{1-\frac{ \hat{x}^2}{\hat\sigma^2_s}} + \hat\mu_s + X_i
@@ -584,9 +583,9 @@ In contrast, if $X_i$ were directly added to $T_{is}$, the variance of $T^*_{is}
 
 Counts for the library generated from each well were rescaled to reflect the new, simulated log-total.
 A quantile adjustment approach was used to preserve the empirical mean-variance relationship.
-Briefly, a negative binomial generalized linear model (NB GLM) was fitted to the counts across all wells for each spike-in transcript, using the glmFit function in edgeR \autocite{mccarthy2012differential, robinson2010edgeR} with a \revised{design matrix containing all experimental factors in the current data set.
+Briefly, a negative binomial generalized linear model (NB GLM) was fitted to the counts across all wells for each spike-in transcript, using the glmFit function in edgeR \autocite{mccarthy2012differential, robinson2010edgeR} with a design matrix containing all experimental factors in the current data set.
 The value of $T_{is}/\log_2(e)$ was used as the offset for well $i$ during GLM fitting.
-The NB dispersion was also estimated for each transcript using the estimateDisp function without empirical Bayes shrinkage.}
+The NB dispersion was also estimated for each transcript using the estimateDisp function without empirical Bayes shrinkage.
 For each transcript $t$, we assumed that the count $y_{ti}$ for well $i$ was sampled from a NB distribution with mean equal to the corresponding fitted value of the GLM and dispersion equal to the estimated transcript-specific value.
 We scaled the NB mean by $2^{T^*_{is} - T_{is}}$ to obtain a modified NB distribution.
 Using the q2qnbinom function \autocite{robinson2008small}, we calculated the lower tail probability of $y_{ti}$ in the original distribution and identified the corresponding quantile with the same tail probability in the modified distribution.
@@ -599,9 +598,9 @@ This new quantile was used as the simulated count for transcript $t$ in $i$.
 \subsection*{Evaluating the robustness of DEG detection}
 Two data sets were used to test the effect of spike-in variability on DEG detection.
 The first was the 416B data generated previously, where DEGs were detected between control and oncogene-induced cells.
-Here, we \revised{combined data from both plates and} used an additive model with a treatment term and a blocking factor for the plate.
+Here, we combined data from both plates and used an additive model with a treatment term and a blocking factor for the plate.
 The second data set was obtained from the NCBI Gene Expression Omnibus (GEO) with the accession number GSE29087, and compared mouse embryonic stem cells and fibroblasts \autocite{islam2011characterization}.
-\revised{This was parameterized using a simple one-way layout.}
+This was parameterized using a simple one-way layout.
 
 In both studies, DEGs were detected between conditions using edgeR and MAST.
 Implementation details of each method are provided in Section~\suppsecsim{} in the Supplemental Materials. 
@@ -613,9 +612,9 @@ This was repeated for 20 simulation iterations and the average proportion across
 
 \subsection*{Evaluating the robustness of HVG detection}
 Our 416B and TSC data sets were used to assess the effect of spike-in variability on detection of HVGs.
-\revised{For each data set, data from both plates were combined into a single analysis with blocking factors to account for uninteresting factors of variation.}
-In the \revised{416B data set}, blocking was performed to remove plate- and treatment-specific effects on mean expression, i.e., HVGs were detected within treatment conditions on each plate.
-\revised{In the TSC data set}, blocking was performed to remove plate effects.
+For each data set, data from both plates were combined into a single analysis with blocking factors to account for uninteresting factors of variation.
+In the 416B data set, blocking was performed to remove plate- and treatment-specific effects on mean expression, i.e., HVGs were detected within treatment conditions on each plate.
+In the TSC data set, blocking was performed to remove plate effects.
 
 In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-in counts 
 (See Section~\suppsecsim{} in the Supplemental Materials for implementation details of each method.)
@@ -643,8 +642,8 @@ This value represents the extent to which the membership of the original cluster
 We also compared the original clusters to those generated from complete-linkage clustering of the original HVG log-expression values.
 
 \section*{Data access}
-Data are available \revised{from the ArrayExpress database (\url{https://www.ebi.ac.uk/arrayexpress/})} using the accession E-MTAB-5522.
-The R code used for the statistical analysis and simulations are available \revised{in the Supplemental Code,} or at \url{https://github.com/MarioniLab/SpikeIns2016}.
+Data are available from the ArrayExpress database (\url{https://www.ebi.ac.uk/arrayexpress/}) using the accession E-MTAB-5522.
+The R code used for the statistical analysis and simulations are available in the Supplemental Code, or at \url{https://github.com/MarioniLab/SpikeIns2016}.
 
 \section*{Acknowledgements}
 We thank Jennifer Nichols and Liliana Antunes for supplying the TSCs.
@@ -668,7 +667,7 @@ Work in the G\"ottgens group was supported by Cancer Research UK, Bloodwise, the
 
 \section*{Supplemental materials}
 The Supplemental Materials is a single PDF file that consists of Sections~1-\suppsecsim{} and contains Supplemental Figures~1-\suppfigindex{} and Supplemental Table~1.
-\revised{The Supplemental Code is a compressed TAR file that contains the code and instructions required to reproduce the results in this paper.}
+The Supplemental Code is a compressed TAR file that contains the code and instructions required to reproduce the results in this paper.
 
 \printbibliography
 
