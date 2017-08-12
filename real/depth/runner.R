@@ -62,7 +62,7 @@ for (operator in c("Calero", "Liora")) {
     all.props <- c(1, 0.8, 0.6, 0.4, 0.2, 0.1, 0.05, 0.02, 0.01)
     
     for (dataset in datasets) {
-        loadin <- readRDS(file.path("../../real", operator, dataset, "analysis/object.rds"))
+        loadin <- readRDS(file.path("../", operator, dataset, "analysis/object.rds"))
         keep <- loadin$samples$premixed
         my.counts <- loadin$counts[,keep]
 
