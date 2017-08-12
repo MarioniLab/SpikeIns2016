@@ -3,6 +3,7 @@
 
 suppressPackageStartupMessages(require(simpaler))
 suppressPackageStartupMessages(require(edgeR))
+suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(require(scran))
 suppressPackageStartupMessages(require(matrixStats))
 suppressPackageStartupMessages(require(statmod))
@@ -16,63 +17,24 @@ top.hits <- c(20, 200, 2000)
 ###########################################################################
 # Running across all data types (saving diagnostics along the way)
 
-for (datatype in c("wilson", "calero", "liora")) { 
-    block <- NULL
-
-	if (datatype=="wilson") { 
-		incoming <- read.table('GSE61533_HTSEQ_count_results.tsv.gz', header=TRUE, row.names=1, colClasses=c('character', rep('integer', 96)))
-		spike.in <- grepl('^ERCC', rownames(incoming))
-		is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
-
-	} else if (datatype=="calero" || datatype=="liora") { 
-        if (datatype=="calero") {
-            incoming.1 <- readRDS("../../real/Calero/trial_20160113/analysis/full.rds")
-            incoming.2 <- readRDS("../../real/Calero/trial_20160325/analysis/full.rds")
-            stopifnot(identical(rownames(incoming.1), rownames(incoming.2)))
-
-            incoming <- cbind(incoming.1$counts, incoming.2$counts)
-            gdata <- incoming.1$genes
-            block <- paste0(rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2))), ".",
-                            ifelse(c(incoming.1$samples$induced, incoming.2$samples$induced), "Induced", "Control"))
-        } else { 
-            incoming.1 <- readRDS("../../real/Liora/test_20160906/analysis/full.rds")
-            incoming.1 <- incoming.1[,is.na(incoming.1$samples$control.well)]
-            incoming.2 <- readRDS("../../real/Liora/test_20170201/analysis/full.rds")
-            incoming.2 <- incoming.2[,is.na(incoming.2$samples$control.well)]
-            stopifnot(identical(rownames(incoming.1), rownames(incoming.2)))
-
-            incoming <- cbind(incoming.1$counts, incoming.2$counts)
-            gdata <- incoming.1$genes
-            block <- rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2)))
-        }
-
-        # Getting rid of SIRVS (spike2), and setting ERCCs (spike1) as the spike-ins.
-        keep <- !gdata$spike2 
-        incoming <- incoming[keep,]
-        gdata <- gdata[keep,]
-        spike.in <- gdata$spike1
-        is.mito <- gdata$is.mito
-    }
+for (datatype in c("Wilson", "Scialdone", "Islam2", "Grun", "Calero", "Liora")) {
+    val <- readRDS(file.path("../datasets", paste0(datatype, ".rds")))
+    incoming <- val$counts
+    spike.in <- val$spikes
+    design <- val$design
 
     # Quality control on cells.
     totals <- colSums(incoming)
     okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
                  !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
-                 !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
                  !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
 	incoming <- incoming[,okay.libs]
+    design <- design[okay.libs,,drop=FALSE]
 
-    # Setting up the design matrix.
-    if (is.null(block)) { 
-        design <- NULL 
-    } else { 
-        design <- model.matrix(~block[okay.libs]) 
-    }
-
-    # Filtering out crappy spikes.
-    high.ab <- rowMeans(incoming) >= 1
-	countsCell <- as.matrix(incoming[high.ab & !spike.in,])
-	spike.param <- spikeParam(incoming[high.ab & spike.in,], design=design)
+    filter.keep <- calcAverage(incoming) >= 0.1
+	countsCell <- incoming[filter.keep & !spike.in,]
+	spike.param <- spikeParam(incoming[filter.keep & spike.in,], design=design)
+    block <- designAsFactor(design)
 
     #########################################################################
     # Running through our various methods.
@@ -87,22 +49,18 @@ for (datatype in c("wilson", "calero", "liora")) {
                 if (i) { countsSpike <- resampleSpikes(spike.param, var.log=my.var) }
                 else { countsSpike <- spike.param$counts }
                 
-                sce <- newSCESet(countData=rbind(countsCell, countsSpike))
-                sce <- calculateQCMetrics(sce, feature_controls=list(Spike=rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(countsSpike)))))
-                setSpike(sce) <- "Spike"
+                sce <- SingleCellExperiment(list(counts=rbind(countsCell, countsSpike)))
+                isSpike(sce, "Spike") <- nrow(countsCell) + seq_len(nrow(countsSpike))
                 sce <- computeSpikeFactors(sce)
                 sce <- normalize(sce)
                 
                 if (method=="VarLog"){ 
-
-                    # Fitting the trend to the spike-in variances.
-                    out <- trendVar(sce, trend="semiloess", design=design)
-
-                    # Computing the biological component.
+                    # Fitting the trend to the spike-in variances, and computing the biological component.
+                    out <- trendVar(sce, parametric=TRUE, design=design)
                     out2 <- decomposeVar(sce, out)
                     out2 <- out2[!isSpike(sce),]
                     my.rank <- rank(out2$p.value)
-                    is.sig <- out2$FDR <= 0.05 
+                    is.sig <- out2$FDR <= 0.05 & !is.na(out2$FDR)
 
                     # Some diagnostics for this data set.
         			if (i==0) { 
@@ -116,18 +74,20 @@ for (datatype in c("wilson", "calero", "liora")) {
                         write.table(file=paste0("log_", datatype, "_", i, ".tsv"), output[order(output$bio, decreasing=TRUE),], 
                                     quote=FALSE, sep="\t", col.names=NA)
                     }
+
                 } else {
+                    # Alternatively, fitting a trend to the CV2 using the Brennecke method.
                     sce2 <- sce
                     if (!is.null(block)) {   
                         leftovers <- removeBatchEffect(exprs(sce2), block=block[okay.libs])
-                        of.value <- t(t(2^leftovers - sce2@logExprsOffset) * sizeFactors(sce2))
+                        of.value <- t(t(2^leftovers - 1) * sizeFactors(sce2))
                         of.value[of.value < 0] <- 0
                         counts(sce2) <- of.value
                     }
                     outt <- technicalCV2(sce2, min.bio.disp=0)
                     outt <- outt[!isSpike(sce2),]
                     my.rank <- rank(outt$p.value)
-                    is.sig <- outt$FDR <= 0.05
+                    is.sig <- outt$FDR <= 0.05 & !is.na(outt$FDR)
 
                     if (i<=1) {
                         output <- outt[is.sig,]
