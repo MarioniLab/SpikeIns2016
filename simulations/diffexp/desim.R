@@ -5,7 +5,7 @@
 suppressPackageStartupMessages(require(simpaler))
 suppressPackageStartupMessages(require(scran))
 suppressPackageStartupMessages(require(edgeR))
-suppressPackageStartupMessages(require(monocle))
+suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(library(MAST))
 
 # Note that Kharchenko's SCDE package doesn't seem to support spike-in normalization.
@@ -19,61 +19,38 @@ filled <- FALSE
 
 #################################################################################
 
-for (datatype in c("calero", "islam")) {
-	if (datatype=="islam") {
-		incoming <- read.table("GSE29087_L139_expression_tab.txt.gz", 
-			colClasses=c(list("character", NULL, NULL, NULL, NULL, NULL, NULL), rep("integer", 96)), skip=6, sep='\t', row.names=1)
-		spike.in <- grepl("SPIKE", rownames(incoming))
-		grouping <- rep(c("ESC", "MEF", "Neg"), c(48, 44, 4))
-		
-        is.mito <- grepl("^mt-", rownames(incoming)) & !spike.in
-        
-        expvar <- data.frame(Group=grouping, stringsAsFactors=FALSE)
-		
-	} else if (datatype=="calero") {
-        incoming.1 <- readRDS("../../real/Calero/trial_20160113/analysis/full.rds")
-        incoming.2 <- readRDS("../../real/Calero/trial_20160325/analysis/full.rds")
-        stopifnot(identical(rownames(incoming.1), rownames(incoming.2)))
-        incoming <- cbind(incoming.1$counts, incoming.2$counts)
-        gdata <- incoming.1$genes
+for (datatype in c("Calero", "Islam", "Buettner", "Hashimshony")) {
+    val <- readRDS(file.path("../datasets", paste0(datatype, ".rds")))
+    incoming <- val$counts
+    spike.in <- val$spikes
+    design <- val$design
 
-        keep <- !gdata$spike2 # Using only the ERCCs as the spike-ins.
-        incoming <- incoming[keep,]
-        gdata <- gdata[keep,]
-        spike.in <- gdata$spike1 
-        is.mito <- gdata$is.mito       
-
-        # Constructing the experimental design.        
-        expvar <- data.frame(Batch=rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2))),
-                             Group=ifelse(c(incoming.1$samples$induced, incoming.2$samples$induced), 
-                                          "Induced", "Control"), 
-                             stringsAsFactors=FALSE)
+	if (datatype=="Islam") {
+        test.coef <- "groupingMEF"
+	} else if (datatype=="Calero") {
+        test.coef <- "GroupInduced"
+    } else if (datatype=="Buettner") {
+        test.coef <- "groupingG2M"
+    } else if (datatype=="Hashimshony") {
+        test.coef <- "grouping2"
     }
     
     # Quality control on cells.
     totals <- colSums(incoming)
     okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
         !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
-        !isOutlier(colSums(incoming[is.mito,])/totals, nmad=3, type="higher") & 
         !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
     incoming <- incoming[,okay.libs]
-    expvar <- expvar[okay.libs,,drop=FALSE]
+    design <- design[okay.libs,,drop=FALSE]
 
-	filter.keep <- rowMeans(incoming) >= 1
-    block <- do.call(paste, c(expvar, sep="."))
-    spike.param <- spikeParam(incoming[spike.in & filter.keep,], design=model.matrix(~block))
+	filter.keep <- calcAverage(incoming) >= 0.1
+    spike.param <- spikeParam(incoming[spike.in & filter.keep,], design=design)
     cell.counts <- incoming[!spike.in & filter.keep,]
 
 	#################################################################################
 	# Running edgeR first.
 
-	y.ref <- DGEList(cell.counts)
-    if (datatype=="calero") {
-        design <- model.matrix(~Batch + Group, expvar)
-    } else if (datatype=="islam") {
-        design <- model.matrix(~Group, expvar)
-    }
-
+    y.ref <- DGEList(cell.counts)
     for (my.var in c(0.015)) {
 		set.seed(231234)
 		results <- top.set <- list()
@@ -88,16 +65,16 @@ for (datatype in c("calero", "islam")) {
 			y$samples$norm.factors <- colSums(spike.data)/y$samples$lib.size
 
 			# Running edgeR.
-			y <- estimateDisp(y, design)
-			fit <- glmFit(y, design, robust=TRUE)
-			res <- glmLRT(fit)
+			y <- estimateDisp(y, design, robust=TRUE)
+			fit <- glmFit(y, design)
+			res <- glmLRT(fit, coef=test.coef)
 
 			# Check if diagnostics look okay:
 			if (i==0) {
 				pdf(paste0("diagnostics_", datatype, ".pdf"))
 				plotBCV(y) # Nice downward trend
 				limma::plotMDS(edgeR::cpm(y, log=TRUE), pch=16,
-                               col=c("red", "blue")[(as.integer(factor(expvar$Group))==1)+1L]) # Mostly separated
+                               col=c("red", "blue")[(as.integer(design[,test.coef])==1)+1L]) # Mostly separated
 				dev.off()
 			}
 
@@ -134,11 +111,10 @@ for (datatype in c("calero", "islam")) {
     #################################################################################
     # Also, MAST.
 
-    if (datatype=="calero") {
-        form <- ~cngeneson + Batch + Group
-    } else if (datatype=="islam") {
-        form <- ~cngeneson + Group
-    }
+    redesign <- design
+    colnames(redesign) <- gsub("[()]", "", colnames(design)) # Killing the braces around the intercept.
+    new.form <- paste(c("~0 + cngeneson", colnames(redesign)), collapse="+")
+    form <- eval(parse(text=new.form))
 
     for (my.var in c(0.015)) {
         set.seed(3742)
@@ -157,11 +133,11 @@ for (datatype in c("calero", "islam")) {
             lcpms <- log2(t(t(cell.counts)/eff.lib.size)*1e6 + 1)
             suppressMessages({
                 sca <- FromMatrix(lcpms, cData=data.frame(wellKey=colnames(lcpms)), fData=data.frame(primerid=rownames(lcpms)))
-                colData(sca) <- cbind(colData(sca), expvar)
+                colData(sca) <- cbind(colData(sca), DataFrame(redesign))
                 colData(sca)$cngeneson <- scale(colMeans(cell.counts>0))
                 
                 mfit <- zlm(form, sca)
-                mlrt <- lrTest(mfit, "Group")
+                mlrt <- lrTest(mfit, test.coef)
                 MAST.p <- mlrt[, "hurdle", "Pr(>Chisq)"]
             })
 
