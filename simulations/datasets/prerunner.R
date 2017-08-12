@@ -1,11 +1,9 @@
-# This examines the technical variability of spike-ins in other data sets.
+# This converts all files into a standard format for easy parsing.
 
-library(scater)
-library(edgeR)
 library(simpaler)
 is.first <- TRUE
 
-for (dataset in c("Wilson", "Islam", "Scialdone", "Islam (2)", "Grun", "Hashimshony", "Buettner")) {
+for (dataset in c("Wilson", "Islam", "Scialdone", "Islam2", "Grun", "Hashimshony", "Buettner", "Calero", "Liora")) {
     if (dataset=="Wilson") {
         incoming <- read.table('GSE61533_HTSEQ_count_results.tsv.gz', header=TRUE, row.names=1, colClasses=c('character', rep('integer', 96)))
         spike.in <- grepl('^ERCC', rownames(incoming))
@@ -26,7 +24,7 @@ for (dataset in c("Wilson", "Islam", "Scialdone", "Islam (2)", "Grun", "Hashimsh
         spike.in <- grepl('^ERCC', rownames(incoming))
         design <- cbind(rep(1, ncol(incoming)))
 
-    } else if (dataset=="Islam (2)") {
+    } else if (dataset=="Islam2") {
         incoming <- read.table("GSE46980_CombinedMoleculeCounts.tab.gz", skip=7, row.names=1, sep="\t", 
                                colClasses=c("character", vector("list", 6), rep("integer", 96)))
         spike.in <- grepl("_SPIKE_", rownames(incoming))
@@ -68,39 +66,44 @@ for (dataset in c("Wilson", "Islam", "Scialdone", "Islam (2)", "Grun", "Hashimsh
         grouping <- factor(rep(c("G1", "G2M", "S"), c(ncol(incoming.G1), ncol(incoming.G2M), ncol(incoming.S))))
         design <- model.matrix(~grouping)        
         
+    } else if (dataset=="Calero") {
+        incoming.1 <- readRDS("../../real/Calero/trial_20160113/analysis/full.rds")
+        incoming.2 <- readRDS("../../real/Calero/trial_20160325/analysis/full.rds")
+        stopifnot(identical(rownames(incoming.1), rownames(incoming.2)))
+        incoming <- cbind(incoming.1$counts, incoming.2$counts)
+        gdata <- incoming.1$genes
+        
+        keep <- !gdata$spike2 # Using only the ERCCs as the spike-ins.
+        incoming <- incoming[keep,]
+        gdata <- gdata[keep,]
+        spike.in <- gdata$spike1 
+
+        Batch <- rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2)))
+        Group <- ifelse(c(incoming.1$samples$induced, incoming.2$samples$induced), "Induced", "Control")
+        design <- model.matrix(~0 + Batch + Group)
+
+    } else if (dataset=="Liora") {
+        incoming.1 <- readRDS("../../real/Liora/test_20160906/analysis/full.rds")
+        incoming.1 <- incoming.1[,is.na(incoming.1$samples$control.well)]
+        incoming.2 <- readRDS("../../real/Liora/test_20170201/analysis/full.rds")
+        incoming.2 <- incoming.2[,is.na(incoming.2$samples$control.well)]
+        stopifnot(identical(rownames(incoming.1), rownames(incoming.2)))
+        incoming <- cbind(incoming.1$counts, incoming.2$counts)
+        gdata <- incoming.1$genes
+        
+        keep <- !gdata$spike2 # Using only the ERCCs as the spike-ins.
+        incoming <- incoming[keep,]
+        gdata <- gdata[keep,]
+        spike.in <- gdata$spike1
+
+        block <- rep(LETTERS[1:2], c(ncol(incoming.1), ncol(incoming.2)))
+        design <- model.matrix(~block)
+
+    } else {
+        stop("Unknown data set")
     }
 
-    # Quality control on the sums of the spike in counts and endogenous transcripts.
-    spike.counts <- as.matrix(incoming[spike.in,])
-    other.sums <- colSums(incoming) - colSums(spike.counts)
-    discard <- isOutlier(colSums(spike.counts), log=TRUE, nmads=3, type="lower") |
-               isOutlier(other.sums, log=TRUE, nmads=3, type="lower")
-
-    # Estimating the mean and dispersion.
-    d <- DGEList(spike.counts[,!discard])
-    redesign <- design[!discard,,drop=FALSE]
-    d <- estimateDisp(d, redesign, prior.df=0, trend.method="none")
-    fit <- glmFit(d, redesign)
-
-    # Calculating new fitted values with a common offset for all cells.
-    fitted <- exp(fit$unshrunk.coefficients %*% t(redesign) + mean(fit$offset))
-    fitted[is.na(fitted)] <- 0
-
-    # Simulating data and calculating the variance.
-    collected <- vector("list", 20)
-    for (it in seq_len(20)) { 
-        sim.spikes <- matrix(rnbinom(length(fitted), mu=fitted, size=1/d$tagwise.dispersion),
-                             nrow=nrow(fitted), ncol=ncol(fitted))
-        collected[[it]] <- estimateVariance(ratios=log2(colSums(sim.spikes)), design=redesign)
-    }
-    collected <- unlist(collected)
-    original <- estimateVariance(ratios=log2(colSums(d$counts)), design=redesign)
-
-    # Saving to file.    
-    write.table(file="collated.txt", append=!is.first, row.names=FALSE, col.names=is.first, sep="\t", quote=FALSE,
-                data.frame(Dataset=dataset, Original=original, Mean=mean(unlist(collected)), 
-                           SE=sqrt(var(collected)/length(collected))))
-    is.first <- FALSE 
+    saveRDS(file=paste0(dataset, ".rds"), list(counts=as.matrix(incoming), spikes=spike.in, design=design))
 }
 
 
