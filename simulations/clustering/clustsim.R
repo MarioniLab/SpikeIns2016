@@ -4,7 +4,6 @@
 suppressPackageStartupMessages(require(simpaler))
 suppressPackageStartupMessages(require(edgeR))
 suppressPackageStartupMessages(require(scran))
-suppressPackageStartupMessages(require(dendextend))
 
 # Estimate support for each cluster.
 
@@ -65,8 +64,8 @@ totals <- colSums(incoming)
 #incoming <- incoming[,okay.libs]
 #my.cells <- my.cells[okay.libs]
 
-# Filtering out crappy spikes.
-high.ab <- rowMeans(incoming) >= 1
+# Filtering out low-abundance genes.
+high.ab <- rowMeans(incoming) >= 0.1
 countsCell <- as.matrix(incoming[high.ab & !spike.in,])
 spike.param <- spikeParam(incoming[high.ab & spike.in,])
 
@@ -81,9 +80,8 @@ for (i in seq(0,20)) {
     if (i) { spike.data <- resampleSpikes(spike.param, var.log=0.015) }
     else { spike.data <- spike.param$counts }
   
-    sce <- newSCESet(countData=rbind(countsCell, spike.data))
-    sce <- calculateQCMetrics(sce, feature_controls=list(Spike=rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(spike.data)))))
-    isSpike(sce) <- "Spike"
+    sce <- SingleCellExperiment(list(counts=rbind(countsCell, spike.data)))
+    isSpike(sce, "Spike") <- rep(c(FALSE, TRUE), c(nrow(countsCell), nrow(spike.data)))
     sce <- computeSpikeFactors(sce)
     sce <- normalize(sce)
 
