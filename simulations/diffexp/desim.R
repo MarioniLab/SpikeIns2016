@@ -15,11 +15,11 @@ top.hits <- 200
 
 temp <- "temp.txt"
 if (file.exists(temp))  { unlink(temp) }
-filled <- FALSE
+filled <- FALSE 
 
 #################################################################################
 
-for (datatype in c("Calero", "Islam", "Buettner", "Hashimshony")) {
+for (datatype in c("Calero", "Islam", "Buettner", "Grun", "Kolodziejczyk")) {
     val <- readRDS(file.path("../datasets", paste0(datatype, ".rds")))
     incoming <- val$counts
     spike.in <- val$spikes
@@ -31,15 +31,18 @@ for (datatype in c("Calero", "Islam", "Buettner", "Hashimshony")) {
         test.coef <- "GroupInduced"
     } else if (datatype=="Buettner") {
         test.coef <- "groupingG2M"
-    } else if (datatype=="Hashimshony") {
-        test.coef <- "grouping2"
-    }
-    
+    } else if (datatype=="Grun") {
+        test.coef <- "groupingserum"
+    } else if (datatype=="Kolodziejczyk") {
+        test.coef <- "conditiona2i"
+    }   
+
     # Quality control on cells.
     totals <- colSums(incoming)
-    okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
-        !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
-        !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
+    f <- designAsFactor(design)
+    okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower", batch=f) & 
+        !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower", batch=f) &
+        !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher", batch=f)
     incoming <- incoming[,okay.libs]
     design <- design[okay.libs,,drop=FALSE]
 
