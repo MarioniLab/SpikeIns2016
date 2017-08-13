@@ -9,6 +9,10 @@ par(mar=c(7.1, 4.1, 2.1, 7.5), xpd=TRUE)
 col <- c("grey80", "grey20")
 x <- barplot(dat, beside=TRUE, las=2, ylab="Variance estimate", col=col, 
              cex.lab=1.4, cex.axis=1.2, cex.names=1.2)
+
+upper <- results$Mean + results$SE
+segments(x[2,], results$Mean, x[2,], upper)
+segments(x[2,]-0.2, upper, x[2,]+0.2, upper)
 legend(max(x), max(dat), legend=c("Size factors", "Sampling noise"), 
        fill=col, cex=1.2)
 dev.off()

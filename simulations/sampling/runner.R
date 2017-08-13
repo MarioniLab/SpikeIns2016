@@ -5,7 +5,7 @@ library(edgeR)
 library(simpaler)
 is.first <- TRUE
 
-for (dataset in c("Wilson", "Islam", "Scialdone", "Islam2", "Grun", "Hashimshony", "Buettner", "Calero", "Liora")) {
+for (dataset in c("Wilson", "Islam", "Scialdone", "Grun", "Kolodziejczyk", "Buettner", "Calero", "Liora")) {
     val <- readRDS(file.path("../datasets", paste0(dataset, ".rds")))
     incoming <- val$counts
     spike.in <- val$spikes
@@ -14,8 +14,9 @@ for (dataset in c("Wilson", "Islam", "Scialdone", "Islam2", "Grun", "Hashimshony
     # Quality control on the sums of the spike in counts and endogenous transcripts.
     spike.counts <- as.matrix(incoming[spike.in,])
     other.sums <- colSums(incoming) - colSums(spike.counts)
-    discard <- isOutlier(colSums(spike.counts), log=TRUE, nmads=3, type="lower") |
-               isOutlier(other.sums, log=TRUE, nmads=3, type="lower")
+    f <- designAsFactor(design)
+    discard <- isOutlier(colSums(spike.counts), log=TRUE, nmads=3, type="lower", batch=f) |
+               isOutlier(other.sums, log=TRUE, nmads=3, type="lower", batch=f)
 
     # Estimating the mean and dispersion.
     d <- DGEList(spike.counts[,!discard])
