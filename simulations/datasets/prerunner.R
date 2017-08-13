@@ -3,7 +3,7 @@
 library(simpaler)
 is.first <- TRUE
 
-for (dataset in c("Wilson", "Islam", "Scialdone", "Islam2", "Grun", "Hashimshony", "Buettner", "Calero", "Liora")) {
+for (dataset in c("Wilson", "Islam", "Scialdone", "Grun", "Buettner", "Kolodziejczyk", "Calero", "Liora")) {
     if (dataset=="Wilson") {
         incoming <- read.table('GSE61533_HTSEQ_count_results.tsv.gz', header=TRUE, row.names=1, colClasses=c('character', rep('integer', 96)))
         spike.in <- grepl('^ERCC', rownames(incoming))
@@ -24,30 +24,12 @@ for (dataset in c("Wilson", "Islam", "Scialdone", "Islam2", "Grun", "Hashimshony
         spike.in <- grepl('^ERCC', rownames(incoming))
         design <- cbind(rep(1, ncol(incoming)))
 
-    } else if (dataset=="Islam2") {
-        incoming <- read.table("GSE46980_CombinedMoleculeCounts.tab.gz", skip=7, row.names=1, sep="\t", 
-                               colClasses=c("character", vector("list", 6), rep("integer", 96)))
-        spike.in <- grepl("_SPIKE_", rownames(incoming))
-        design <- cbind(rep(1, ncol(incoming)))
-
     } else if (dataset=="Grun") {
         incoming <- read.table("GSE54695_data_transcript_counts.txt.gz", header=TRUE, row.names=1, sep="\t", 
                                colClasses=c("character", rep("numeric", 80), vector("list", 80), 
-                                            rep("numeric", 80), vector("list", 80)))
+                                            rep("numeric", 80), vector("list", 80))) # keep only single cells.
         spike.in <- grepl("^ERCC", rownames(incoming))
         grouping <- sub("SC_([^_]+)_[0-9]+", "\\1", colnames(incoming))
-        design <- model.matrix(~grouping)
-
-    } else if (dataset=="Hashimshony") {
-        incoming.1 <- read.table("GSE78779/GSE78779_CS1_manual.txt.gz", row.names=1, colClasses=c("character", rep("integer", 24)))
-        incoming.2 <- read.table("GSE78779/GSE78779_CS2_manual.txt.gz", row.names=1, colClasses=c("character", rep("integer", 20)))
-        stopifnot(identical(rownames(incoming.1), rownames(incoming.2)))
-        incoming <- cbind(incoming.1, incoming.2)
-        colnames(incoming) <- NULL
-
-        incoming <- incoming[!grepl("^__", rownames(incoming)),]
-        spike.in <- grepl('^ERCC', rownames(incoming))
-        grouping <- factor(rep(1:2, c(ncol(incoming.1), ncol(incoming.2))))
         design <- model.matrix(~grouping)
 
     } else if (dataset=="Buettner") {
@@ -64,7 +46,19 @@ for (dataset in c("Wilson", "Islam", "Scialdone", "Islam2", "Grun", "Hashimshony
         incoming <- incoming[seq_len(max(grep("^ERCC", rownames(incoming)))),]
         spike.in <- grepl("^ERCC", rownames(incoming))
         grouping <- factor(rep(c("G1", "G2M", "S"), c(ncol(incoming.G1), ncol(incoming.G2M), ncol(incoming.S))))
-        design <- model.matrix(~grouping)        
+        design <- model.matrix(~grouping)
+
+    } else if (grepl("Kolodziejczyk", dataset)) {
+        incoming <- read.table("counttable_es.csv", row.names=1, header=TRUE, colClasses=c("character", rep("integer", 704)))
+        incoming <- incoming[!grepl("^__", rownames(incoming)),]
+        spike.in <- grepl('^ERCC', rownames(incoming))
+        batch <- sub(".*_([0-9]+)_[0-9]+.counts", "\\1", colnames(incoming))
+        condition <- sub("ola_mES_([^_]+)_.*", "\\1", colnames(incoming))
+
+        keep <- batch=="3" # Keep only the batch with spike-ins for all three conditions.
+        incoming <- incoming[,keep]
+        condition <- condition[keep]
+        design <- model.matrix(~condition)
         
     } else if (dataset=="Calero") {
         incoming.1 <- readRDS("../../real/Calero/trial_20160113/analysis/full.rds")

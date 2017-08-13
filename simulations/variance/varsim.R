@@ -17,17 +17,19 @@ top.hits <- c(20, 200, 2000)
 ###########################################################################
 # Running across all data types (saving diagnostics along the way)
 
-for (datatype in c("Wilson", "Scialdone", "Islam2", "Grun", "Calero", "Liora")) {
+for (datatype in c("Wilson", "Scialdone", "Kolodziejczyk", "Calero", "Liora")) {
     val <- readRDS(file.path("../datasets", paste0(datatype, ".rds")))
     incoming <- val$counts
     spike.in <- val$spikes
     design <- val$design
+    use.parametric <- !datatype %in% "Kolodziejczyk" # parametric mode doesn't work very well, for some reason.
 
     # Quality control on cells.
     totals <- colSums(incoming)
-    okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower") & 
-                 !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower") &
-                 !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher")
+    f <- designAsFactor(design)
+    okay.libs <- !isOutlier(totals, nmad=3, log=TRUE, type="lower", batch=f) & 
+                 !isOutlier(colSums(incoming!=0), nmad=3, log=TRUE, type="lower", batch=f) &
+                 !isOutlier(colSums(incoming[spike.in,])/totals, nmad=3, type="higher", batch=f)
 	incoming <- incoming[,okay.libs]
     design <- design[okay.libs,,drop=FALSE]
 
@@ -56,7 +58,7 @@ for (datatype in c("Wilson", "Scialdone", "Islam2", "Grun", "Calero", "Liora")) 
                 
                 if (method=="VarLog"){ 
                     # Fitting the trend to the spike-in variances, and computing the biological component.
-                    out <- trendVar(sce, parametric=TRUE, design=design)
+                    out <- trendVar(sce, parametric=use.parametric, design=design)
                     out2 <- decomposeVar(sce, out)
                     out2 <- out2[!isSpike(sce),]
                     my.rank <- rank(out2$p.value)
