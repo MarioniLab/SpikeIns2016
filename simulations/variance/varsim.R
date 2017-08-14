@@ -17,11 +17,12 @@ top.hits <- c(20, 200, 2000)
 ###########################################################################
 # Running across all data types (saving diagnostics along the way)
 
-for (datatype in c("Wilson", "Scialdone", "Kolodziejczyk", "Calero", "Liora")) {
+for (datatype in c("Scialdone", "Kolodziejczyk", "Calero", "Liora")) {
     val <- readRDS(file.path("../datasets", paste0(datatype, ".rds")))
     incoming <- val$counts
     spike.in <- val$spikes
     design <- val$design
+    name <- val$name
     use.parametric <- !datatype %in% "Kolodziejczyk" # parametric mode doesn't work very well, for some reason.
 
     # Quality control on cells.
@@ -110,7 +111,7 @@ for (datatype in c("Wilson", "Scialdone", "Kolodziejczyk", "Calero", "Liora")) {
 
     		top.lost <- do.call(rbind, top.res)
             colnames(top.lost) <- paste0("Top", top.hits)
-    		write.table(file=temp, data.frame(Dataset=datatype, Variance=my.var, Method=method, top.lost, Sig=unlist(sig.res)),
+    		write.table(file=temp, data.frame(Dataset=name, Variance=my.var, Method=method, top.lost, Sig=unlist(sig.res)),
     			row.names=FALSE, col.names=!filled, quote=FALSE, sep="\t", append=filled)
     		filled <- TRUE
         }

@@ -19,7 +19,11 @@ filled <- FALSE
 
 #################################################################################
 
-for (datatype in c("Calero", "Islam", "Buettner", "Grun", "Kolodziejczyk")) {
+for (datatype in c("Calero", 
+                   # "Islam", 
+                   "Buettner", 
+                   "Grun", 
+                   "Kolodziejczyk")) {
     val <- readRDS(file.path("../datasets", paste0(datatype, ".rds")))
     incoming <- val$counts
     spike.in <- val$spikes

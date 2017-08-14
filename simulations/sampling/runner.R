@@ -11,10 +11,10 @@ for (dataset in c("Islam2",
                   "Buettner", 
                   "Grun", 
                   "Kolodziejczyk", 
-                  "Islam", 
+#                  "Islam", 
                   "Hashimshony", 
                   "Liora",
-                  "Wilson", 
+#                  "Wilson", 
                   "Calero", 
                   "Scialdone", 
                   "Zeisel")) {
@@ -43,15 +43,18 @@ for (dataset in c("Islam2",
     for (it in seq_len(20)) { 
         sim.spikes <- matrix(rnbinom(length(fitted), mu=fitted, size=1/d$tagwise.dispersion),
                              nrow=nrow(fitted), ncol=ncol(fitted))
-        collected[[it]] <- colSums(sim.spikes)
+        spike.totals <- colSums(sim.spikes)
+        spike.totals <- spike.totals/mean(spike.totals)
+        collected[[it]] <- spike.totals
     }
 
     spike.totals <- colSums(d$counts)
+    spike.totals <- spike.totals/mean(spike.totals)
     collected <- do.call(cbind, collected)/spike.totals
     all.values[[name]] <- apply(collected, 1, sd) * 100
 }
 
-pdf("collated.pdf", width=10, height=8)
+pdf("collated.pdf", width=10, height=6)
 par(mar=c(9.1, 4.1, 4.1, 2.1))
 boxplot(all.values, ylab="Size factor estimation error (%)", cex.axis=1.2, cex.names=1.2, 
         cex.lab=1.4, col="grey80", las=2)
