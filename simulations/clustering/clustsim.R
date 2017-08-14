@@ -4,6 +4,7 @@
 suppressPackageStartupMessages(require(simpaler))
 suppressPackageStartupMessages(require(edgeR))
 suppressPackageStartupMessages(require(scran))
+suppressPackageStartupMessages(require(scater))
 
 # Estimate support for each cluster.
 
@@ -53,6 +54,7 @@ discard <- duplicated(incoming[,2])
 incoming <- incoming[!discard,]
 rownames(incoming) <- incoming[,2]
 incoming <- incoming[,-(1:2)]
+incoming <- as.matrix(incoming)
 
 spike.in <- grepl("ERCC", rownames(incoming))
 totals <- colSums(incoming)
@@ -65,7 +67,7 @@ totals <- colSums(incoming)
 #my.cells <- my.cells[okay.libs]
 
 # Filtering out low-abundance genes.
-high.ab <- rowMeans(incoming) >= 0.1
+high.ab <- calcAverage(incoming) >= 0.1
 countsCell <- as.matrix(incoming[high.ab & !spike.in,])
 spike.param <- spikeParam(incoming[high.ab & spike.in,])
 
