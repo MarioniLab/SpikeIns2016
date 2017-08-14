@@ -1,4 +1,4 @@
-pdf("setplot.pdf", width=14, height=7)
+pdf("setplot.pdf", width=14, height=14)
 par(mar=c(3.1, 5.1, 2.1, 2.1), mfrow=c(2,1))
 
 ###############################################################
@@ -27,7 +27,7 @@ combined.means <- rbind(l.means[,1], r.means[,1], l.means[,2], r.means[,2])
 combined.stder <- rbind(l.stder[,1], r.stder[,1], l.stder[,2], r.stder[,2])
 upper <- combined.means + combined.stder
 
-all.cols <- c("forestgreen", "lightgreen", "red", "pink")
+all.cols <- c("forestgreen", "lightgreen", "darkgoldenrod", "yellow2")
 out <- barplot(combined.means, beside=TRUE, col=all.cols, ylab='Change in the DEG set (%)', 
                ylim=c(0, max(upper)), cex.lab=1.4, cex.axis=1.2, cex.names=1.4)
 
@@ -43,6 +43,7 @@ legend("topright", fill=all.cols, cex=1.4,
 curcoords <- par()$usr
 mtext("a", line=0, cex=1.5, at=curcoords[1]-1, font=2)
 
+###############################################################
 # Making plots of how HVG results change.
 
 hvg.results <- read.table("~/AaronDocs/Research/SpikeIns/simulations/variance/results.txt", header=TRUE, sep="\t", stringsAsFactor=FALSE)    
