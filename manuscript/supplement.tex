@@ -239,6 +239,7 @@ This reduces computational work by filtering} out low-abundance genes that do no
 
 \subsection{Methods for detecting differentially expressed genes}
 For DEG detection with edgeR v3.18.1, a NB GLM was fitted to the counts for each gene \citep{mccarthy2012differential} using a suitable design matrix.
+\revised{The design matrix for each data set was constructed using an additive parametrization for all experimental factors, including the factor containing the conditions to be compared for differential expression.}
 The log-transformed total count for the spike-in transcripts was used as the offset for each library.
 This is equivalent to spike-in normalization as each count is effectively downscaled by the spike-in total.
 An abundance-dependent trend was fitted to the NB dispersions of all genes using the estimateDisp function.
@@ -259,15 +260,15 @@ Specifically, the spike-in totals were scaled so that their mean across all libr
 The size factor for each library was defined as its scaled spike-in total.
 We did \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
 The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package (v1.4.4) with min.bio.disp set to zero.
-If blocking factors were present, they were regressed out by log-transforming the counts; applying the removeBatchEffect function from the limma package \citep{ritchie2015limma} to the log-counts; and converting the corrected log-values back to the count scale, prior to using technicalCV2.
+If any \revised{experimental} factors were present, they were regressed out by log-transforming the counts; applying the removeBatchEffect function from the limma package \citep{ritchie2015limma} to the log-counts; and converting the corrected log-values back to the count scale, prior to using technicalCV2.
 
 The second approach to detect HVGs was based on computing the variance of log-expression values \citep{lun2016stepbystep}.
 For each count in each library, a normalized log-expression value was defined as the log-ratio of the count with the spike-in size factor for that library.
 (A pseudo-count of 1 was added to avoid undefined values upon log-transformation.)
-The variance of log-expression was computed across all cells for each spike-in transcript.
+\revised{If any experimental factors were present, they were used to construct a design matrix with an additive parametrization -- otherwise, an intercept-only design matrix was used.
+The design matrix was used to fit a linear model to the log-expression values to obtain the residual variance for each spike-in transcript.}
 A loess curve was fitted to the log-variance against the mean for all spike-in transcripts using the trendVar function in scran, representing the mean-variance relationship due to technical noise.
-The biological component of the variance and a $p$-value was computed for each gene using the decomposeVar function.
-If blocking factors were present, they were used to construct a design matrix for modelling in trendVar.
+\revised{Variance estimation was repeated on the log-expression values for each endogenous gene,} and the biological component of the variance and a $p$-value was computed for each gene using the decomposeVar function.
 
 \subsection{Methods for dimensionality reduction and clustering}
 Size factors for all libraries were defined from the spike-in totals as previously described. 
