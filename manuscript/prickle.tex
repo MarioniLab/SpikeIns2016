@@ -362,19 +362,20 @@ These results suggest that the detection and ranking of DEGs and HVGs are largel
 Indeed, genes that were not consistently detected across simulation iterations tended to have weak log-fold changes for DEGs, or small biological components for HVGs (Supplemental Figure~\suppfiglostsim{}).
 This is expected as genes on the borderline of significance are more susceptible to random fluctuations in the size factors.
 
-\begin{figure}[bt]
+\begin{figure}[btp]
     \begin{center}
         \includegraphics[width=\textwidth,trim=0mm 5mm 0mm 5mm,clip]{../simulations/pics/setplot.pdf}
     \end{center}
     \caption{Effect of spike-in variability on DEG or HVG detection in simulated data.
         (a) The percentage change in the set of DEGs detected in each data set at a FDR of 5\% by edgeR or MAST.
         This was also calculated for the top set of 200 DEGs with the smallest $p$-values.
-        Simulations were based on our 416B data set, to detect DEGs after inducing expression of a \textit{CBFB-MYH11} oncogene compared to a mCherry control (see Methods);
-        or on the data from \citet{islam2011characterization}, to detect DEGs between mouse embryonic stem cells (mESCs) and fibroblasts.
+        Simulations were performed to detect DEGs \revised{in our 416B data set after inducing expression of a \textit{CBFB-MYH11} oncogene compared to a mCherry control (see Methods);
+        between mouse embryonic stem cells (mESCs) in G1 and G2/M phases of the cell cycle \autocite{buettner2015computational};
+        or between mESCs cultured in different conditions - serum, ground state (2i) or alternative ground state (a2i) \autocite{grun2014validation,kolod2015single}.}
         (b) The percentage change in the set of HVGs detected in each data set at a FDR of 5\%,
         using the Brennecke \textit{et al.} method based on the squared coefficient of variation (CV$^2$) or with a method based on the variance of log-expression.
         This was also calculated for the top set of 200 HVGs with the smallest $p$-values.
-        Simulations were based on our 416B and TSC data to detect HVGs across cells.
+        Simulations were performed to detect HVGs in our 416B and TSC data sets, \revised{in liver cells \autocite{scialdone2015computational} and in mESCs \autocite{kolod2015single}.}
         All values represent the mean of 20 simulation iterations, and error bars represent standard errors.
     }
     \label{fig:setchange}

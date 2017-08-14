@@ -27,9 +27,11 @@ combined.means <- rbind(l.means[,1], r.means[,1], l.means[,2], r.means[,2])
 combined.stder <- rbind(l.stder[,1], r.stder[,1], l.stder[,2], r.stder[,2])
 upper <- combined.means + combined.stder
 
+renamed <- c("416B\n(induced/control)", "mESC\n(G2M/G1)", "mESC\n(serum/2i)", "mESC\n(a2i/2i)")[match(colnames(upper), c("Calero", "Buettner", "Grun", "Kolodziejczyk"))]
 all.cols <- c("forestgreen", "lightgreen", "darkgoldenrod", "yellow2")
 out <- barplot(combined.means, beside=TRUE, col=all.cols, ylab='Change in the DEG set (%)', 
-               ylim=c(0, max(upper)), cex.lab=1.4, cex.axis=1.2, cex.names=1.4)
+               ylim=c(0, 10), cex.lab=1.4, cex.axis=1.2, names.arg=character(ncol(upper)))
+mtext(at=colMeans(out), text=renamed, side=1, line=2, cex=1.4)
 
 segments(out, combined.means, out, upper)
 segments(out-0.2, upper, out+0.2, upper)
@@ -66,12 +68,14 @@ l.stder <- do.call(rbind, l.stder)
 r.stder <- do.call(rbind, r.stder)
 
 combined.means <- rbind(l.means[,1], r.means[,1], l.means[,2], r.means[,2])
+combined.means[combined.means < 0.05] <- 0.05
 combined.stder <- rbind(l.stder[,1], r.stder[,1], l.stder[,2], r.stder[,2])
 upper <- combined.means + combined.stder
 
+colnames(combined.means) <- sub(" \\(Kolod\\)", "", colnames(combined.means))
 all.cols <- c("blue", "lightblue", "red", "pink")
 out <- barplot(combined.means, beside=TRUE, col=all.cols, ylab='Change in the HVG set (%)', 
-               ylim=c(0, max(upper)), cex.lab=1.4, cex.axis=1.2, cex.names=1.4)
+               ylim=c(0, 10), cex.lab=1.4, cex.axis=1.2, cex.names=1.4)
 
 segments(out, combined.means, out, upper)
 segments(out-0.2, upper, out+0.2, upper)
