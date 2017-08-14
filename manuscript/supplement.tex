@@ -258,6 +258,19 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
 \printbibliography
 
 \newpage
+
+\begin{figure}[btp]
+    \begin{center}
+        \includegraphics[width=\textwidth]{pics/explanation.pdf}
+    \end{center}
+    \caption{\revised{Schematic of the effect of variability in spike-in addition ($\sigma^2_{vol}$) or library preparation ($\sigma^2_{lib(s)}$) on the performance of spike-in normalization.
+        The spike-in size factor for each cell is calculated from the sum of counts for spike-in transcripts.
+        The size factors faithfully represent the true cell-specific biases when equal amounts of spike-in RNA are added to each well and technical noise in library preparation and sequencing is low.
+        This is not the case when spike-in addition is variable or technical noise is high, manifesting as error from the true biases (i.e., large residual variance).
+    Note that the true biases are unknown, so $\sigma^2_{vol}$ and $\sigma^2_{lib(s)}$ are instead estimated from spike-in mixtures as described in our experimental design.}
+    }
+\end{figure}
+
 \begin{figure}[btp]
     \begin{center}
         \begin{subfigure}{0.49\textwidth}
@@ -347,11 +360,11 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
 \begin{figure}[btp]
     \begin{center}
         \begin{subfigure}{0.49\textwidth}
-            \includegraphics[width=\textwidth,page=1]{../simulations/depth/depth_effect.pdf}
+            \includegraphics[width=\textwidth,page=1]{../real/depth/depth_effect.pdf}
             \caption{}
         \end{subfigure}
         \begin{subfigure}{0.49\textwidth}
-            \includegraphics[width=\textwidth,page=2]{../simulations/depth/depth_effect.pdf}
+            \includegraphics[width=\textwidth,page=2]{../real/depth/depth_effect.pdf}
             \caption{}
         \end{subfigure}
     \end{center}
