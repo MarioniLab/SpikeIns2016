@@ -128,6 +128,8 @@ If the mean of $T_{is}$ does not change between separate/premixed experiments, n
 This suggests that $\sigma^2_{lib(s)}$ will not change between $\variance(\theta_i)$ and $\variance(\theta^*_i)$, allowing calculation of $\sigma^2_{vol}$ from their difference.
 
 \section{Computing the contribution of stochastic noise}
+
+\subsection{Calculating the effect of noise on the log-ratios}
 We performed simulations to obtain a rough estimate of the contribution of $\sigma^2_{lib(s)}$ to the variance of $\theta^*_i$.
 For each plate in each data set (416B or TSC), we extracted the spike-in count data for the premixed wells.
 For each spike-in set (SIRV or ERCC), the log-transformed sum of counts across all transcripts in that set was used as the GLM offset. 
@@ -154,6 +156,26 @@ Thus, the true values of $\sigma^2_{vol}$ or $\variance(F_i)$ should generally b
 In contrast, sampling noise during sequencing depends on the coverage and will contribute to the true value of $\sigma^2_{lib(s)}$.
 This means that we need to test the effect of reducing coverage on $\sigma^2_{lib(s)}$.
 
+\begin{color}{red}
+\subsection{Calculating the effect of noise on size factor precision}
+The above simulations describe the contribution of stochastic noise to the log-ratios in our mixture experiments.
+However, we can also perform simulations to quantify the effect of noise on the precision of the spike-in size factors themselves.
+For a given data set, we first performed quality control by removing cells with small outlier values (i.e., more than 3 median absolute deviations below the median) for the log-transformed total endogenous counts or for the log-total spike-in counts.
+We estimated the NB dispersion and fitted a GLM to the spike-in counts for each transcript, using the log-sum of spike-in counts as the GLM offset for each cell.
+For each transcript in each cell, we used the corresponding fitted value and dispersion estimate to sample a new count from a negative binomial distribution, yielding a new set of simulated spike-in counts.
+
+To estimate a size factor for each cell, we calculated the sum of simulated counts for all spike-in transcripts in each cell.
+The count sums were scaled so that the average sum across all cells in the data set was equal to unity.
+The scaled count sum for each cell was then used as its spike-in size factor.
+We repeated this procedure with a new set of simulated counts for multiple iterations, and we defined the estimation error as the standard deviation of the estimated size factors for the same cell across iterations. 
+This was expressed as a percentage of the original value of the size factor (i.e., computed from the original counts) for each cell.
+We performed these simulations on all data sets in Section~\ref{sec:datasets} to obtain Supplementary Figure~\ref{fig:sampling}.
+
+We stress that these simulations only examine the variability in spike-in counts due to random sampling noise. 
+It is not possible to make any precise conclusions regarding variability in the \textit{amount} of spike-in RNA added to each cell.
+To do so requires the use of spike-in mixtures, which are not available in public data.
+\end{color}
+
 \section{Examining index switching on the HiSeq 4000}
 Cells from three of our plates were multiplexed and sequenced on the Illumina HiSeq 4000 machine using the ExAmp chemistry.
 A recent study showed that the index primers used for barcoding each sample could switch between samples \citep{sinha2017index}, thereby contaminating one sample with DNA from other samples.
@@ -177,18 +199,43 @@ By comparison, the 1\% (maximum) rate of contamination due to index switching is
 % x <- colSums(loadin2$counts[loadin2$genes$spike1,])
 % sqrt(var(x)/mean(x)^2)
 
+\begin{color}{red}
+\section{Overview of data sets used in simulations}
+\label{sec:datasets}
+We obtained the following public data sets, containing counts for ERCC spike-in transcripts:
+\begin{itemize}
+    \item Liver cells from \cite{scialdone2015computational}, obtained from the ArrayExpress repository with the accession E-MTAB-3707.
+        No experimental factors were considered.
+    \item Brain cells from \cite{zeisel2015brain}, obtained from \url{http://linnarssonlab.org/cortex}.
+        Only the subset of cells from the cortex was used.
+        No experimental factors were considered.
+    \item Mouse embryonic stem cells from \cite{buettner2015computational}, obtained from ArrayExpress with the accession E-MTAB-2805.
+        Cell cycle phase (G1, G2M or S) was treated as the experimental factor.
+    \item Mouse embryonic stem cells from \cite{kolod2015single}, obtained from \url{http://www.ebi.ac.uk/teichmann-srv/espresso}.
+        The culture condition (2i, a2i or lif) was treated as the experimental factor.
+        Only the subset of cells from batch 3 was used as these contained spike-ins for all conditions.
+    \item Mouse embryonic stem cells from \cite{islam2014quantitative}, obtained from the Gene Expression Omnibus (GEO) with the accession GSE46980.
+        No experimental factors were considered.
+    \item Mouse embryonic stem cells from \cite{grun2014validation}, obtained from GEO with the accession GSE54695.
+        The culture condition (2i or serum) was treated as a experimental factor.
+    \item Fibroblasts from \cite{hashimshony2016celseq2}, obtained from GEO with the accession GSE78779.
+        No experimental factors were considered.
+        Only the subset of cells from the C1 experiment was used.
+\end{itemize}
+In each of our TSC and 416B data sets, data from both plates were analyzed together.
+We treated the plate of origin for each cell as an experimental factor, along with the oncogene induction status for 416B cells.
+Only the ERCC counts were used in simulations, and all SIRV transcripts were discarded for simplicity.
+\end{color}
 
 \section{Implementation details for the downstream analyses}
 
-\subsection{Data pre-processing}
-Quality control was performed by removing libraries with outlier values for various metrics \citep{lun2016stepbystep}.
+\subsection{Quality control on cells and genes}
+Quality control was performed on each data set in Section~\ref{sec:datasets} by removing cells with outlier values for various metrics \citep{lun2016stepbystep}.
 These metrics included the log-transformed total read count across all genes and the log-transformed total number of expressed genes, where small outliers were removed; 
-and the proportion of reads mapped to spike-in transcripts or mitochondrial genes, where large outliers were removed.
+and the proportion of reads mapped to spike-in transcripts, where large outliers were removed.
 Outliers were defined as values that were more than three median absolute deviations away from the median in the specified direction.
-Genes were also removed if the average count across all cells was below 1.
-This filters out low-abundance genes that do not contain enough information for reliable inference.
-For our data sets, only the ERCC spike-in transcripts were used in downstream analyses.
-All SIRV transcripts were discarded for simplicity.
+Genes were also removed if the average count across all cells was below \revised{0.1.
+This reduces computational work by filtering} out low-abundance genes that do not contain enough information for reliable inference.
 
 \subsection{Methods for detecting differentially expressed genes}
 For DEG detection with edgeR v3.18.1, a NB GLM was fitted to the counts for each gene \citep{mccarthy2012differential} using a suitable design matrix.
@@ -377,6 +424,23 @@ Moreover, we only used the cells extracted from a single individual (HP1502401, 
         Each point represents the mean variance from 20 simulation iterations, with error bars representing standard errors of the variance estimates.
     }
     \label{fig:sampledepth}
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=\textwidth]{../simulations/sampling/collated.pdf}
+    \end{center}
+    \caption{\revised{Relative estimation error for the spike-in size factor of each cell, shown as a percentage of the value of the size factor.
+        Boxplots represent the distribution of errors across cells in each data set.
+        Errors were calculated after resampling spike-in counts from a negative binomial distribution with parameters estimated from the original counts.
+        Calculations were performed using data for mouse embryonic stem cells (mESCs) from \cite{islam2014quantitative},
+        \cite{buettner2015computational}, \cite{grun2014validation} and \cite{kolod2015single};  
+        fibroblasts from \cite{hashimshony2016celseq2};
+        trophoblast stem cells (TSCs) and 416B cells from our experiments;
+        liver cells from \cite{scialdone2015computational};
+        and brain cells from \cite{zeisel2015brain}. }
+    }
+    \label{fig:sampling}
 \end{figure}
 
 \begin{figure}[btp]
