@@ -4,12 +4,25 @@ library(scater)
 library(edgeR)
 library(simpaler)
 is.first <- TRUE
+set.seed(9999)
 
-for (dataset in c("Wilson", "Islam", "Scialdone", "Grun", "Kolodziejczyk", "Buettner", "Calero", "Liora")) {
+all.values <- list()
+for (dataset in c("Islam2",
+                  "Buettner", 
+                  "Grun", 
+                  "Kolodziejczyk", 
+                  "Islam", 
+                  "Hashimshony", 
+                  "Liora",
+                  "Wilson", 
+                  "Calero", 
+                  "Scialdone", 
+                  "Zeisel")) {
     val <- readRDS(file.path("../datasets", paste0(dataset, ".rds")))
     incoming <- val$counts
     spike.in <- val$spikes
     design <- val$design
+    name <- val$name
 
     # Quality control on the sums of the spike in counts and endogenous transcripts.
     spike.counts <- as.matrix(incoming[spike.in,])
@@ -22,28 +35,24 @@ for (dataset in c("Wilson", "Islam", "Scialdone", "Grun", "Kolodziejczyk", "Buet
     d <- DGEList(spike.counts[,!discard])
     redesign <- design[!discard,,drop=FALSE]
     d <- estimateDisp(d, redesign, prior.df=0, trend.method="none")
-    fit <- glmFit(d, redesign)
-
-    # Calculating new fitted values with a common offset for all cells.
-    fitted <- exp(fit$unshrunk.coefficients %*% t(redesign) + mean(fit$offset))
-    fitted[is.na(fitted)] <- 0
+    fit <- glmFit(d, redesign, prior.count=0)
+    fitted <- fit$fitted.values
 
     # Simulating data and calculating the variance.
     collected <- vector("list", 20)
     for (it in seq_len(20)) { 
         sim.spikes <- matrix(rnbinom(length(fitted), mu=fitted, size=1/d$tagwise.dispersion),
                              nrow=nrow(fitted), ncol=ncol(fitted))
-        collected[[it]] <- estimateVariance(ratios=log2(colSums(sim.spikes)), design=redesign)
+        collected[[it]] <- colSums(sim.spikes)
     }
-    collected <- unlist(collected)
-    original <- estimateVariance(ratios=log2(colSums(d$counts)), design=redesign)
 
-    # Saving to file.    
-    write.table(file="collated.txt", append=!is.first, row.names=FALSE, col.names=is.first, sep="\t", quote=FALSE,
-                data.frame(Dataset=dataset, Original=original, Mean=mean(unlist(collected)), 
-                           SE=sqrt(var(collected)/length(collected))))
-    is.first <- FALSE 
+    spike.totals <- colSums(d$counts)
+    collected <- do.call(cbind, collected)/spike.totals
+    all.values[[name]] <- apply(collected, 1, sd) * 100
 }
 
-
-
+pdf("collated.pdf", width=10, height=8)
+par(mar=c(9.1, 4.1, 4.1, 2.1))
+boxplot(all.values, ylab="Size factor estimation error (%)", cex.axis=1.2, cex.names=1.2, 
+        cex.lab=1.4, col="grey80", las=2)
+dev.off()
