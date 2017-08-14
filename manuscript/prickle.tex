@@ -52,7 +52,8 @@
 \newcommand{\suppsecmath}{1}
 \newcommand{\suppsecnoise}{2}
 \newcommand{\suppsecindex}{3}
-\newcommand{\suppsecsim}{4}
+\newcommand{\suppsecdata}{4}
+\newcommand{\suppsecsim}{5}
 
 \newcommand{\supptabstats}{1}
 
@@ -597,14 +598,13 @@ This new quantile was used as the simulated count for transcript $t$ in $i$.
 % Okay, maybe the trended dispersion would be a bit weird, because technical variability should depend on the amount of RNA, but some inaccuracy there is forgivable.
 
 \subsection*{Evaluating the robustness of DEG detection}
-Two data sets were used to test the effect of spike-in variability on DEG detection.
-The first was the 416B data generated previously, where DEGs were detected between control and oncogene-induced cells.
-Here, we combined data from both plates and used an additive model with a treatment term and a blocking factor for the plate.
-The second data set was obtained from the NCBI Gene Expression Omnibus (GEO) with the accession number GSE29087, and compared mouse embryonic stem cells and fibroblasts \autocite{islam2011characterization}.
-This was parameterized using a simple one-way layout.
-
-In both studies, DEGs were detected between conditions using edgeR and MAST.
-Implementation details of each method are provided in Section~\suppsecsim{} in the Supplemental Materials. 
+\revised{We used a number of data sets to test the effect of spike-in variability on DEG detection.
+This included our 416B data, where DEGs were detected between control and oncogene-induced cells;
+and public data sets involving mESCs, where DEGs were detected between G1 and G2/M phases of the cell cycle \autocite{buettner2015computational}
+or between different culture conditions \autocite{grun2014validation,kolod2015single}.
+Access to each public data set is described in Section~\suppsecdata{} of the Supplemental Materials.}
+In each study, DEGs were detected between conditions using edgeR and MAST.
+Implementation details of each method are provided in Section~\suppsecsim{} of the Supplemental Materials. 
 Briefly, normalization was performed by scaling the counts (explicitly or via offsets) such that the spike-in totals were the same between cells.
 The set of DEGs in the original data was then identified at a FDR of 5\%.
 This procedure was repeated for the simulated data, and the number of genes that were detected in the original results and not in the simulated results (or vice versa) was recorded as a proportion of the total number of original DEGs.
@@ -612,21 +612,18 @@ The proportion of the top 200 genes with the smallest $p$-values that were share
 This was repeated for 20 simulation iterations and the average proportion across iterations was reported for each method.
 
 \subsection*{Evaluating the robustness of HVG detection}
-Our 416B and TSC data sets were used to assess the effect of spike-in variability on detection of HVGs.
-For each data set, data from both plates were combined into a single analysis with blocking factors to account for uninteresting factors of variation.
-In the 416B data set, blocking was performed to remove plate- and treatment-specific effects on mean expression, i.e., HVGs were detected within treatment conditions on each plate.
-In the TSC data set, blocking was performed to remove plate effects.
-
-In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-in counts 
-(See Section~\suppsecsim{} in the Supplemental Materials for implementation details of each method.)
+\revised{We used several data sets to test the effect of spike-in variability on HVG detection.
+This included our 416B and TSC data sets, as well as public data sets involving mESCs \autocite{kolod2015single} or liver cells \autocite{scialdone2015computational}.}
+In each data set, spike-in normalization was performed and HVGs were detected using two approaches based on spike-in counts.
 The first approach is based on the method of \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
 The second approach is based on the variance of the log-normalized expression values \autocite{lun2016stepbystep}, which provides some more robustness against outlier expression patterns.
 Each method was applied on the original and simulated data, and a set of significant HVGs was detected at a FDR of 5\%.
 The proportion of HVGs common to both the original and simulated sets was computed, along with the common proportion among the top 200 genes with the lowest $p$-values.
 This was repeated for 20 simulation iterations and the average proportion across iterations was reported for each method.
+\revised{See Section~\suppsecdata{} of the Supplemental Materials for details on public data access and Section~\suppsecsim{} for the implementation details of each HVG detection method.}
 
 \subsection*{Evaluating dimensionality reduction and clustering}
-Count data from a study of pancreatic islet cells \autocite{segerstople2016single} were obtained from ArrayExpress with the acession E-MTAB-5061.
+\revised{We obtained count data from a study of pancreatic islet cells \autocite{segerstople2016single} (see Section~\suppsecdata{} of the Supplemental Materials).}
 Spike-in normalization was performed and a set of HVGs was defined using the variance-of-log-expression method.
 PCA plots of the first three components were constructed from the matrix of log-expression values for the HVGs.
 This process -- including HVG detection -- was repeated with the simulated data after introducing spike-in variability.

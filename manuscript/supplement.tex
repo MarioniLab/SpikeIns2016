@@ -169,7 +169,7 @@ The count sums were scaled so that the average sum across all cells in the data 
 The scaled count sum for each cell was then used as its spike-in size factor.
 We repeated this procedure with a new set of simulated counts for multiple iterations, and we defined the estimation error as the standard deviation of the estimated size factors for the same cell across iterations. 
 This was expressed as a percentage of the original value of the size factor (i.e., computed from the original counts) for each cell.
-We performed these simulations on all data sets in Section~\ref{sec:datasets} to obtain Supplementary Figure~\ref{fig:sampling}.
+We performed these simulations on the data sets in Section~\ref{sec:datasets} to obtain Supplementary Figure~\ref{fig:sampling}.
 
 We stress that these simulations only examine the variability in spike-in counts due to random sampling noise. 
 It is not possible to make any precise conclusions regarding variability in the \textit{amount} of spike-in RNA added to each cell.
@@ -221,6 +221,10 @@ We obtained the following public data sets, containing counts for ERCC spike-in 
     \item Fibroblasts from \cite{hashimshony2016celseq2}, obtained from GEO with the accession GSE78779.
         No experimental factors were considered.
         Only the subset of cells from the C1 experiment was used.
+    \item Pancreatic islet cells from \cite{segerstople2016single}, obtained from ArrayExpress with the accession E-MTAB-5061.
+        Cells annotated as low quality were removed.
+        (For downstream analyses, we considered all remaining cells as high-quality, so no further cell-level quality control was applied.)
+        We only used the cells extracted from a single individual (HP1502401, healthy male) for simplicity.
 \end{itemize}
 In each of our TSC and 416B data sets, data from both plates were analyzed together.
 We treated the plate of origin for each cell as an experimental factor, along with the oncogene induction status for 416B cells.
@@ -230,7 +234,7 @@ Only the ERCC counts were used in simulations, and all SIRV transcripts were dis
 \section{Implementation details for the downstream analyses}
 
 \subsection{Quality control on cells and genes}
-Quality control was performed on each data set in Section~\ref{sec:datasets} by removing cells with outlier values for various metrics \citep{lun2016stepbystep}.
+\revised{Cell-level} quality control was performed on each data set by removing cells with outlier values for various metrics \citep{lun2016stepbystep}.
 These metrics included the log-transformed total read count across all genes and the log-transformed total number of expressed genes, where small outliers were removed; 
 and the proportion of reads mapped to spike-in transcripts, where large outliers were removed.
 Outliers were defined as values that were more than three median absolute deviations away from the median in the specified direction.
@@ -298,10 +302,6 @@ However, we do not do this as it does not capture the variability in the identif
 Upon completion of the simulation, each cell will have one original location and one remapped location per iteration. 
 For each cell, the smallest circle centered at its original location was drawn that contained the 95\% of the remapped locations.
 This avoids inflated circles due to outliers.
-
-Note that, for the data set used in this simulation, we removed cells that were already annotated as low quality in the associated metadata.
-No additional outlier-based quality control was performed.
-Moreover, we only used the cells extracted from a single individual (HP1502401, healthy male) for simplicity.
 
 \printbibliography
 
