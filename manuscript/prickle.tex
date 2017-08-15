@@ -38,16 +38,17 @@
 \bibliography{refnorm}
 
 % References to supplementary files.
-\newcommand{\suppfignorm}{1}
-\newcommand{\suppfigtotals}{2}
-\newcommand{\suppfigorder}{3}
-\newcommand{\suppfigcell}{4}
-\newcommand{\suppfigbiophys}{5}
-\newcommand{\suppfignoise}{6}
-\newcommand{\suppfiglostsim}{7}
-\newcommand{\suppfigspikeconc}{8}
-\newcommand{\suppfigspikeave}{9}
-\newcommand{\suppfigindex}{10}
+\newcommand{\suppfigschem}{1}
+\newcommand{\suppfignorm}{2}
+\newcommand{\suppfigtotals}{3}
+\newcommand{\suppfigorder}{4}
+\newcommand{\suppfigcell}{5}
+\newcommand{\suppfigbiophys}{6}
+\newcommand{\suppfignoise}{7}
+\newcommand{\suppfiglostsim}{8}
+\newcommand{\suppfigspikeconc}{9}
+\newcommand{\suppfigspikeave}{10}
+\newcommand{\suppfigindex}{11}
 
 \newcommand{\suppsecmath}{1}
 \newcommand{\suppsecnoise}{2}
@@ -128,7 +129,7 @@ One particular advantage of this strategy is that it does not make any assumptio
 This means that spike-in normalization can be applied in situations where large-scale changes in expression (e.g., related to changes in total RNA content, or involving highly heterogeneous populations containing many cell types) are expected and of interest \autocite{lun2016stepbystep,nestorowa2016single}.
 
 There are two common criticisms of spike-in normalization that challenge the validity of its central assumptions.
-The first is that the same quantity of spike-in RNA may not be consistently added to each sample \autocite{robinson2010tmm}, and the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \autocite{grun2015design} (i.e., unequal capture efficiencies, caused by differences in the biophysical properties of the transcripts).
+The first is that the same quantity of spike-in RNA may not be consistently added to each sample \autocite{robinson2010tmm}, and the second is that synthetic spike-in transcripts may not behave in the same manner as endogenous transcripts \autocite{grun2015design} (i.e., \revised{the two sets of transcripts} have unequal capture efficiencies, caused by differences in their biophysical properties).
 Any differences in spike-in quantity or behaviour across cells will compromise the accuracy of spike-in normalization \autocite{risso2014normalization}.
 In some cases, it may also be difficult to gauge how much spike-in RNA should be added, especially if the quantity of endogenous RNA per cell is unknown, resulting in insufficient spike-in coverage for normalization.
 These criticisms may contribute to the limited use of this normalization strategy in the scRNA-seq literature \autocite{bacher2016design}.
@@ -265,24 +266,29 @@ To obtain an estimate of the variance of the volume addition step, simple arithm
 \]
 It should be stressed that this variance estimate is relevant to all experiments using the same protocol for spike-in addition, even if the identity or concentration of the spike-in set is different.
 
+\revised{In general, scaling normalization for RNA-seq data is performed by dividing all counts in each library by a library-specific constant, known as the ``size factor''.
+For spike-in normalization, the size factor for cell $i$ is directly proportional to the sum of counts for the spike-in transcripts, i.e., $2^{T_{is}}$.
+This reflects the fact that spike-in normalization aims to eliminate systematic differences in the coverage of spike-in set $s$ between cells, thus correcting for well/cell-specific technical biases.
+Any variance due to volume addition ($\sigma^2_{vol}$) or technical noise ($\sigma^2_{lib(s)}$) will reduce the precision of $T_{is}$ and of the size factor estimates (Supplemental Figure~\suppfigschem{}), thus reducing the effectiveness of spike-in normalization.
+}
+
 \subsection*{Estimating the variance of volume addition}
 Using our mathematical framework, we estimated the variance components using the data from our mixture experiments.
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplemental Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
-Linear models are particularly useful as they allow blocking on additional structure in the experimental design -- we used a one-way layout to account for shifts in the mean due to addition order or oncogene induction (see Methods).
+Linear models are particularly useful as they allow blocking on additional structure in the experimental design.
+We used a one-way layout to account for shifts in the mean \revised{ratio} due to addition order or oncogene induction (see Methods).
 The value of $T_{is}$ was also similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplemental Figure~\suppfigtotals{}, Section~\suppsecmath{} of the Supplemental Materials for details).
 Finally, the order of spike-in addition did not significantly affect the variance estimates for the separate-addition wells in most plates (Supplemental Figure~\suppfigorder{}).
 
 Our results indicate that $\sigma^2_{vol}$ is consistently smaller than $\variance(\theta^*_i)$, i.e., the variance in the rest of the protocol (Figure~\ref{fig:varestimates}a).
 Indeed, no significant difference was detected between the estimated $\variance(\theta_i)$ and $\variance(\theta^*_i)$ of each plate.
 This indicates that variability of spike-in volume addition is a minor contributor to the technical variability of the spike-in counts.
-To put these estimates into context, consider that $T_{is}$ represents the log$_2$-transformed ``size factor'' for the library generated from well $i$.
-Spike-in normalization is performed by scaling all counts in this library by $2^{-T_{is}}$.
-This eliminates differences in the coverage of spike-in set $s$ between cells and corrects for well/cell-specific technical biases.
-The variance of the log-size factors is at least one order of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b), indicating that the variances in sequencing depth and capture efficiency across wells (i.e., $\variance{(\log_2 L_{i})}$ and $\variance{(\log_2 R_{is})}$) are more important than the variance of volume addition.
+To put these estimates into context, consider that the variance of the log-size factors $T_{is}$ across cells is at least one order of magnitude larger than $\sigma^2_{vol}$ (Figure~\ref{fig:varestimates}b).
+\revised{This indicates that the error in the size factors due to variable volume addition is negligible relative to the amount of scaling that is performed to account for differences in sequencing depth and capture efficiency across wells, i.e., $\variance{(\log_2 L_{i})}$ and $\variance{(\log_2 R_{is})}$.}
 We also computed the variance of the log$_2$-ratio of total counts for the mouse genes against one of the spike-in sets.
 This represents the biological fluctuations in total RNA content across cells and was, again, at least an order of magnitude larger than $\sigma^2_{vol}$ (Supplemental Figure~\suppfigcell{}).
-When compared to the other technical and biological components of variability in a scRNA-seq experiment, the variance of volume addition is relatively small and thus is unlikely to have a major effect on spike-in normalization.
+\revised{These results show that the variance of volume addition is minor compared to other technical and biological sources of variability in a scRNA-seq experiment, and thus is unlikely to have a major effect on spike-in normalization.}
 
 \begin{figure}[btp]
     \begin{center}
