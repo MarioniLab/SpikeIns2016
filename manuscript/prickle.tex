@@ -291,7 +291,7 @@ To put these estimates into context, consider that the variance of the log-size 
 \revised{This indicates that the error in the size factors due to variable volume addition is negligible relative to the amount of scaling that is performed to account for differences in sequencing depth and capture efficiency across wells, i.e., $\variance{(\log_2 L_{i})}$ and $\variance{(\log_2 R_{is})}$.}
 We also computed the variance of the log$_2$-ratio of total counts for the mouse genes against one of the spike-in sets.
 This represents the biological fluctuations in total RNA content across cells and was, again, at least an order of magnitude larger than $\sigma^2_{vol}$ (Supplemental Figure~\suppfigcell{}).
-\revised{These results show that the variance of volume addition is minor compared to other technical and biological sources of variability in a scRNA-seq experiment, and thus is unlikely to have a major effect on spike-in normalization.}
+\revised{These results show that the variance of volume addition is small compared to other technical and biological sources of variability in a scRNA-seq experiment, and thus is unlikely to have a major effect on spike-in normalization.}
 
 \begin{figure}[btp]
     \begin{center}
@@ -323,8 +323,8 @@ In our mathematical framework, the variance of $\theta^*_i$ provides an upper bo
 Our estimate of $\variance(\theta^*_i)$ is an order of magnitude lower than the estimated variances of the log-size factors in each plate (Figure~\ref{fig:varestimates}) and of cellular RNA content (Supplemental Figure~\suppfigcell{}).
 This indicates that the potential variance in the differences in spike-in behaviour, while greater than $\sigma^2_{vol}$, is still relatively small compared to other biases in the system, e.g., fluctuations in cellular RNA content, well-to-well variability in global capture efficiency.
 To elaborate, consider that the maximum $\variance(F_i)$ corresponds to an error of $2^{\sqrt{0.015}} \approx 8$\% in the size factor estimates.
-This is minor when we consider that spike-in normalization -- even in a homogeneous population of cells -- involves scaling the counts for each cell by at least $2^{\sqrt{0.15}} \approx 30$\%.
-More drastic scaling is likely in heterogeneous data sets with greater differences in total RNA content between subpopulations, further reducing the relevance of any small errors in size factor estimation.
+\revised{This error is small, especially} when we consider that spike-in normalization involves scaling the counts for each cell by at least $2^{\sqrt{0.15}} \approx 30$\% \revised{in our data sets.
+These results suggest that variance in spike-in behaviour across cells is unlikely to have a strong effect on normalization.}  
 
 Here, $F_i$ is only computed between two spike-in sets.
 In practice, the more relevant differences are those between synthetic spike-in and endogenous transcripts.
@@ -350,8 +350,8 @@ This is especially relevant to data sets where the spike-in coverage is lower th
 \revised{Finally, we performed simulations to assess the effect of noise on the precision of the spike-in size factors themselves (see Section~\suppsecnoisier{} of the Supplemental Materials).
     This was performed using our 416B and TSC data sets as well as public data from existing studies \autocite{scialdone2015computational,zeisel2015brain,islam2014quantitative,hashimshony2016celseq2,buettner2015computational,grun2014validation,kolod2015single}.
 In each data set, we observed that sampling noise resulted in $\approx 5$\% error in the estimates for the spike-in size factors (Supplemental Figure~\suppfignoisier{}).
-By comparison, the size factors routinely vary by more than 30\% across cells (Supplemental Figure~\suppfigsizevar{}).
-This suggests that the loss of precision due to noise is minor and can be ignored during spike-in normalization.
+By comparison, the size factors routinely varied by more than 30\% across cells (Supplemental Figure~\suppfigsizevar{}).
+Thus, the loss of precision due to noise is small and can probably be ignored during spike-in normalization.
 }
 
 \subsection*{Assessing the downstream effect of variability with simulations}
