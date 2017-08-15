@@ -429,7 +429,7 @@ This avoids inflated circles due to outliers.
 
 \begin{figure}
     \begin{center}
-        \includegraphics[width=\textwidth]{../simulations/sampling/collated.pdf}
+        \includegraphics[width=\textwidth]{../simulations/sampling/collated_sampling.pdf}
     \end{center}
     \caption{\revised{Relative estimation error for the spike-in size factor of each cell, shown as a percentage of the value of the size factor.
         Boxplots represent the distribution of errors across cells in each data set.
@@ -443,6 +443,19 @@ This avoids inflated circles due to outliers.
     }
     \label{fig:sampling}
 \end{figure}
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=\textwidth]{../simulations/sampling/collated_sizefac.pdf}
+    \end{center}
+    \caption{\revised{Absolute deviation of the spike-in size factor of each cell, shown as a percentage of the mean size factor across cells.
+        Deviations were calculated by fitting a linear model to the $\log_2$-size factors, using a design matrix containing all experimental factors in the data set.
+        The deviation for each cell was defined as $2^r$ where $r$ is the corresponding residual for that cell in the fitted model.
+    Each boxplot represents the distribution of deviations across cells in a particular data set, see Supplemental Figure~\ref{fig:sampling}.}
+    }
+    \label{fig:sampling}
+\end{figure}
+
 
 \begin{figure}[btp]
     \begin{center}

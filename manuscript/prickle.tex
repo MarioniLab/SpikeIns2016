@@ -45,13 +45,16 @@
 \newcommand{\suppfigcell}{5}
 \newcommand{\suppfigbiophys}{6}
 \newcommand{\suppfignoise}{7}
-\newcommand{\suppfiglostsim}{8}
-\newcommand{\suppfigspikeconc}{9}
-\newcommand{\suppfigspikeave}{10}
-\newcommand{\suppfigindex}{11}
+\newcommand{\suppfignoisier}{8}
+\newcommand{\suppfigsizevar}{9}
+\newcommand{\suppfiglostsim}{10}
+\newcommand{\suppfigspikeconc}{11}
+\newcommand{\suppfigspikeave}{12}
+\newcommand{\suppfigindex}{13}
 
 \newcommand{\suppsecmath}{1}
-\newcommand{\suppsecnoise}{2}
+\newcommand{\suppsecnoise}{2.1}
+\newcommand{\suppsecnoisier}{2.2}
 \newcommand{\suppsecindex}{3}
 \newcommand{\suppsecdata}{4}
 \newcommand{\suppsecsim}{5}
@@ -343,6 +346,13 @@ Upon decreasing coverage \textit{in silico}, we observed an increase in $\sigma^
 However, even at 40-50\% coverage, the variance due to noise was still an order of magnitude lower than the variance due to cell-specific biases (Figure~\ref{fig:varestimates}b) or biological variability (Supplemental Figure~\suppfigcell{}).
 These results suggest that spike-in normalization is still reliable when lower amounts of spike-in RNA are added.
 This is especially relevant to data sets where the spike-in coverage is lower than recommended, due to difficulties in determining the appropriate concentration of spike-ins to add to each cell when the quantity of endogenous RNA is unknown.
+
+\revised{Finally, we performed simulations to assess the effect of noise on the precision of the spike-in size factors themselves (see Section~\suppsecnoisier{} of the Supplemental Materials).
+    This was performed using our 416B and TSC data sets as well as public data from existing studies \autocite{scialdone2015computational,zeisel2015brain,islam2014quantitative,hashimshony2016celseq2,buettner2015computational,grun2014validation,kolod2015single}.
+In each data set, we observed that sampling noise resulted in $\approx 5$\% error in the estimates for the spike-in size factors (Supplemental Figure~\suppfignoisier{}).
+By comparison, the size factors routinely vary by more than 30\% across cells (Supplemental Figure~\suppfigsizevar{}).
+This suggests that the loss of precision due to noise is minor and can be ignored during spike-in normalization.
+}
 
 \subsection*{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to fluctuations in the total spike-in counts due to variability in spike-in addition, behaviour or sequencing noise.
