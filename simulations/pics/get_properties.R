@@ -5,7 +5,7 @@
 
 pdf("comparison_log_HVG.pdf", width=4, height=6)
 par(mar=c(5.1, 5.1, 4.1, 2.1))
-for (x in c("calero", "liora")) {
+for (x in c("Calero", "Liora")) {
     original <- sprintf("../variance/log_%s_0.tsv",x)
     modified <- sprintf("../variance/log_%s_1.tsv",x)
     odata <- read.table(original, header=TRUE)
@@ -49,7 +49,7 @@ dev.off()
 
 pdf("comparison_edgeR_DEG.pdf", width=4, height=6)
 par(mar=c(5.1, 5.1, 4.1, 2.1))
-for (x in c("calero", "islam")) {
+for (x in c("Calero", "Buettner")) {
     original <- sprintf("../diffexp/edgeR_%s_0.tsv",x)
     modified <- sprintf("../diffexp/edgeR_%s_1.tsv",x)
     odata <- read.table(original, header=TRUE)
@@ -57,7 +57,7 @@ for (x in c("calero", "islam")) {
     mdata <- read.table(modified, header=TRUE)
     mdata <- mdata[mdata$FDR <= 0.05,]
     
-    dname <- ifelse(x=="calero", "416B", "mESC")
+    dname <- ifelse(x=="Calero", "416B (induced/control)", "mESC (G2M/G1)")
     olfc <- abs(odata$logFC)
     mlfc <- abs(mdata$logFC)
     kept <- olfc[rownames(odata) %in% rownames(mdata)]
