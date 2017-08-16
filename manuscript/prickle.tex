@@ -365,18 +365,19 @@ Thus, the loss of precision due to noise is small and can probably be ignored du
 
 \subsection*{Assessing the downstream effect of variability with simulations}
 We assessed whether the results of downstream analyses using spike-in normalization were sensitive to fluctuations in the total spike-in counts due to variability in spike-in addition, behaviour or sequencing noise.
-First, we obtained data from plate-based experiments that contained counts for spike-in transcripts.
-This included public data sets \autocite{segerstople2016single,islam2011characterization} as well as our 416B and TSC data.
+First, we obtained data from \revised{scRNA-seq experiments that used spike-in RNA}.
+This included \revised{a number of} public data sets \autocite{scialdone2015computational,islam2014quantitative,buettner2015computational,grun2014validation,kolod2015single,segerstople2016single} as well as our 416B and TSC data.
 We then performed analyses such as detection of differentially expressed genes (DEGs) and highly variable genes (HVGs), as well as dimensionality reduction and clustering of cells.
 This was done without any modification of the data to obtain a set of ``original results''.
 
 Next, we designed simulations based on each of the real data sets (see Methods).
 Briefly, the total spike-in count for each well was rescaled by a randomly sampled factor with variance equal to our experimental estimate of spike-in variance.
 Counts for the individual spike-in transcipts were rescaled to reflect this new total, thus yielding a simulated data set.
-Analyses were performed on the simulated data and the new results were compared to the original set of results.
+\revised{Downstream} analyses were performed \revised{using the original counts for the endogenous genes and the simulated counts for the spike-in transcripts.
+The new results were then compared to the original set of results from each analysis.}
 Any differences indicate that the analysis is sensitive to spike-in variability in real experiments.
 The advantage of this simulation design is that only the spike-in counts are modified.
-Counts for the endogenous transcripts were used directly without any modification, preserving the realistic nature of the data in each simulation.
+\revised{No simulations or resampling were performed for the counts of the endogenous genes}, preserving the realistic nature of the data in each simulation \revised{and ensuring that only spike-in variability can cause differences in the analysis results.}
 
 For DEG detection, we applied edgeR \autocite{robinson2010edgeR} and MAST \autocite{finak2015mast} to the original and simulated data after spike-in normalization.
 edgeR represents methods designed for DE analyses of bulk RNA-seq data, while MAST represents bespoke single-cell methods.
