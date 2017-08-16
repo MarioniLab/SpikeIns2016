@@ -161,6 +161,14 @@ We also obtain an upper bound on the cell-to-cell variability in the differences
 Simulations indicate that both factors have only minor effects on the results of downstream analyses such as detection of DE and highly variable genes.
 These results suggest that spike-ins can be safely used for routine normalization of scRNA-seq data.
 
+\revised{We emphasize that we are only interested in the performance of spike-in RNA for scaling normalization.
+This involves the calculation of cell-specific scaling factors to remove relative biases between cells.
+We are not investigating the performance of spike-in RNA for the absolute quantification of endogenous transcript molecules \autocite{svensson2017power},
+which would involve absolute quantification of the bias in each cell.
+We are also not studying the use of spike-ins for batch correction \autocite{tung2016batch}, which would require modelling of gene-specific batch effects beyond simple cell-specific scaling.
+Both of these tasks are separate to scaling normalization and will not be addressed here.
+}
+
 \subsection*{Description of the mixture experiments}
 We aimed to assess the variability in the added spike-in quantity across cells.
 To do so, we performed mixture experiments using two distinct spike-in sets (Figure~\ref{fig:expdesign}) -- the External RNA Controls Consortium (ERCC) set and the Spike-in RNA Variants (SIRV) set.
@@ -269,9 +277,10 @@ To obtain an estimate of the variance of the volume addition step, simple arithm
 \]
 It should be stressed that this variance estimate is relevant to all experiments using the same protocol for spike-in addition, even if the identity or concentration of the spike-in set is different.
 
-\revised{In general, scaling normalization for RNA-seq data is performed by dividing all counts in each library by a library-specific constant, known as the ``size factor''.
+\revised{Generally, scaling normalization of RNA-seq data is performed by dividing all counts in each library by a library-specific constant, known as the ``size factor''.
 For spike-in normalization, the size factor for cell $i$ is directly proportional to the sum of counts for the spike-in transcripts, i.e., $2^{T_{is}}$.
 This reflects the fact that spike-in normalization aims to eliminate systematic differences in the coverage of spike-in set $s$ between cells, thus correcting for well/cell-specific technical biases.
+(We assume each well contains a cell and will use ``cell'' and ``well'' interchangeably in the following text.)
 Any variance due to volume addition ($\sigma^2_{vol}$) or technical noise ($\sigma^2_{lib(s)}$) will reduce the precision of $T_{is}$ and of the size factor estimates (Supplemental Figure~\suppfigschem{}), thus reducing the effectiveness of spike-in normalization.
 }
 
@@ -312,8 +321,8 @@ This represents the biological fluctuations in total RNA content across cells an
 \subsection*{Estimating the variance of differential behaviour}
 The variance of $F_i$ is also relevant as it determines the effect of differences in behaviour between distinct sets of transcripts.
 Even when the average capture efficiency differs between sets, spike-in normalization is still appropriate \textit{provided that the fold change in efficiency is the same in all wells}.
-Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts.
-This scales up the counts for the spike-in transcripts in all libraries by the same factor, which ultimately cancels out between libraries (i.e., the log-fold changes of endogenous or spike-in transcripts between different libraries are unaffected).
+Consider a situation where there is a consistent increase in efficiency in the spike-in set relative to endogenous transcripts \autocite{svensson2017power}.
+This scales up the counts for the spike-in transcripts in all \revised{wells} by the same factor, which ultimately cancels out between \revised{wells}, i.e., the log-fold changes of endogenous or spike-in transcripts between \revised{wells} are unaffected.
 However, if the fold change in efficiency varies across wells, the accuracy of spike-in normalization is compromised.
 This is because specific changes in efficiency for the spike-in transcripts are confounded with general changes in efficiency for all transcripts in the well.
 Differences in the coverage of spike-in transcripts may not represent technical biases affecting other transcripts, precluding their use for normalizing all counts.
