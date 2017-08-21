@@ -410,7 +410,7 @@ This is expected as genes on the borderline of significance are more susceptible
 
 For dimensionality reduction, we restricted ourselves to principal components analysis (PCA) on the normalized expression profiles of all cells. 
 While $t$-distributed stochastic neighbour embedding \autocite{van2008visualizing} is commonly used, its robustness is difficult to evaluate due to its randomness.
-We generated PCA plots of the first three principal components using both the original and simulated data \revised{from a scRNA-seq study of the human pancreas \autocite{segerstople2016single}}.
+We generated PCA plots of the first three principal components using the original and simulated data \revised{from a scRNA-seq study of the human pancreas \autocite{segerstople2016single}}.
 At each simulation iteration, coordinates of all cells in the simulated plots were mapped onto the corresponding original plots to determine the sensitivity of the original locations to spike-in variability.
 Figure~\ref{fig:dimclust}a indicates that changes in the location of each cell across simulation iterations were generally minor.
 In particular, movement of cells across iterations did not compromise the separation of different cell types. 
@@ -461,7 +461,7 @@ This is not straightforward to gauge for biological systems that are not well st
 If insufficient spike-ins are added, sampling noise will increase and the precision of spike-in normalization will deteriorate.
 However, we do not consider this to be a matter of reliability.
 It is \revised{not} surprising that suboptimal performance is obtained when inappropriate concentrations of reagents are used, and spike-in RNA is no exception.
-Pilot experiments can be performed to identify the most suitable spike-in concentration to use for a given biological system, just like they would be used to determine the optimal dissociation conditions, lysis buffer, amplification cycles, etc.
+Pilot experiments can be performed to identify the most suitable spike-in concentration to use for a given biological system, just like they would be used to determine the optimal dissociation conditions, lysis buffer, amplification cycles \revised{and so on}.
 Once the optimal concentration is determined, it can be used for all experiments on that system and the choice of concentration ceases to be an issue.
 In contrast, the variability of volume addition and of spike-in behaviour cannot be easily controlled even if all other parameters are optimized. 
 
@@ -489,8 +489,7 @@ If a non-DE majority cannot be assumed, spike-in normalization should be used; c
 We stress that our study only examines the reliability of spike-ins for ``relative'' normalization, i.e., to make counts comparable across cells.
 We do not consider the reliability of spike-ins for absolute quantification, i.e., to determine the number of molecules of each transcript in each cell.
 This is more difficult to evaluate as accuracy is affected by the magnitude of the differences in the behaviour of spike-in and endogenous transcripts.
-In contrast, relative normalization is only affected by variability in the differences in behaviour across wells, as discussed above.
-Nonetheless, our conclusions are still relevant as absolute quantification depends on the precise addition of spike-in RNA to each cell.
+In contrast, relative normalization is only affected by variability in the differences in behaviour across wells, as \revised{we have previously} discussed.
 
 \section*{Methods}
 
