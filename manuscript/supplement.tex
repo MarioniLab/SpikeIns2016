@@ -140,21 +140,24 @@ To simulate counts, we recalculated the fitted values of the GLM after setting t
 The cell- and transcript-specific fitted values and the transcript-specific dispersion were used as the parameters for a NB distribution from which counts were resampled.
 In this manner, simulated counts were obtained for each spike-in transcript in each cell.
 
-The aim is to compute the variance of the log-ratios of the total counts between spike-in sets from the simulated data.
+\revised{Our} aim is to compute the variance of the log-ratios of the total counts between spike-in sets from the simulated data.
 By forcing the offsets of all wells to be equal, we removed differences in the log-ratios between wells due to cell-specific capture efficiency and sequencing depth.
-This means that any variance in the simulated log-ratios across wells must be due to stochastic sampling noise, i.e.,  $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$.
-We also downscaled the fitted values to determine the effect of reducing spike-in coverage on the sampling noise.
-We scaled down to 1\% of the original coverage to mimic the addition of less spike-in RNA to each well.
-To preserve the mean-variance relationship during downscaling, we fitted a loess curve of degree 1 to the original log-transformed NB dispersion against the log-mean of the fitted values across all cells.
-We used this trend to determine the new NB dispersion for each transcript, which we then used during count sampling.
+This means that any variance in the simulated log-ratios across wells must be due to stochastic sampling noise.
+\revised{Estimates of this variance represent the approximate contribution of $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ to $\variance(\theta^*_i)$ (Supplemental Figure~\ref{fig:sampledepth}, at 100\% coverage).}
 
-We do not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
+We also downscaled the fitted values to determine the effect of reducing spike-in coverage on the sampling noise.
+\revised{Specifically, we repeated the simulations after scaling the fitted values down to 1\% of their original values, to mimic the addition of less spike-in RNA to each well.}
+To preserve the mean-variance relationship during downscaling, we fitted a loess curve of degree 1 to the original log-transformed NB dispersion against the log-mean of the fitted values across all cells.
+We used this trend to determine the new NB dispersion for each transcript.
+\revised{Count sampling was then performed using the scaled fitted values and new dispersions.}
+
+We \revised{did} not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
 Both of these terms refer to experimental processes that should be independent of the concentration of spike-in RNA.
 For example, the process of adding a volume of a solution is unrelated to the solution's contents.
 Similarly, the process of capturing a transcript molecule is unrelated to the number of other transcript molecules, excepting the presence of limiting reagents.
 Thus, the true values of $\sigma^2_{vol}$ or $\variance(F_i)$ should generally be unaffected by the depth of coverage.
 In contrast, sampling noise during sequencing depends on the coverage and will contribute to the true value of $\sigma^2_{lib(s)}$.
-This means that we need to test the effect of reducing coverage on $\sigma^2_{lib(s)}$.
+This \revised{motivated our simulations} to test the effect of reducing coverage on $\sigma^2_{lib(s)}$.
 
 \begin{color}{red}
 \subsection{Calculating the effect of noise on size factor precision}
@@ -243,7 +246,7 @@ This reduces computational work by filtering} out low-abundance genes that do no
 
 \subsection{Methods for detecting differentially expressed genes}
 For DEG detection with edgeR v3.18.1, a NB GLM was fitted to the counts for each gene \citep{mccarthy2012differential} using a suitable design matrix.
-\revised{The design matrix for each data set was constructed using an additive parametrization for all experimental factors, including the factor containing the conditions to be compared for differential expression.}
+\revised{The design matrix for each data set was constructed using an additive parameterization for all experimental factors, including the factor containing the conditions to be compared for differential expression.}
 The log-transformed total count for the spike-in transcripts was used as the offset for each library.
 This is equivalent to spike-in normalization as each count is effectively downscaled by the spike-in total.
 An abundance-dependent trend was fitted to the NB dispersions of all genes using the estimateDisp function.
@@ -269,7 +272,7 @@ If any \revised{experimental} factors were present, they were regressed out by l
 The second approach to detect HVGs was based on computing the variance of log-expression values \citep{lun2016stepbystep}.
 For each count in each library, a normalized log-expression value was defined as the log-ratio of the count with the spike-in size factor for that library.
 (A pseudo-count of 1 was added to avoid undefined values upon log-transformation.)
-\revised{If any experimental factors were present, they were used to construct a design matrix with an additive parametrization -- otherwise, an intercept-only design matrix was used.
+\revised{If any experimental factors were present, they were used to construct a design matrix with an additive parameterization -- otherwise, an intercept-only design matrix was used.
 The design matrix was used to fit a linear model to the log-expression values to obtain the residual variance for each spike-in transcript.}
 A loess curve was fitted to the log-variance against the mean for all spike-in transcripts using the trendVar function in scran, representing the mean-variance relationship due to technical noise.
 \revised{Variance estimation was repeated on the log-expression values for each endogenous gene,} and the biological component of the variance and a $p$-value was computed for each gene using the decomposeVar function.
