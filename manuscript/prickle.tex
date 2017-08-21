@@ -94,12 +94,12 @@
 \textbf{Abstract:}
 By profiling the transcriptomes of individual cells, single-cell RNA sequencing provides unparalleled resolution to study cellular heterogeneity.
 However, this comes at the cost of high technical noise, including cell-specific biases in capture efficiency and library generation.
-One strategy for removing these biases is to add a constant amount of spike-in RNA to each cell, and to scale the observed expression values so that the coverage of spike-in RNA is constant across cells.
-This approach has previously been criticized as its accuracy depends on the precise addition of spike-in RNA to each sample, and on similarities in behaviour (e.g., capture efficiency) between the spike-in and endogenous transcripts.
+One strategy for removing these biases is to add a constant amount of spike-in RNA to each cell, and to scale the observed expression values so that the coverage of spike-in \revised{transcripts} is constant across cells.
+This approach has previously been criticized as its accuracy depends on the precise addition of spike-in RNA to each sample.
 Here, we perform mixture experiments using two different sets of spike-in RNA to quantify the variance in the amount of spike-in RNA added to each well in a plate-based protocol.
 We also obtain an upper bound on the variance due to differences in behaviour between the two spike-in sets.
 We demonstrate that both factors are small contributors to the total technical variance and have only minor effects on downstream analyses such as detection of highly variable genes and clustering.
-Our results suggest that spike-in normalization is reliable enough for routine use in single-cell RNA sequencing data analyses.
+Our results suggest that \revised{scaling} normalization \revised{using spike-in transcripts} is reliable enough for routine use in single-cell RNA sequencing data analyses.
 \end{quote}
 
 \section*{Introduction}
@@ -196,7 +196,7 @@ The difference between these two estimates represents the variance attributable 
 For each library, reads were mapped to the genome and assigned to genes to quantify expression.
 The total count was computed across all transcripts of each spike-in set in each well.
 The log$_2$-ratio of the totals between the two sets was computed for each well, and the variance of this log-ratio was computed \textit{across} wells.
-Any variability in spike-in volume addition should manifest as an increase to the variability of the log-ratio, given that the spike-in sets were added independently to each well.
+Any variability in spike-in volume addition should manifest as an increase \revised{in} the variability of the log-ratio, given that the spike-in sets were added independently to each well.
 
 We also repeated the experiment by adding volumes of ``premixed'' spike-in solution where the two spike-in sets had been pooled at a 1:1 ratio.
 This ensures that there is no well-to-well variability in the relative quantities of RNA from the two spike-in sets.
@@ -333,7 +333,7 @@ Our estimate of $\variance(\theta^*_i)$ is an order of magnitude lower than the 
 This indicates that the potential variance in the differences in spike-in behaviour, while greater than $\sigma^2_{vol}$, is still relatively small compared to other biases in the system, e.g., fluctuations in cellular RNA content, well-to-well variability in global capture efficiency.
 To elaborate, consider that the maximum $\variance(F_i)$ corresponds to an error of $2^{\sqrt{0.015}} \approx 8$\% in the size factor estimates.
 \revised{This error is small, especially} when we consider that spike-in normalization involves scaling the counts for each cell by at least $2^{\sqrt{0.15}} \approx 30$\% \revised{in our data sets.
-These results suggest that variance in spike-in behaviour across cells is unlikely to have a strong effect on normalization.}  
+These results suggest that variance in spike-in behaviour across cells is unlikely to have a strong effect on scaling normalization.}  
 
 Here, $F_i$ is only computed between two spike-in sets.
 In practice, the more relevant differences are those between synthetic spike-in and endogenous transcripts.
@@ -410,7 +410,7 @@ This is expected as genes on the borderline of significance are more susceptible
 
 For dimensionality reduction, we restricted ourselves to principal components analysis (PCA) on the normalized expression profiles of all cells. 
 While $t$-distributed stochastic neighbour embedding \autocite{van2008visualizing} is commonly used, its robustness is difficult to evaluate due to its randomness.
-We generated PCA plots of the first three principal components using both the original and simulated data.
+We generated PCA plots of the first three principal components using both the original and simulated data \revised{from a scRNA-seq study of the human pancreas \autocite{segerstople2016single}}.
 At each simulation iteration, coordinates of all cells in the simulated plots were mapped onto the corresponding original plots to determine the sensitivity of the original locations to spike-in variability.
 Figure~\ref{fig:dimclust}a indicates that changes in the location of each cell across simulation iterations were generally minor.
 In particular, movement of cells across iterations did not compromise the separation of different cell types. 
@@ -447,7 +447,7 @@ We also obtained a rough estimate of the well-to-well variability in the differe
 Both values were at least an order of magnitude smaller than the variance of spike-in coverage across cells, suggesting that differences in spike-in volume or behaviour were not major sources of error in the context of spike-in normalization.
 This was supported by simulations where the introduction of realistic levels of spike-in variance yielded only minor changes in the results of DEG and HVG analyses as well as PCA and clustering.
 Our results indicate that spike-in normalization is reliable enough for routine use in scRNA-seq data analyses.
-The common criticisms of using spike-in RNA for normalization are only weakly relevant, if at all, to single-cell transcriptome studies, and can generally be ignored.
+The common criticisms of using spike-in RNA for \revised{scaling} normalization are only weakly relevant, if at all, to single-cell transcriptome studies, and can generally be ignored.
 
 Our conclusions differ from those of \citet{risso2014normalization}, where spike-in normalization is not considered reliable enough for analyses of bulk RNA-seq data.
 We speculate that this difference may be due to the difficulty of adding an appropriate amount of spike-in RNA at the population level.
@@ -460,8 +460,8 @@ It is worth mentioning another common criticism of the use of spike-in RNA -- na
 This is not straightforward to gauge for biological systems that are not well studied.
 If insufficient spike-ins are added, sampling noise will increase and the precision of spike-in normalization will deteriorate.
 However, we do not consider this to be a matter of reliability.
-It is hardly surprising that suboptimal performance is obtained when inappropriate concentrations of reagents are used, and spike-in RNA is no exception.
-Pilot experiments can be easily performed to identify the most suitable spike-in concentration to use for a given biological system, just like they would be used to determine the optimal dissociation conditions, lysis buffer, amplification cycles, etc.
+It is \revised{not} surprising that suboptimal performance is obtained when inappropriate concentrations of reagents are used, and spike-in RNA is no exception.
+Pilot experiments can be performed to identify the most suitable spike-in concentration to use for a given biological system, just like they would be used to determine the optimal dissociation conditions, lysis buffer, amplification cycles, etc.
 Once the optimal concentration is determined, it can be used for all experiments on that system and the choice of concentration ceases to be an issue.
 In contrast, the variability of volume addition and of spike-in behaviour cannot be easily controlled even if all other parameters are optimized. 
 
@@ -568,8 +568,8 @@ Under the null hypothesis of equal variances computed from independent data, the
 This can either be one-sided (i.e., $\sigma^2_1 \le \sigma^2_2$ under the null), in which case the lower tail probability at the observed ratio is taken as the $p$-value;
 or it can be two-sided, in which case the $p$-value is defined as twice the smaller of the two tail probabilities.
 Significant differences were defined by rejecting the null hypothesis at a type I error rate of 5\%.
-We calculated $\sigma^2_{vol}$ from estimates of $\variance(\theta_i)$ and $\variance(\theta^2_i)$, using the expression described above.
-However, if the difference between $\variance(\theta_i)$ and $\variance(\theta^2_i)$ was negative, $\sigma^2_{vol}$ was set to zero instead.
+We calculated $\sigma^2_{vol}$ from estimates of $\variance(\theta_i)$ and $\variance(\theta^*_i)$, using the expression described above.
+However, if the difference between $\variance(\theta_i)$ and $\variance(\theta^*_i)$ was negative, $\sigma^2_{vol}$ was set to zero instead.
 To assess the effect of the order of spike-in addition, a linear model was fitted to the subset of relevant wells on each plate to obtain an order-specific variance estimate.
 
 \subsection*{Simulation design for resampling spike-in variability}
