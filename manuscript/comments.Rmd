@@ -1,0 +1,18 @@
+# Explaining the simulation results
+
+Variance ranking should largely be robust to spike-in variability.
+Any variability should affect all genes equally, such that the ranking shouldn't change much.
+Testing for significance over tehnical noise will be more sensitive, as the technical estimates are normalized by assuming no variability.
+Any variability is absorbed into the total variability, resulting in an overestimate of the biological variability.
+The extent to which this affects things will depend on the magnitude of the variability.
+
+For DE analyses, the ranking should also be robust, provided that sufficient cells are present in each condition.
+Any variability will average out across the condition, such that the log-fold change between conditions is unaffected.
+Of course, the variance of each gene will be increased by the same amount.
+This won't affect the rankings, as each gene will be affected; however, it will result in loss of power.
+Whether this results in a substantial effect in detection depends on the size of the increase.
+
+Clustering is likely to be most sensitive to spike-in variability.
+This is because clustering (and dimension reduction) treats each cell as its own entity.
+Fluctuations in spike-in quantities will affect the quantification and inferences for that cell.
+There is no averaging out that can robustify against changes at a per-cell level.
