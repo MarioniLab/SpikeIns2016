@@ -147,9 +147,9 @@ This means that any variance in the simulated log-ratios across wells must be du
 
 We also downscaled the fitted values to determine the effect of reducing spike-in coverage on the sampling noise.
 \revised{Specifically, we repeated the simulations after scaling the fitted values down to 1\% of their original values, to mimic the addition of less spike-in RNA to each well.}
-To preserve the mean-variance relationship during downscaling, we fitted a loess curve of degree 1 to the original log-transformed NB dispersion against the log-mean of the fitted values across all cells.
-We used this trend to determine the new NB dispersion for each transcript.
-\revised{Count sampling was then performed using the scaled fitted values and new dispersions.}
+To preserve the mean-variance relationship, we fitted a loess curve of degree 1 to the original log-transformed NB dispersion against the log-mean of the fitted values across all cells.
+We used this trend to determine the new NB dispersion for each transcript \revised{after downscaling.
+Count sampling was then performed using the scaled fitted values and new dispersions.}
 
 We \revised{did} not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
 Both of these terms refer to experimental processes that should be independent of the concentration of spike-in RNA.
@@ -303,7 +303,7 @@ Specifically:
 The more obvious approach to remapping is to directly project the simulated log-expression data onto the space of the original plot.
 However, we do not do this as it does not capture the variability in the identification of the PCs across iterations.
 Upon completion of the simulation, each cell will have one original location and one remapped location per iteration. 
-For each cell, the smallest circle centered at its original location was drawn that contained the 95\% of the remapped locations.
+For each cell, the smallest circle centered at its original location was drawn that contained 95\% of the remapped locations.
 This avoids inflated circles due to outliers.
 
 \printbibliography
@@ -317,7 +317,7 @@ This avoids inflated circles due to outliers.
     \caption{\revised{Schematic of the effect of variability in spike-in addition ($\sigma^2_{vol}$) or library preparation ($\sigma^2_{lib(s)}$) on the performance of spike-in normalization.
         The spike-in size factor for each cell is calculated from the sum of counts for spike-in transcripts.
         The size factors faithfully represent the true cell-specific biases when equal amounts of spike-in RNA are added to each well and technical noise in library preparation and sequencing is low.
-        This is not the case when spike-in addition is variable or technical noise is high, manifesting as error from the true biases (i.e., large residual variance).
+        This is not true when spike-in addition is variable or technical noise is high, manifesting as errors relative to the true biases (i.e., large residual variance).
     Note that the true biases are unknown, so $\sigma^2_{vol}$ and $\sigma^2_{lib(s)}$ are instead estimated from spike-in mixtures as described in our experimental design.}
     }
 \end{figure}
@@ -343,7 +343,7 @@ This avoids inflated circles due to outliers.
     \end{center}
     \caption{
         Distribution of the log-ratios after separate or premixed addition of spike-in sets.
-        For each plate, a linear model was fitted to the log-ratios of the corresponding wells to account for the experimental design.
+        For each plate, a linear model was fitted to the log-ratios of the corresponding wells to account for \revised{factors in} the experimental design.
         (a, b) Quantile-quantile plots of the residuals of the fitted model for each plate.
         Residuals were standardized and plotted against the theoretical quantiles of a standard normal distribution.
         The dotted line represents equality between the sample and theoretical quantiles.
@@ -453,7 +453,7 @@ This avoids inflated circles due to outliers.
     \end{center}
     \caption{\revised{Absolute deviation of the spike-in size factor of each cell, shown as a percentage of the mean size factor across cells.
         Deviations were calculated by fitting a linear model to the $\log_2$-size factors, using a design matrix containing all experimental factors in the data set.
-        The deviation for each cell was defined as $2^r$ where $r$ is the corresponding residual for that cell in the fitted model.
+    The deviation for each cell was defined as $|2^r-1| \times 100$ where $r$ is the corresponding residual for that cell in the fitted model.
     Each boxplot represents the distribution of deviations across cells in a particular data set, see Supplemental Figure~\ref{fig:sampling}.}
     }
 \end{figure}

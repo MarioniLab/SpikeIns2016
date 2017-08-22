@@ -164,7 +164,7 @@ These results suggest that spike-ins can be safely used for routine normalizatio
 \revised{We emphasize that we are only interested in the performance of spike-in RNA for scaling normalization.
 This involves the calculation of cell-specific scaling factors to remove relative biases between cells.
 We are not investigating the performance of spike-in RNA for the absolute quantification of endogenous transcript molecules \autocite{svensson2017power},
-which would involve absolute quantification of the bias in each cell.
+which would require estimation of the absolute bias in each cell.
 We are also not studying the use of spike-ins for batch correction \autocite{tung2016batch}, which would require modelling of gene-specific batch effects beyond simple cell-specific scaling.
 Both of these tasks are separate to scaling normalization and will not be addressed here.
 }
@@ -289,7 +289,7 @@ Using our mathematical framework, we estimated the variance components using the
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplemental Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
 Linear models are particularly useful as they allow blocking on additional structure in the experimental design.
-We used a one-way layout to account for shifts in the mean \revised{ratio} due to addition order or oncogene induction (see Methods).
+We used a one-way layout to account for shifts in the mean \revised{log-ratio} due to addition order or oncogene induction (see Methods).
 The value of $T_{is}$ was also similar between wells with premixed or separate addition of spike-ins, which simplifies the calculation of $\sigma^2_{vol}$ (see Supplemental Figure~\suppfigtotals{}, Section~\suppsecmath{} of the Supplemental Materials for details).
 Finally, the order of spike-in addition did not significantly affect the variance estimates for the separate-addition wells in most plates (Supplemental Figure~\suppfigorder{}).
 
@@ -410,7 +410,7 @@ This is expected as genes on the borderline of significance are more susceptible
 
 For dimensionality reduction, we restricted ourselves to principal components analysis (PCA) on the normalized expression profiles of all cells. 
 While $t$-distributed stochastic neighbour embedding \autocite{van2008visualizing} is commonly used, its robustness is difficult to evaluate due to its randomness.
-We generated PCA plots of the first three principal components using the original and simulated data \revised{from a scRNA-seq study of the human pancreas \autocite{segerstople2016single}}.
+\revised{We used a scRNA-seq study of the human pancreas \autocite{segerstople2016single} to generate} PCA plots of the first three principal components for both the original and simulated data.
 At each simulation iteration, coordinates of all cells in the simulated plots were mapped onto the corresponding original plots to determine the sensitivity of the original locations to spike-in variability.
 Figure~\ref{fig:dimclust}a indicates that changes in the location of each cell across simulation iterations were generally minor.
 In particular, movement of cells across iterations did not compromise the separation of different cell types. 
@@ -546,7 +546,7 @@ This corresponds to the amount of spike-in RNA that we aimed to add to each well
 The coverage of each ERCC transcript was directly proportional to its theoretical concentration in the spike-in mixture (Supplemental Figure~\suppfigspikeconc{}),
 and the distribution of average read counts across spike-in transcripts or endogenous genes was consistent across plates (Supplemental Figure~\suppfigspikeave{}).
 These diagnostics indicate that the spike-in transcripts were successfully captured, sequenced and processed into counts for most wells.
-We removed any wells where the total count for either spike-in set or for the endogenous genes was more than three median absolute deviations below the median value for each plate. 
+We removed any wells where the \revised{log-}total count for either spike-in set or for the endogenous genes was more than three median absolute deviations below the median value for each plate. 
 It is likely that capture or sequencing failed for these wells, so they were not used for variance estimation.
 In addition, we examined the effect of index switching \autocite{sinha2017index} in each data set generated on the HiSeq 4000, and found it to be negligible (see Section~\suppsecindex{} of the Supplemental Materials, Supplemental Figure~\suppfigindex{}).
 
@@ -588,7 +588,7 @@ This means that
     \variance(T_{is}) \approx \sigma^2_{lib(s)} + \sigma^2_{vol} + \variance(F_i) + \variance(\log_2 R_{i0}) + \variance(\log_2 L_i) \;,
 \]
 i.e., the variance of $T_{is}$ is a sum of the variances of its component terms.
-The above approximation allows us to account for the measured values of $ \sigma^2_{vol}$ and $\variance(F_i)$ when simulating new values for $T_{is}$.
+The above approximation allows us to account for the measured $\sigma^2_{vol}$, \revised{$\sigma^2_{lib(s)}$} and $\variance(F_i)$ when simulating new values for $T_{is}$.
 
 % If library quantification has been performed, then L_i will be more likely to be correlated with volume because everything competes against each other.
 % At least it won't be correlated with global capture efficiency, as this should cancel out.
@@ -597,9 +597,9 @@ The above approximation allows us to account for the measured values of $ \sigma
 % Doing so would be problematic, as direct scaling of the counts would distort the empirical mean-variance relationship of the count data.
 
 Let us denote $x^2 = \sigma^2_{vol} + \variance(F_i) + \sigma^2_{lib(s)}$, representing the total variance in the log$_2$-total count of one spike-in set $s$ due to variable addition, capture efficiency and sequencing noise.
-We also denote $\hat\sigma^2_s$ as the estimate of $\variance(T_{is})$ across wells, and $\hat\mu_s$ as the estimate of $E(T_{is})$.
 We use the estimated $\variance(\theta^*_i) \approx 0.015$ in Figure~\ref{fig:varestimates}a as our estimate $\hat{x}^2$ of the upper bound of $x^2$.
 This is based on the fact that $\sigma^2_{vol}$ is near-zero in Figure~\ref{fig:varestimates}a, while $\variance(\theta^*_i) = \sigma^2_{lib(1)} + \sigma^2_{lib(2)} + \variance(F_i)$ and thus provides an upper bound on $\variance(F_i) + \sigma^2_{lib(s)}$ for any $s$.
+We also denote $\hat\sigma^2_s$ as the estimate of $\variance(T_{is})$ across wells, and $\hat\mu_s$ as the estimate of $E(T_{is})$.
 For each well $i$, we compute a simulated log$_2$-total $T^*_{is}$ as
 \[
     T^*_{is} = (T_{is} - \hat\mu_s)\sqrt{1-\frac{ \hat{x}^2}{\hat\sigma^2_s}} + \hat\mu_s + X_i
@@ -633,7 +633,7 @@ Implementation details of each method are provided in Section~\suppsecsim{} of t
 Briefly, normalization was performed by scaling the counts (explicitly or via offsets) such that the spike-in totals were the same between cells.
 The set of DEGs in the original data was then identified at a FDR of 5\%.
 This procedure was repeated for the simulated data, and the number of genes that were detected in the original results and not in the simulated results (or vice versa) was recorded as a proportion of the total number of original DEGs.
-The proportion of the top 200 genes with the smallest $p$-values that were shared between the original and simulated results was also computed.
+The proportion of the top 200 genes with the smallest $p$-values that were \revised{different} between the original and simulated results was also computed.
 This was repeated for 20 simulation iterations and the average proportion across iterations was reported for each method.
 
 \subsection*{Evaluating the robustness of HVG detection}
@@ -643,7 +643,8 @@ In each data set, spike-in normalization was performed and HVGs were detected us
 The first approach is based on the method of \cite{brennecke2013accounting} where the squared coefficient of variation for each gene is tested for a significant increase above technical noise.
 The second approach is based on the variance of the log-normalized expression values \autocite{lun2016stepbystep}, which provides some more robustness against outlier expression patterns.
 Each method was applied on the original and simulated data, and a set of significant HVGs was detected at a FDR of 5\%.
-The proportion of HVGs common to both the original and simulated sets was computed, along with the common proportion among the top 200 genes with the lowest $p$-values.
+The proportion of HVGs \revised{that were detected in the original results and not in the simulated results (or vice versa) was computed.}
+\revised{Similarly, we computed} the proportion of the top 200 genes with the lowest $p$-values \revised{that differed between the original and simulated results.}
 This was repeated for 20 simulation iterations and the average proportion across iterations was reported for each method.
 \revised{See Section~\suppsecdata{} of the Supplemental Materials for details on public data access and Section~\suppsecsim{} for the implementation details of each HVG detection method.}
 
