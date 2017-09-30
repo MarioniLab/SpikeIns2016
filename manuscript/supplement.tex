@@ -140,26 +140,25 @@ To simulate counts, we recalculated the fitted values of the GLM after setting t
 The cell- and transcript-specific fitted values and the transcript-specific dispersion were used as the parameters for a NB distribution from which counts were resampled.
 In this manner, simulated counts were obtained for each spike-in transcript in each cell.
 
-\revised{Our} aim is to compute the variance of the log-ratios of the total counts between spike-in sets from the simulated data.
+Our aim is to compute the variance of the log-ratios of the total counts between spike-in sets from the simulated data.
 By forcing the offsets of all wells to be equal, we removed differences in the log-ratios between wells due to cell-specific capture efficiency and sequencing depth.
 This means that any variance in the simulated log-ratios across wells must be due to stochastic sampling noise.
-\revised{Estimates of this variance represent the approximate contribution of $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ to $\variance(\theta^*_i)$ (Supplemental Figure~\ref{fig:sampledepth}, at 100\% coverage).}
+Estimates of this variance represent the approximate contribution of $\sigma^2_{lib(1)} + \sigma^2_{lib(2)}$ to $\variance(\theta^*_i)$ (Supplemental Figure~\ref{fig:sampledepth}, at 100\% coverage).
 
 We also downscaled the fitted values to determine the effect of reducing spike-in coverage on the sampling noise.
-\revised{Specifically, we repeated the simulations after scaling the fitted values down to 1\% of their original values, to mimic the addition of less spike-in RNA to each well.}
+Specifically, we repeated the simulations after scaling the fitted values down to 1\% of their original values, to mimic the addition of less spike-in RNA to each well.
 To preserve the mean-variance relationship, we fitted a loess curve of degree 1 to the original log-transformed NB dispersion against the log-mean of the fitted values across all cells.
-We used this trend to determine the new NB dispersion for each transcript \revised{after downscaling.
-Count sampling was then performed using the scaled fitted values and new dispersions.}
+We used this trend to determine the new NB dispersion for each transcript after downscaling.
+Count sampling was then performed using the scaled fitted values and new dispersions.
 
-We \revised{did} not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
+We did not examine the effect of reducing spike-in coverage on $\sigma^2_{vol}$ or $\variance(F_i)$.
 Both of these terms refer to experimental processes that should be independent of the concentration of spike-in RNA.
 For example, the process of adding a volume of a solution is unrelated to the solution's contents.
 Similarly, the process of capturing a transcript molecule is unrelated to the number of other transcript molecules, excepting the presence of limiting reagents.
 Thus, the true values of $\sigma^2_{vol}$ or $\variance(F_i)$ should generally be unaffected by the depth of coverage.
 In contrast, sampling noise during sequencing depends on the coverage and will contribute to the true value of $\sigma^2_{lib(s)}$.
-This \revised{motivated our simulations} to test the effect of reducing coverage on $\sigma^2_{lib(s)}$.
+This motivated our simulations to test the effect of reducing coverage on $\sigma^2_{lib(s)}$.
 
-\begin{color}{red}
 \subsection{Calculating the effect of noise on size factor precision}
 The above simulations describe the contribution of stochastic noise to the log-ratios in our mixture experiments.
 However, we can also perform simulations to quantify the effect of noise on the precision of the spike-in size factors themselves.
@@ -177,7 +176,6 @@ We performed these simulations on the data sets in Section~\ref{sec:datasets} to
 We stress that these simulations only examine the variability in spike-in counts due to random sampling noise. 
 It is not possible to make any precise conclusions regarding variability in the \textit{amount} of spike-in RNA added to each cell.
 To do so requires the use of spike-in mixtures, which are not available in public data.
-\end{color}
 
 \section{Examining index switching on the HiSeq 4000}
 Cells from three of our plates were multiplexed and sequenced on the Illumina HiSeq 4000 machine using the ExAmp chemistry.
@@ -202,7 +200,6 @@ By comparison, the 1\% (maximum) rate of contamination due to index switching is
 % x <- colSums(loadin2$counts[loadin2$genes$spike1,])
 % sqrt(var(x)/mean(x)^2)
 
-\begin{color}{red}
 \section{Overview of data sets used in simulations}
 \label{sec:datasets}
 We obtained the following public data sets, containing counts for ERCC spike-in transcripts:
@@ -232,21 +229,20 @@ We obtained the following public data sets, containing counts for ERCC spike-in 
 In each of our TSC and 416B data sets, data from both plates were analyzed together.
 We treated the plate of origin for each cell as an experimental factor, along with the oncogene induction status for 416B cells.
 Only the ERCC counts were used in simulations, and all SIRV transcripts were discarded for simplicity.
-\end{color}
 
 \section{Implementation details for the downstream analyses}
 
 \subsection{Quality control on cells and genes}
-\revised{Cell-level} quality control was performed on each data set by removing cells with outlier values for various metrics \citep{lun2016stepbystep}.
+Cell-level quality control was performed on each data set by removing cells with outlier values for various metrics \citep{lun2016stepbystep}.
 These metrics included the log-transformed total read count across all genes and the log-transformed total number of expressed genes, where small outliers were removed; 
 and the proportion of reads mapped to spike-in transcripts, where large outliers were removed.
 Outliers were defined as values that were more than three median absolute deviations away from the median in the specified direction.
-Genes were also removed if the average count across all cells was below \revised{0.1.
-This reduces computational work by filtering} out low-abundance genes that do not contain enough information for reliable inference.
+Genes were also removed if the average count across all cells was below 0.1.
+This reduces computational work by filtering out low-abundance genes that do not contain enough information for reliable inference.
 
 \subsection{Methods for detecting differentially expressed genes}
 For DEG detection with edgeR v3.18.1, a NB GLM was fitted to the counts for each gene \citep{mccarthy2012differential} using a suitable design matrix.
-\revised{The design matrix for each data set was constructed using an additive parameterization for all experimental factors, including the factor containing the conditions to be compared for differential expression.}
+The design matrix for each data set was constructed using an additive parameterization for all experimental factors, including the factor containing the conditions to be compared for differential expression.
 The log-transformed total count for the spike-in transcripts was used as the offset for each library.
 This is equivalent to spike-in normalization as each count is effectively downscaled by the spike-in total.
 An abundance-dependent trend was fitted to the NB dispersions of all genes using the estimateDisp function.
@@ -267,15 +263,15 @@ Specifically, the spike-in totals were scaled so that their mean across all libr
 The size factor for each library was defined as its scaled spike-in total.
 We did \textit{not} compute separate size factors for the endogenous genes and spike-in transcripts, as this would require the use of non-DE normalization methods.
 The rest of the method was implemented as originally described, using the technicalCV2 function in the scran package (v1.4.4) with min.bio.disp set to zero.
-If any \revised{experimental} factors were present, they were regressed out by log-transforming the counts; applying the removeBatchEffect function from the limma package \citep{ritchie2015limma} to the log-counts; and converting the corrected log-values back to the count scale, prior to using technicalCV2.
+If any experimental factors were present, they were regressed out by log-transforming the counts; applying the removeBatchEffect function from the limma package \citep{ritchie2015limma} to the log-counts; and converting the corrected log-values back to the count scale, prior to using technicalCV2.
 
 The second approach to detect HVGs was based on computing the variance of log-expression values \citep{lun2016stepbystep}.
 For each count in each library, a normalized log-expression value was defined as the log-ratio of the count with the spike-in size factor for that library.
 (A pseudo-count of 1 was added to avoid undefined values upon log-transformation.)
-\revised{If any experimental factors were present, they were used to construct a design matrix with an additive parameterization -- otherwise, an intercept-only design matrix was used.
-The design matrix was used to fit a linear model to the log-expression values to obtain the residual variance for each spike-in transcript.}
+If any experimental factors were present, they were used to construct a design matrix with an additive parameterization -- otherwise, an intercept-only design matrix was used.
+The design matrix was used to fit a linear model to the log-expression values to obtain the residual variance for each spike-in transcript.
 A loess curve was fitted to the log-variance against the mean for all spike-in transcripts using the trendVar function in scran, representing the mean-variance relationship due to technical noise.
-\revised{Variance estimation was repeated on the log-expression values for each endogenous gene,} and the biological component of the variance and a $p$-value was computed for each gene using the decomposeVar function.
+Variance estimation was repeated on the log-expression values for each endogenous gene, and the biological component of the variance and a $p$-value was computed for each gene using the decomposeVar function.
 
 \subsection{Methods for dimensionality reduction and clustering}
 Size factors for all libraries were defined from the spike-in totals as previously described. 
@@ -314,11 +310,11 @@ This avoids inflated circles due to outliers.
     \begin{center}
         \includegraphics[width=\textwidth]{pics/explanation.pdf}
     \end{center}
-    \caption{\revised{Schematic of the effect of variability in spike-in addition ($\sigma^2_{vol}$) or library preparation ($\sigma^2_{lib(s)}$) on the performance of spike-in normalization.
+    \caption{Schematic of the effect of variability in spike-in addition ($\sigma^2_{vol}$) or library preparation ($\sigma^2_{lib(s)}$) on the performance of spike-in normalization.
         The spike-in size factor for each cell is calculated from the sum of counts for spike-in transcripts.
         The size factors faithfully represent the true cell-specific biases when equal amounts of spike-in RNA are added to each well and technical noise in library preparation and sequencing is low.
         This is not true when spike-in addition is variable or technical noise is high, manifesting as errors relative to the true biases (i.e., large residual variance).
-    Note that the true biases are unknown, so $\sigma^2_{vol}$ and $\sigma^2_{lib(s)}$ are instead estimated from spike-in mixtures as described in our experimental design.}
+    Note that the true biases are unknown, so $\sigma^2_{vol}$ and $\sigma^2_{lib(s)}$ are instead estimated from spike-in mixtures as described in our experimental design.
     }
 \end{figure}
 
@@ -343,7 +339,7 @@ This avoids inflated circles due to outliers.
     \end{center}
     \caption{
         Distribution of the log-ratios after separate or premixed addition of spike-in sets.
-        For each plate, a linear model was fitted to the log-ratios of the corresponding wells to account for \revised{factors in} the experimental design.
+        For each plate, a linear model was fitted to the log-ratios of the corresponding wells to account for factors in the experimental design.
         (a, b) Quantile-quantile plots of the residuals of the fitted model for each plate.
         Residuals were standardized and plotted against the theoretical quantiles of a standard normal distribution.
         The dotted line represents equality between the sample and theoretical quantiles.
@@ -434,7 +430,7 @@ This avoids inflated circles due to outliers.
     \begin{center}
         \includegraphics[width=\textwidth]{../simulations/sampling/collated_sampling.pdf}
     \end{center}
-    \caption{\revised{Relative estimation error for the spike-in size factor of each cell, shown as a percentage of the value of the size factor.
+    \caption{Relative estimation error for the spike-in size factor of each cell, shown as a percentage of the value of the size factor.
         Boxplots represent the distribution of errors across cells in each data set.
         Errors were calculated after resampling spike-in counts from a negative binomial distribution with parameters estimated from the original counts.
         Calculations were performed using data for mouse embryonic stem cells (mESCs) from \cite{islam2014quantitative},
@@ -442,7 +438,7 @@ This avoids inflated circles due to outliers.
         fibroblasts from \cite{hashimshony2016celseq2};
         trophoblast stem cells (TSCs) and 416B cells from our experiments;
         liver cells from \cite{scialdone2015computational};
-        and brain cells from \cite{zeisel2015brain}. }
+        and brain cells from \cite{zeisel2015brain}. 
     }
     \label{fig:sampling}
 \end{figure}
@@ -451,10 +447,10 @@ This avoids inflated circles due to outliers.
     \begin{center}
         \includegraphics[width=\textwidth]{../simulations/sampling/collated_sizefac.pdf}
     \end{center}
-    \caption{\revised{Absolute deviation of the spike-in size factor of each cell, shown as a percentage of the mean size factor across cells.
+    \caption{Absolute deviation of the spike-in size factor of each cell, shown as a percentage of the mean size factor across cells.
         Deviations were calculated by fitting a linear model to the $\log_2$-size factors, using a design matrix containing all experimental factors in the data set.
     The deviation for each cell was defined as $|2^r-1| \times 100$ where $r$ is the corresponding residual for that cell in the fitted model.
-    Each boxplot represents the distribution of deviations across cells in a particular data set, see Supplemental Figure~\ref{fig:sampling}.}
+    Each boxplot represents the distribution of deviations across cells in a particular data set, see Supplemental Figure~\ref{fig:sampling}.
     }
 \end{figure}
 
@@ -479,7 +475,7 @@ This avoids inflated circles due to outliers.
         \end{subfigure}
     \end{center}
     \caption{Properties of genes that were detected as DEGs or HVGs in both the original and simulated data with spike-in variability (common), compared to genes that were no longer detected or additionally detected after simulation (lost/gained).
-    (a, b) Absolute magnitudes of the log-fold changes of DEGs from edgeR in the 416B or mESC \revised{cell cycle} data sets.
+    (a, b) Absolute magnitudes of the log-fold changes of DEGs from edgeR in the 416B or mESC cell cycle data sets.
     (c, d) Biological components of variation of HVGs from the variance of log-expression method in the 416B and TSC data sets.
     The number of genes in each category is also shown for each data set.
     Similar results were obtained for the CV$^2$ method and MAST.
