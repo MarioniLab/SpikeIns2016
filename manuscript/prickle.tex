@@ -285,7 +285,7 @@ Any variance due to volume addition ($\sigma^2_{vol}$) or technical noise ($\sig
 }
 
 \subsection*{Estimating the variance of volume addition}
-Using our mathematical framework, we estimated the variance components using the data from our mixture experiments.
+Using our mathematical framework, we estimated the variance components based on the data from our mixture experiments.
 We observed that the log-ratios $\theta_i$ and $\theta^*_i$ computed from each plate were roughly normally distributed (Supplemental Figure~\suppfignorm{}).
 Thus, we fitted a linear model to each set of log-ratios and used the residual variance of the fit as our estimate of $\variance(\theta_i)$ or $\variance(\theta^*_i)$.
 Linear models are particularly useful as they allow blocking on additional structure in the experimental design.
@@ -564,7 +564,7 @@ Note that we fit linear models to each plate separately, to check whether the es
 
 To detect differences in the variance estimates for premixed and separate addition, an F-test for the equality of variances was applied.
 Under the null hypothesis of equal variances computed from independent data, the ratio of the variances $\sigma^2_1/\sigma^2_2$ should follow a F-distribution on $n_1$ and $n_2$ degrees of freedom, where $n_1$ and $n_2$ are the residual degrees of freedom used to estimate $\sigma^2_1$ and $\sigma^2_2$, respectively.
-This can either be one-sided (i.e., $\sigma^2_1 \le \sigma^2_2$ under the null), in which case the lower tail probability at the observed ratio is taken as the $p$-value;
+This can either be one-sided (i.e., $\sigma^2_1 \le \sigma^2_2$ under the null), in which case the upper tail probability at the observed ratio is taken as the $p$-value;
 or it can be two-sided, in which case the $p$-value is defined as twice the smaller of the two tail probabilities.
 Significant differences were defined by rejecting the null hypothesis at a type I error rate of 5\%.
 We calculated $\sigma^2_{vol}$ from estimates of $\variance(\theta_i)$ and $\variance(\theta^*_i)$, using the expression described above.
