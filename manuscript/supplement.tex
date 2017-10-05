@@ -111,7 +111,7 @@ If not, $L_i$ will be constant across wells, with its exact value depending on t
 However, if quantification was performed, $L_i$ will theoretically depend on the other variables that contribute to $T_{is}$.
 Specifically,
 \[
-    L_i = D_i \left[ \sum_{s \in \{1, 2\}} \left( l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right) + l_0 R_{i0} \sum_g r_g N_{ig} \right]^{-1}
+    L_i \approx D_i \left[ \sum_{s \in \{1, 2\}} \left( l_s V_{is} R_{is} \sum_{t_s} r_{t_s} c_{t_s} \right) + l_0 R_{i0} \sum_g r_g N_{ig} \right]^{-1}
 \]
 where $D_i$ is a random variable representing the total sequencing depth for well $i$ (in reads);
 $N_{ig}$ is a random variable specifying the number of transcripts for each endogenous gene $g$ in $i$;
@@ -167,7 +167,7 @@ We estimated the NB dispersion and fitted a GLM to the spike-in counts for each 
 For each transcript in each cell, we used the corresponding fitted value and dispersion estimate to sample a new count from a negative binomial distribution, yielding a new set of simulated spike-in counts.
 
 To estimate a size factor for each cell, we calculated the sum of simulated counts for all spike-in transcripts in each cell.
-The count sums were scaled so that the average sum across all cells in the data set was equal to unity.
+The count sums were scaled so that the average value across all cells in the data set was equal to unity.
 The scaled count sum for each cell was then used as its spike-in size factor.
 We repeated this procedure with a new set of simulated counts for multiple iterations, and we defined the estimation error as the standard deviation of the estimated size factors for the same cell across iterations. 
 This was expressed as a percentage of the original value of the size factor (i.e., computed from the original counts) for each cell.
@@ -204,24 +204,24 @@ By comparison, the 1\% (maximum) rate of contamination due to index switching is
 \label{sec:datasets}
 We obtained the following public data sets, containing counts for ERCC spike-in transcripts:
 \begin{itemize}
-    \item Liver cells from \cite{scialdone2015computational}, obtained from the ArrayExpress repository with the accession E-MTAB-3707.
+    \item Liver cells from \citet{scialdone2015computational}, obtained from the ArrayExpress repository with the accession E-MTAB-3707.
         No experimental factors were considered.
-    \item Brain cells from \cite{zeisel2015brain}, obtained from \url{http://linnarssonlab.org/cortex}.
+    \item Brain cells from \citet{zeisel2015brain}, obtained from \url{http://linnarssonlab.org/cortex}.
         Only the subset of cells from the cortex was used.
         No experimental factors were considered.
-    \item Mouse embryonic stem cells from \cite{buettner2015computational}, obtained from ArrayExpress with the accession E-MTAB-2805.
+    \item Mouse embryonic stem cells from \citet{buettner2015computational}, obtained from ArrayExpress with the accession E-MTAB-2805.
         Cell cycle phase (G1, G2M or S) was treated as the experimental factor.
-    \item Mouse embryonic stem cells from \cite{kolod2015single}, obtained from \url{http://www.ebi.ac.uk/teichmann-srv/espresso}.
+    \item Mouse embryonic stem cells from \citet{kolod2015single}, obtained from \url{http://www.ebi.ac.uk/teichmann-srv/espresso}.
         The culture condition (2i, a2i or lif) was treated as the experimental factor.
         Only the subset of cells from batch 3 was used as these contained spike-ins for all conditions.
-    \item Mouse embryonic stem cells from \cite{islam2014quantitative}, obtained from the Gene Expression Omnibus (GEO) with the accession GSE46980.
+    \item Mouse embryonic stem cells from \citet{islam2014quantitative}, obtained from the Gene Expression Omnibus (GEO) with the accession GSE46980.
         No experimental factors were considered.
-    \item Mouse embryonic stem cells from \cite{grun2014validation}, obtained from GEO with the accession GSE54695.
+    \item Mouse embryonic stem cells from \citet{grun2014validation}, obtained from GEO with the accession GSE54695.
         The culture condition (2i or serum) was treated as a experimental factor.
-    \item Fibroblasts from \cite{hashimshony2016celseq2}, obtained from GEO with the accession GSE78779.
+    \item Fibroblasts from \citet{hashimshony2016celseq2}, obtained from GEO with the accession GSE78779.
         No experimental factors were considered.
         Only the subset of cells from the C1 experiment was used.
-    \item Pancreatic islet cells from \cite{segerstople2016single}, obtained from ArrayExpress with the accession E-MTAB-5061.
+    \item Pancreatic islet cells from \citet{segerstople2016single}, obtained from ArrayExpress with the accession E-MTAB-5061.
         Cells annotated as low quality were removed.
         (For downstream analyses, we considered all remaining cells as high-quality, so no further cell-level quality control was applied.)
         We only used the cells extracted from a single individual (HP1502401, healthy male) for simplicity.
@@ -433,12 +433,12 @@ This avoids inflated circles due to outliers.
     \caption{Relative estimation error for the spike-in size factor of each cell, shown as a percentage of the value of the size factor.
         Boxplots represent the distribution of errors across cells in each data set.
         Errors were calculated after resampling spike-in counts from a negative binomial distribution with parameters estimated from the original counts.
-        Calculations were performed using data for mouse embryonic stem cells (mESCs) from \cite{islam2014quantitative},
-        \cite{buettner2015computational}, \cite{grun2014validation} and \cite{kolod2015single};  
-        fibroblasts from \cite{hashimshony2016celseq2};
+        Calculations were performed using data for mouse embryonic stem cells (mESCs) from \citet{islam2014quantitative},
+        \citet{buettner2015computational}, \citet{grun2014validation} and \citet{kolod2015single};  
+        fibroblasts from \citet{hashimshony2016celseq2};
         trophoblast stem cells (TSCs) and 416B cells from our experiments;
-        liver cells from \cite{scialdone2015computational};
-        and brain cells from \cite{zeisel2015brain}. 
+        liver cells from \citet{scialdone2015computational};
+        and brain cells from \citet{zeisel2015brain}. 
     }
     \label{fig:sampling}
 \end{figure}
