@@ -16,3 +16,14 @@ Clustering is likely to be most sensitive to spike-in variability.
 This is because clustering (and dimension reduction) treats each cell as its own entity.
 Fluctuations in spike-in quantities will affect the quantification and inferences for that cell.
 There is no averaging out that can robustify against changes at a per-cell level.
+
+# Alternative methods to accounting for total RNA content
+
+Assume that the expectation of the bias in capture efficiency is the same between cell types.
+This means that the average size factor across cells in each cluster can be used as a relative measure of total RNA content, without needing spike-ins.
+One could theoretically use this to adjust the log-fold changes in expression between clusters to incorporate changes in total RNA content.
+However, this strategy assumes that no library quantification was performed, and that there is no competition for capture/sequencing resources between transcripts in each cell.
+Such effects would result in non-equal expectations of the biases between cell types.
+It also assumes that you can obtain sensible clusters in the first place without using information about total RNA content.
+This may not be possible, and not normalizing at all would require the clustering to deal with large variability in capture efficiency or sequencing depth across cells.
+In such cases, use of spike-ins would be preferable for directly separating the technical effects from biological changes in RNA content.
