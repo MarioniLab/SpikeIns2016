@@ -10,6 +10,7 @@ output:
 ```{r, echo=FALSE, results='hide'}
 knitr::opts_chunk$set(fig.path="figure-tech/", error=FALSE, message=FALSE, warning=FALSE)
 options(width=100)
+if (!exists(".spike.local")) { .spike.local <- TRUE }
 ```
 
 # Introduction
@@ -32,12 +33,29 @@ Here we have two factors making up six groups in total.
 The first factor is whether an oncogene has been induced in the cell line.
 The second factor is how the spike-ins have been added -- ERCCs followed by SIRVs, SIRVs followed by ERCCs, or as a premixed set.
 
-```{r, message=FALSE}
+<!--
+Only this block changes depending on whether it is run locally (i.e., on the author's machine)
+or using public data, via "run_me.sh"
+-->
+
+```{r, eval=.spike.local, echo=.spike.local, message=FALSE}
 library(simpaler)
 is.induced <- grepl("S50[5-8]", colnames(all.counts))
 ercc.first <- grepl("N70[1-4]", colnames(all.counts))
 sirv.first <- grepl("N70[5-8]", colnames(all.counts))
 premixed <- grepl("N7(09|10|11|12)", colnames(all.counts))
+colSums(data.frame(Induced=is.induced, ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
+```
+
+```{r, eval=!.spike.local, echo=!.spike.local, message=FALSE}
+library(simpaler)
+anno <- read.table("sdrf.tsv", header=TRUE, sep="\t", fill=TRUE, 
+    check.names=FALSE, stringsAsFactors=FALSE, comment="")
+anno <- anno[match(colnames(all.counts), anno[,"Source Name"]),]
+is.induced <- anno[,"Factor Value[phenotype]"]=="induced CBFB-MYH11 oncogene expression"
+ercc.first <- anno[,"Factor Value[spike-in addition]"]=="ERCC+SIRV"
+sirv.first <- anno[,"Factor Value[spike-in addition]"]=="SIRV+ERCC"
+premixed <- anno[,"Factor Value[spike-in addition]"]=="Premixed"
 colSums(data.frame(Induced=is.induced, ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
 ```
 
@@ -86,7 +104,7 @@ hist(sirv.sums, breaks=20, main="SIRV sums", col="grey")
 We remove libraries with outliers in any of the count sums.
 
 ```{r, message=FALSE}
-library(scran)
+library(scater)
 keep <- !(isOutlier(mouse.sums, nmad=3, log=TRUE, type="lower") | 
           isOutlier(ercc.sums, nmad=3, log=TRUE, type="lower") | 
           isOutlier(sirv.sums, nmad=3, log=TRUE, type="lower"))
