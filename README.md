@@ -2,10 +2,10 @@
 
 To run the real data analyses, enter `real` and follow these instructions:
 
-1. Enter `ArrayExpress`, download the count matrices from [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5522/E-MTAB-5522.processed.1.zip) and unpack them. 
+1. Enter `ArrayExpress/`, download the count matrices from [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5522/E-MTAB-5522.processed.1.zip) and unpack them. 
 Also download the [SDRF file](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5522/E-MTAB-5522.sdrf.txt).
 2. Install `package/` in your R installation, using `R CMD INSTALL --preclean package`.
-3. Enter `Calero/public_I` and run `run_me.sh`.
+3. Enter `Calero/trial_20160113/` and run `run_me.sh`.
 This will produce a Markdown document containing the variance estimates, along with some serialized R objects for further inspection if necessary.
 4. Repeat for `Calero/public_II`, `Liora/public_I` and `Liora/public_II`.
 5. Run `make_pics.R` to reproduce the figures in the paper.
