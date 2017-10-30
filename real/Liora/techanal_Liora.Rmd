@@ -10,6 +10,9 @@ output:
 ```{r, echo=FALSE, results='hide'}
 knitr::opts_chunk$set(fig.path="figure-tech/", error=FALSE, message=FALSE, warning=FALSE)
 options(width=100)
+if (!exists(".spike.local")) { 
+    .spike.local <- TRUE
+}
 ```
 
 # Introduction
@@ -27,11 +30,22 @@ is.mouse <- !is.ercc & !is.sirv
 colSums(data.frame(ERCC=sum(is.ercc), SIRV=sum(is.sirv), Mouse=sum(is.mouse)))
 ```
 
+<!--
+The evaluation of some code blocks depends on whether
+they are executed locally (i.e., on the author's machine)
+or using the public data. Results are, fortunately, the same.
+-->
+
+`r if (.spike.local) { "
 We define the well identities for each sample, using information in the metadata and manifest files.
 (The former stores the Sanger ID:well number, and the latter stores the file name:Sanger ID. 
 Hence the need for the contortions below.)
+" } else { "
+We load in the annotation.
+"}
+`
 
-```{r}
+```{r, echo=.spike.local, eval=.spike.local}
 manifest <- read.csv("manifest.csv", header=TRUE, stringsAsFactors=FALSE)
 metadata <- read.csv("metadata.csv", header=TRUE, stringsAsFactors=FALSE)
 metadata <-  metadata[match(colnames(all.counts), metadata[,4]),]
@@ -40,12 +54,31 @@ well.ids <- sub(".*_", "", manifest$SUPPLIER.SAMPLE.NAME)
 stopifnot(all(!is.na(well.ids)))
 ```
 
-The positive control is at A1 (50 cells), while the negative control is at H12 (no cells).
+```{r, echo=!.spike.local, eval=!.spike.local} 
+anno <- read.table("sdrf.tsv", header=TRUE, sep="\t", fill=TRUE, 
+    check.names=FALSE, stringsAsFactors=FALSE, comment="")
+anno <- anno[match(colnames(all.counts), anno[,"Source Name"]),]
+```
 
-```{r}
+
+`r if (.spike.local) { "
+The positive control is at A1 (50 cells), while the negative control is at H12 (no cells).
+" } else { "
+Pulling out the control type for each well.
+"}
+`
+
+```{r, echo=.spike.local, eval=.spike.local}
 control.type <- rep(NA, length(well.ids))
 control.type[well.ids=="A01"] <- "+"
 control.type[well.ids=="H12"] <- "-"
+```
+
+```{r, echo=!.spike.local, eval=!.spike.local}
+conanno <- anno[,"Characteristics[single cell well quality]"]
+control.type <- character(nrow(anno))
+control.type[conanno=="50 cells"] <- "+"
+control.type[conanno=="no cell"] <- "-"
 ```
 
 We also define the grouping for each sample. 
@@ -53,11 +86,19 @@ Here we have two factors making up six groups in total.
 The first factor is whether an oncogene has been induced in the cell line.
 The second factor is how the spike-ins have been added -- ERCCs followed by SIRVs, SIRVs followed by ERCCs, or as a premixed set.
 
-```{r, message=FALSE}
+```{r, echo=.spike.local, eval=.spike.local, message=FALSE}
 library(simpaler)
 ercc.first <- grepl("[A-Z]0[1234]", well.ids) 
 sirv.first <- grepl("[A-Z]0[5678]", well.ids)
 premixed <- grepl("[A-Z](09|10|11|12)", well.ids) 
+colSums(data.frame(ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
+```
+
+```{r, echo=!.spike.local, eval=!.spike.local, message=FALSE}
+library(simpaler)
+ercc.first <- anno[,"Factor Value[spike-in addition]"]=="ERCC+SIRV"
+sirv.first <- anno[,"Factor Value[spike-in addition]"]=="SIRV+ERCC"
+premixed <- anno[,"Factor Value[spike-in addition]"]=="Premixed"
 colSums(data.frame(ERCC=ercc.first, SIRV=sirv.first, Premixed=premixed))
 ```
 
@@ -67,7 +108,7 @@ Now we add all this information together.
 spike.data <- setupSpikes(all.counts, spike1=is.ercc, spike2=is.sirv, 
     separate=ercc.first|sirv.first, premixed=premixed,
     ercc.first=ercc.first, sirv.first=sirv.first, 
-    well.ids=well.ids, control.well=control.type)
+    control.well=control.type)
 ```
 
 We also add some annotation describing which genes are endogenous, and whether they are mitochondrial.
@@ -129,7 +170,7 @@ hist(sirv.sums, breaks=20, main="SIRV sums", col="grey")
 We remove libraries with outliers in any of the count sums.
 
 ```{r, message=FALSE}
-library(scran)
+library(scater)
 keep <- !(isOutlier(mouse.sums, nmad=3, log=TRUE, type="lower") | 
           isOutlier(ercc.sums, nmad=3, log=TRUE, type="lower") | 
           isOutlier(sirv.sums, nmad=3, log=TRUE, type="lower")) 
