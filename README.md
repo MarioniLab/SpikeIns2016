@@ -7,9 +7,10 @@ Also download the [SDRF file](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-55
 2. Install `package/` in your R installation, using `R CMD INSTALL --preclean package`.
 3. Enter `Calero/trial_20160113/` and run `run_me.sh`.
 This will produce a Markdown document containing the variance estimates, along with some serialized R objects for further inspection if necessary.
-4. Repeat for `Calero/public_II`, `Liora/public_I` and `Liora/public_II`.
+4. Repeat for `Calero/trial_20160325`, `Liora/test_20160906` and `Liora/test_20170201`.
 5. Run `make_pics.R` to reproduce the figures in the paper.
 6. Enter `depth/` and run `runner.R` to perform the simulations for sampling noise.
+7. Enter `index_swapping/` and run `check_swap.R` to generate the figures checking for index swapping.
 
 To run the simulations, enter the `simulations` directory:
 
