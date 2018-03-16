@@ -24,7 +24,7 @@ You can also run `sizevar.R` to quantify the variation in size factors across ce
 This requires you to obtain `pancreas_refseq_rpkms_counts_3514sc.txt.gz` from the processed files in [E-MAT-5061](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5061/E-MTAB-5061.processed.1.zip), along with the corresponding [SDRF file](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5061/E-MTAB-5061.sdrf.txt).
 6. Enter `pics/` and run `picmaker.R` and `get_properties.R` to reproduce the figures in the paper.
 
-The `sequence_check/biophysical/` directory contains a script to examine the differences in biophysical properties between the spike-in and endogenous mouse genes.
+The `sequences/biophysical/` directory contains a script to examine the differences in biophysical properties between the spike-in and endogenous mouse genes.
 
 The `manuscript` directory contains all LaTeX code used to generate the manuscript.
 This can be compiled with `make`.
