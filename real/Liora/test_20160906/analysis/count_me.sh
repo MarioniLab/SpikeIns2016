@@ -1,7 +1,6 @@
 echo '
-anno.files <- c("/lustre/jmlab/resources/annotation/processed/mm10.gtf", 
-	"/lustre/jmlab/resources/annotation/original/ERCC92.gtf", 
-	"/lustre/jmlab/resources/annotation/original/SIRV_C_150601a.gtf")
+anno.files <- file.path("../../../../sequences/annotation/",
+    c("mm10.gtf", "ERCC92.gtf", "SIRV_C_150601a.gtf"))
 bam.files <- list.files("../bam", full=TRUE, pattern="bam$")
 stat.file <- "../all_qual.tsv"
 ispet <- TRUE
