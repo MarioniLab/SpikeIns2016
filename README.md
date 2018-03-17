@@ -3,21 +3,24 @@
 ## Overview
 
 This repository provides the code (and manuscript files!) for the paper **Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data**
-by Lun _et al._, published in _Genome Research_ in 2017.
+by Lun _et al._, published in _Genome Research_ in 2017 (https://dx.doi.org/10.1101/gr.222877.117).
 
 ## Repeating the real data analysis
 
-To run the real data analyses, enter `real` and follow these instructions:
+Run `download.sh` to download the count matrices from ArrayExpress (E-MTAB-5522), unpack them and move them to the relevant directories.
+This will also download the SDRF file describing the annotation for all samples.
 
-1. Enter `ArrayExpress/`, download the count matrices from [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5522/E-MTAB-5522.processed.1.zip) and unpack them. 
-Also download the [SDRF file](https://www.ebi.ac.uk/arrayexpress/files/E-MTAB-5522/E-MTAB-5522.sdrf.txt).
-2. Install `package/` in your R installation, using `R CMD INSTALL --preclean package`.
-3. Enter `Calero/trial_20160113/` and run `run_me.sh`.
+Install `package/` using `R CMD INSTALL --preclean package` (or an equivalent command for your installation).
+This was last tested with R version 3.4.* and Bioconductor version 3.6.
+
+Enter `real` and follow these instructions:
+
+1. Enter `Calero/trial_20160113/` and run `run_me.sh`.
 This will produce a Markdown document containing the variance estimates, along with some serialized R objects for further inspection if necessary.
-4. Repeat for `Calero/trial_20160325`, `Liora/test_20160906` and `Liora/test_20170201`.
-5. Run `make_pics.R` to reproduce the figures in the paper.
-6. Enter `depth/` and run `runner.R` to perform the simulations for sampling noise.
-7. Enter `index_swapping/` and run `check_swap.R` to generate the figures checking for index swapping.
+2. Repeat for `Calero/trial_20160325`, `Liora/test_20160906` and `Liora/test_20170201`.
+3. Run `make_pics.R` to reproduce the figures in the paper.
+4. Enter `depth/` and run `runner.R` to perform the simulations for sampling noise.
+5. Enter `index_swapping/` and run `check_swap.R` to generate the figures checking for index swapping.
 
 ## Repeating the simulations
 
@@ -39,18 +42,16 @@ The `sequences/biophysical/` directory contains a script to examine the differen
 
 Readers interested in regenerating the count matrices from the FASTQ files are advised to:
 
-1. Obtain master scripts from https://github.com/LTLA/CRUKTools (last tested with 915706ac016f6f59e74b4ec266f06349293b997f),
-in addition to the _subread_ aligner and _Rsubread_.
-2. Follow the instructions in `sequences/genomes/README.md` to build the genome indices.
+1. Follow the instructions in `sequences/genomes/README.md` to build the genome indices.
 Similarly, follow the instructions in `sequences/annotation/README.md` to obtain the annotation.
-3. Download the FASTQ files from [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-5522/).
+2. Download the FASTQ files from [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-5522/).
 Files corresponding to each batch of data should be placed in `Calero/trial_20160113/fastq`, etc.
-4. Run the various `mapme.sh` scripts to execute the master scripts for alignment, and `count_me.sh` for read counting.
-Obviously the paths may need to be changed to point to the location of the master scripts.
+3. Run the various `mapme.sh` scripts to execute the master scripts for alignment, and `count_me.sh` for read counting.
+Paths should refer to the top-level `tools/` directory obtained using `download.sh`.
+
+Note that the `mapme.sh` scripts in `Liora` need to be modified to retrieve file names from the `fastq` subdirectory.
 
 ## Creating the manuscript
 
 The `manuscript` directory contains all LaTeX code used to generate the manuscript.
 This can be compiled with `make`.
-
-
