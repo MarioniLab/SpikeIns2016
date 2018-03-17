@@ -55,8 +55,8 @@ stopifnot(all(!is.na(well.ids)))
 ```
 
 ```{r, echo=!.spike.local, eval=!.spike.local} 
-anno <- read.table("sdrf.tsv", header=TRUE, sep="\t", fill=TRUE, 
-    check.names=FALSE, stringsAsFactors=FALSE, comment="")
+anno <- read.table("../../../ArrayExpress/E-MTAB-5522.sdrf.txt", header=TRUE, 
+    sep="\t", fill=TRUE, check.names=FALSE, stringsAsFactors=FALSE, comment="")
 anno <- anno[match(colnames(all.counts), anno[,"Source Name"]),]
 ```
 
