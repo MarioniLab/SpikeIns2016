@@ -43,3 +43,11 @@ Such effects would result in non-equal expectations of the biases between cell t
 It also assumes that you can obtain sensible clusters in the first place without using information about total RNA content.
 This may not be possible, and not normalizing at all would require the clustering to deal with large variability in capture efficiency or sequencing depth across cells.
 In such cases, use of spike-ins would be preferable for directly separating the technical effects from biological changes in RNA content.
+
+# Concerning accuracy of spike-in normalization
+
+We did not discuss the _accuracy_ of spike-in normalization, only focusing on _precision_.
+In hindsight, we should have also done the former.
+This would ideally be done with a pool of endogenous RNA at varying (known) dilutions, mixed with a constant amount of spike-in RNA.
+The aim would be to see if the dilutions could be successfully recovered.
+I guess this would be expected, given the history of work that has gone into showing that sequencing is a linear measurement technique.
