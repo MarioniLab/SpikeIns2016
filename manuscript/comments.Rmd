@@ -1,3 +1,19 @@
+# A deeper explanation of spike-in normalization 
+
+The assumption is that the coverage of endogenous genes are also affected by $L_i$ and $R_{i0}$ (which we assume to be a scalar transformation of $R_{is}$),
+while everything else is constant across cells (see Equation 1 and the equation in Supplementary Section 1).
+This means that dividing by the spike-in coverage will eliminate the effect of these cell-specific variables.
+The normalized expression for gene $g$ in each cell $i$ can then be written as $zN_{ig}$,
+where $z$ is constant across all cells and includes all of the endogenous and spike-in constants, i.e., $r_s$, $c_s$, $l_s$, $V_s$ (presumably) and so on.
+This ensures that the normalized values are comparable across cells.
+
+We can extend this reasoning by considering the case where we add different _known_ amounts of spike-in RNA.
+For example, consider a cell $i^*$ in which we added twice as much spike-in RNA as the others.
+The coverage of the spike-in RNA may not necessarily be doubled due to the composition effects in $L_i$.
+Nonetheless, if we proceed to the calculation of the normalized values, we will obtain a normalized expression of $zN_{i^*g}/2$.
+This is half the correct value, and can be fixed by halving the spike-in size factor prior to normalization.
+We don't have to worry about the effect of doubling on composition bias, as the composition bias cancels out anyway during normalization.
+
 # Explaining the simulation results
 
 Variance ranking should largely be robust to spike-in variability.
