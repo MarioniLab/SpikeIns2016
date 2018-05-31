@@ -2,8 +2,8 @@
 
 ## Overview
 
-This repository provides code for the paper **Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data** by Lun _et al._, 
-(2017, [_Genome Research_](https://dx.doi.org/10.1101/gr.222877.117)).
+This repository provides code for the paper **Assessing the reliability of spike-in normalization for analyses of single-cell RNA sequencing data** 
+by [Lun _et al._ (2017)](https://dx.doi.org/10.1101/gr.222877.117).
 
 ## Repeating the real data analysis
 
